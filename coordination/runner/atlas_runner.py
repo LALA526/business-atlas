@@ -731,6 +731,13 @@ class ProcessLock:
             self.handle.close()
             raise RunnerError("writer_locked", "another runner process owns the persistent writer lock") from error
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.release()
+        return False
+
     def release(self) -> None:
         fcntl.flock(self.handle.fileno(), fcntl.LOCK_UN)
         self.handle.close()
