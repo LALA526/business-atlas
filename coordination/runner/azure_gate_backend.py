@@ -74,7 +74,7 @@ class AzureGateBackend:
             pr = self.api(self.pr_path('?api-version=7.1'), 'POST', {
                 'sourceRefName': 'refs/heads/' + branch, 'targetRefName': 'refs/heads/main',
                 'title': task['taskId'] + ': ' + task.get('title', 'Atlas task'),
-                'description': 'Candidate from independent implementation, review and QA sessions. Coordinator evidence is bound to source ' + candidate_sha})
+                'description': 'Scoped T1.0 requirement delivery. Task: ' + task['taskId'] + '\nRequirement IDs: ' + ', '.join(task.get('requirementIds', [])) + '\nAcceptance: ' + task.get('acceptance', '') + '\nIndependent implementation, review and QA evidence is bound to source ' + candidate_sha})
         pr_id = str(pr['pullRequestId'])
         deadline = time.monotonic() + self.config.get('timeoutSeconds', 1800)
         while time.monotonic() < deadline:

@@ -1123,6 +1123,7 @@ class AtlasRunner:
                     "leaseExpiresAt": row["lease_expires_at"],
                     "baseSha": row["base_sha"],
                     "candidateSha": row["candidate_sha"],
+                    "integration": json.loads(row["integration_json"]) if row["integration_json"] else None,
                     "contractDigest": row["contract_digest"],
                     "evidenceDir": row["evidence_dir"],
                     "failureCategory": row["failure_category"],
@@ -1208,11 +1209,15 @@ class AtlasRunner:
         manifest = self.preflight()
         if not manifest["ready"]:
             return {"status": "preflight_failed", "manifest": str(self.state_dir / "preflight-manifest.json")}
+        if hasattr(self.adapter, "sync_status"):
+            self.adapter.sync_status(self.status())
         iterations = 0
         limit = int(self.controls.get("maxLoopIterations", 0))
         while not self.stop_event.is_set():
             self._check_stop()
             result = self.run_once()
+            if hasattr(self.adapter, "sync_status"):
+                self.adapter.sync_status(self.status())
             iterations += 1
             if result["status"] == "idle":
                 return {"status": "idle", "iterations": iterations}
@@ -1286,7 +1291,12 @@ def build_real_runner(repo: Path, state_dir: Path, controls_path: Path) -> Atlas
     controls = load_controls(repo, controls_path, state_dir)
     supervisor = ProcessSupervisor()
     model = controls["model"]["id"]
-    adapter = OpenCodeAdapter(model, supervisor)
+    if controls.get("roleBackend") == "multica":
+        from multica_adapter import MulticaAdapter
+        binding = read_json(Path(controls["multicaBindingPath"]))
+        adapter = MulticaAdapter(binding, supervisor)
+    else:
+        adapter = OpenCodeAdapter(model, supervisor)
     integration_config = controls["integration"]
     if integration_config.get("backend") == "azure_gates":
         from azure_gate_backend import AzureGateBackend
@@ -1298,6 +1308,9 @@ def build_real_runner(repo: Path, state_dir: Path, controls_path: Path) -> Atlas
         integration = PendingIntegrationBackend()
     else:
         raise RunnerError("integration_invalid", "integration.backend must be azure or pending")
+    if controls.get("roleBackend") == "multica":
+        from multica_adapter import MulticaIntegration
+        integration = MulticaIntegration(integration, adapter)
     return AtlasRunner(
         repo,
         repo / DEFAULT_BASELINE,

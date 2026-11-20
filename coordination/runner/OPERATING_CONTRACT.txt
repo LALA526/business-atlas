@@ -60,3 +60,14 @@ permanent credentials, unlimited quota or nonexistent external business facts.
 Runtime controls and logs live outside Git. Continuous development is disabled
 until an explicit start command. This preparation session does not mark T01–T44
 complete and does not silently begin the complete product implementation.
+
+2026-11-20 Multica migration and PR requirement:
+Use only the new Business Atlas Mac16 T1.0 workspace and pinned Mac16 runtime.
+All four AI roles execute through native Multica issues on separate Mac worktrees.
+The deterministic host coordinator retains leases, review/QA and Azure gates.
+Every scoped requirement delivery task needs its own PR, listing covered requirement IDs.
+No direct completion from commits or agent self-report. The canonical requirement issue
+is completed only after its exact reviewed candidate is merged and deployed.
+Execution sub-issues are role-run receipts, not completed product requirements.
+Leader is read-only and returns its plan in the response; the coordinator persists it.
+The old runner-state and Windows workspace remain paused and are never resumed here.

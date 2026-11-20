@@ -5,7 +5,7 @@ import argparse, contextlib, hashlib, json, os, signal, subprocess, sys, time
 
 REPO = Path.home() / 'Workspace/projects/business-atlas'
 PREP = REPO.parent / 'business-atlas-preflight'
-STATE = PREP / 'runner-state'
+STATE = PREP / 'runner-state-multica'
 CONTROLS = STATE / 'controls.json'
 sys.path.insert(0, str(REPO / 'coordination/runner'))
 import atlas_runner as ar
@@ -22,6 +22,7 @@ def prepare():
     assert 'ATLAS_KIMI_K31_OK' in ar.parse_opencode_jsonl(proof.read_text())
     if not CONTROLS.exists():
         save(CONTROLS, {'enabled': False, 'stopRequested': False, 'maxConcurrentTasks': 1,
+            'roleBackend': 'multica', 'multicaBindingPath': str(PREP / 'multica-binding.json'),
             'maxRetries': 2, 'maxTaskAttempts': 3, 'timeoutSeconds': 2700, 'leaseSeconds': 3600,
             'model': {'id': 'kimi-code-plan-cn/k3.1-pro', 'verified': True,
                 'evidenceFile': str(proof), 'evidenceSha256': hashlib.sha256(proof.read_bytes()).hexdigest()},
@@ -29,6 +30,9 @@ def prepare():
                 'projectId': 'dd3e7018-2931-4702-8812-ef2a69a00103', 'repositoryId': pipeline['repositoryId'],
                 'pipelineId': pipeline['pipelineId'], 'buildPoolId': pipeline['buildPoolId'],
                 'targetBranch': 'main', 'deployStage': 'DeployMac8', 'timeoutSeconds': 1800, 'pollSeconds': 15}})
+    controls = json.loads(CONTROLS.read_text())
+    if controls.get('roleBackend') != 'multica' or not controls.get('multicaBindingPath'):
+        raise RuntimeError('Native Multica binding is mandatory; preserve legacy state instead of silently reusing it')
     runner = ar.build_real_runner(REPO, STATE, CONTROLS)
     try:
         result = runner.ledger.initialize(REPO / ar.DEFAULT_DAG, REPO / ar.DEFAULT_BASELINE, int(time.time()))
@@ -37,6 +41,9 @@ def prepare():
     print(json.dumps({'prepared': True, 'taskCount': result['tasks'], 'enabled': json.loads(CONTROLS.read_text())['enabled']}))
 
 def snapshot():
+    controls = json.loads(CONTROLS.read_text())
+    if controls.get('roleBackend') != 'multica' or not controls.get('multicaBindingPath'):
+        raise RuntimeError('Native Multica binding is mandatory; legacy direct execution is disabled')
     runner = ar.build_real_runner(REPO, STATE, CONTROLS)
     try:
         manifest = runner.preflight()
@@ -54,6 +61,8 @@ def snapshot():
 
 def serve():
     control = json.loads(CONTROLS.read_text())
+    if control.get('roleBackend') != 'multica' or not control.get('multicaBindingPath'):
+        raise RuntimeError('Native Multica binding is mandatory')
     if not control.get('enabled'):
         print('Continuous product development is disabled')
         return 0

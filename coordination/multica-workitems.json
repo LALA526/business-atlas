@@ -1,0 +1,207 @@
+{
+  "profile": "atlas-mac16",
+  "workspaceId": "567b4222-884b-4e09-9356-e98b78614d23",
+  "daemonId": "01a1958d-ea1d-7167-b939-c21fc53ae637",
+  "runtimeId": "b1be1486-1198-4ca3-a557-1c210cb7dc48",
+  "projectId": "4e70d4f0-fa7c-4c5d-abac-0b5ca941e08d",
+  "roles": {
+    "atlas-leader": {
+      "agentId": "88e546e2-0b88-4675-a060-3493b7355aba",
+      "projectId": "41fc4e05-f036-4e1b-8444-553f9c643762",
+      "resourceId": "b5df0f8a-c34e-4383-89e5-897daca635a5"
+    },
+    "atlas-builder": {
+      "agentId": "ed692ba0-1521-431e-a7bf-39812348ae0d",
+      "projectId": "2a536752-2719-486a-afc5-ae8a151027c7",
+      "resourceId": "129d4095-e6e9-4a34-93bb-19f86d5f93e0"
+    },
+    "atlas-reviewer": {
+      "agentId": "7b0931ea-753c-4e7e-bd41-9d497c4c689d",
+      "projectId": "20b2f383-8839-4a21-9cb8-396ef9b37398",
+      "resourceId": "0e02398c-be5b-42ed-a692-cdceb5d1a63e"
+    },
+    "atlas-qa": {
+      "agentId": "18cec4a5-3009-43d6-bd53-9a62343416f2",
+      "projectId": "22e0813a-e823-42c8-be5c-e71cfb0c7136",
+      "resourceId": "848fae08-6add-4bbb-9d4b-de21cb7d4efc"
+    }
+  },
+  "tasks": {
+    "T01": {
+      "id": "01a1f79b-9b9b-7937-98c4-df95d1206a6b",
+      "identifier": "BAM-1"
+    },
+    "T02": {
+      "id": "01a1f79b-9d26-7ea3-8378-13edaa623239",
+      "identifier": "BAM-2"
+    },
+    "T03": {
+      "id": "01a1f79b-9e23-776d-a69d-1c5824d360e8",
+      "identifier": "BAM-3"
+    },
+    "T04": {
+      "id": "01a1f79b-9f26-7ba4-94d2-d711578035c4",
+      "identifier": "BAM-4"
+    },
+    "T05": {
+      "id": "01a1f79b-a029-759f-b4ed-e83e94c6ef7c",
+      "identifier": "BAM-5"
+    },
+    "T06": {
+      "id": "01a1f79b-a110-7656-b3be-ca4f7aa26c54",
+      "identifier": "BAM-6"
+    },
+    "T07": {
+      "id": "01a1f79b-a22f-7554-824f-cbb1cae3da2b",
+      "identifier": "BAM-7"
+    },
+    "T08": {
+      "id": "01a1f79b-a33b-7eee-b344-7c3ae3a565d6",
+      "identifier": "BAM-8"
+    },
+    "T09": {
+      "id": "01a1f79b-a428-766f-ac0b-3781e02b299c",
+      "identifier": "BAM-9"
+    },
+    "T10": {
+      "id": "01a1f79b-a50d-7005-a766-d9fb28a4a01c",
+      "identifier": "BAM-10"
+    },
+    "T11": {
+      "id": "01a1f79b-a5f8-7305-a038-e9933b67590e",
+      "identifier": "BAM-11"
+    },
+    "T12": {
+      "id": "01a1f79b-a6e4-76e7-a95c-0459502b6a5e",
+      "identifier": "BAM-12"
+    },
+    "T13": {
+      "id": "01a1f79b-a84c-7b76-9888-06b39278537b",
+      "identifier": "BAM-13"
+    },
+    "T14": {
+      "id": "01a1f79b-a954-75c3-8bcd-b1104b3906bb",
+      "identifier": "BAM-14"
+    },
+    "T15": {
+      "id": "01a1f79b-aa4a-743c-9bb9-02902d22d347",
+      "identifier": "BAM-15"
+    },
+    "T16": {
+      "id": "01a1f79b-ab3a-76ee-9389-898cea611538",
+      "identifier": "BAM-16"
+    },
+    "T17": {
+      "id": "01a1f79b-ac32-71bf-bce4-f45648bbc0e3",
+      "identifier": "BAM-17"
+    },
+    "T18": {
+      "id": "01a1f79b-ad4d-7af2-9090-79a6208200d7",
+      "identifier": "BAM-18"
+    },
+    "T19": {
+      "id": "01a1f79b-ae47-7975-8511-e2f10ad3b523",
+      "identifier": "BAM-19"
+    },
+    "T20": {
+      "id": "01a1f79b-af4c-795f-9098-37cb223c139f",
+      "identifier": "BAM-20"
+    },
+    "T21": {
+      "id": "01a1f79b-b0a3-78e8-9c09-a8971fe00dcb",
+      "identifier": "BAM-21"
+    },
+    "T22": {
+      "id": "01a1f79b-b1a0-7ba4-b84e-92c7b7ed63cb",
+      "identifier": "BAM-22"
+    },
+    "T23": {
+      "id": "01a1f79b-b286-75aa-adc0-881639326924",
+      "identifier": "BAM-23"
+    },
+    "T24": {
+      "id": "01a1f79b-b373-76c4-85d1-2cf4372ca24c",
+      "identifier": "BAM-24"
+    },
+    "T25": {
+      "id": "01a1f79b-b46d-7d74-a306-528c090200fc",
+      "identifier": "BAM-25"
+    },
+    "T26": {
+      "id": "01a1f79b-b56a-7769-9269-f80f594aabc0",
+      "identifier": "BAM-26"
+    },
+    "T27": {
+      "id": "01a1f79b-b650-78e5-89ca-2b627e9e3dc0",
+      "identifier": "BAM-27"
+    },
+    "T28": {
+      "id": "01a1f79b-b743-7ca6-a9f7-517016234a81",
+      "identifier": "BAM-28"
+    },
+    "T29": {
+      "id": "01a1f79b-b82c-76fb-b59f-2f98b3c94d4e",
+      "identifier": "BAM-29"
+    },
+    "T30": {
+      "id": "01a1f79b-b91b-789b-94b6-f78e908028cf",
+      "identifier": "BAM-30"
+    },
+    "T31": {
+      "id": "01a1f79b-ba11-792c-9cc7-612ad70460b2",
+      "identifier": "BAM-31"
+    },
+    "T32": {
+      "id": "01a1f79b-bb25-7eb0-8131-d61a7a4f6726",
+      "identifier": "BAM-32"
+    },
+    "T33": {
+      "id": "01a1f79b-bc50-73a6-9b6f-0620cba9928e",
+      "identifier": "BAM-33"
+    },
+    "T34": {
+      "id": "01a1f79b-bd57-714a-80ae-e2cb6a03c45f",
+      "identifier": "BAM-34"
+    },
+    "T35": {
+      "id": "01a1f79b-be5f-7394-b661-dc9e254b4dd4",
+      "identifier": "BAM-35"
+    },
+    "T36": {
+      "id": "01a1f79b-bf48-7818-8c64-4d934a2d5791",
+      "identifier": "BAM-36"
+    },
+    "T37": {
+      "id": "01a1f79b-c046-72fa-8ffa-30f3d82dcd98",
+      "identifier": "BAM-37"
+    },
+    "T38": {
+      "id": "01a1f79b-c140-794a-a78e-32fe9659c8eb",
+      "identifier": "BAM-38"
+    },
+    "T39": {
+      "id": "01a1f79b-c23d-7dba-8384-33adfc799f04",
+      "identifier": "BAM-39"
+    },
+    "T40": {
+      "id": "01a1f79b-c325-7ae7-8a21-c1cfe8eaacbb",
+      "identifier": "BAM-40"
+    },
+    "T41": {
+      "id": "01a1f79b-c410-7317-8927-cfbcf384f2f5",
+      "identifier": "BAM-41"
+    },
+    "T42": {
+      "id": "01a1f79b-c500-7283-bcdc-c743fe86198c",
+      "identifier": "BAM-42"
+    },
+    "T43": {
+      "id": "01a1f79b-c5ee-74a5-a3d9-7f619391d643",
+      "identifier": "BAM-43"
+    },
+    "T44": {
+      "id": "01a1f79b-c6de-79bd-b7fd-757670c10f8d",
+      "identifier": "BAM-44"
+    }
+  }
+}
