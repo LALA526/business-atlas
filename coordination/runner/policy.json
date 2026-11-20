@@ -3,14 +3,9 @@
   "productVerify": "scripts/ci/verify",
   "taskVerify": {
     "T01": [
-      "python3.13",
+      "/Users/fox/Workspace/projects/business-atlas-preflight/.venv/bin/python",
       "scripts/ci/verify_task.py",
       "T01"
-    ],
-    "T02": [
-      "python3.13",
-      "scripts/ci/verify_task.py",
-      "T02"
     ]
   }
 }

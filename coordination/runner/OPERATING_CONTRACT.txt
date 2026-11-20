@@ -1,0 +1,62 @@
+Autonomous development operating contract — 2026-11-20
+
+Authority: the user explicitly delegates daily implementation, technical design,
+review, verification and automatic deployment to AI using OpenCode and Kimi.
+RoutinAI is currently not part of the runtime and must not block startup.
+Use independent fresh sessions for Leader, Builder, Reviewer and QA.
+
+The entire T1.0 scope remains: 44 tasks, 154 requirements, 14 invariants. Do not
+stop at a vertical slice or silently discard requirements. Original baseline bytes
+are frozen inputs. Preserve UI V9.3 checkpoint and V9.4 working-copy hashes; use
+V9.4 as the text-first visual reference. Prototype localStorage, fake identity
+selectors, fake model runs, fake approvals and fake deployment are not product code.
+
+Read the committed coordinator verification policy before planning every task.
+T01 must create docs/decisions/T01-contract-freeze.json with technicalBaseline
+"T1.0", inputDagSha256 of actual original DAG bytes, scope.textFirst=true,
+scope.dedicatedDrawing=false, approval.kind="delegated-ai", and an unknowns array.
+Record decisions under the user's AI delegation, never a made-up human signature.
+Unknown true CPQ facts or unavailable production identities must remain unknown;
+AI may decide normal implementation details but cannot fabricate external facts.
+
+From T02 onward there must be an actual executable scripts/ci/verify that checks
+the implemented product at its current task scope. Build and test real .NET, Web,
+database, security and browser behavior as applicable. Missing product verification
+is a failing gate, not an implicit pass. Root preparation validation also calls
+this product entry when present. CI continues to validate immutable input contracts,
+UI reference hashes and coordinator regression tests.
+
+The initial pipeline packages and deploys an expressly labelled PREPARATION service.
+Its successful deployment does not satisfy T39–T44 or product performance/security
+acceptance. T39 must replace preparation packaging/deployment with actual API,
+Worker, database, OIDC/TLS and private Blob deployment plus migration and smoke gates.
+Keep the Azure deployment stage identifier DeployMac8, or coordinate a reviewed
+change to the private coordinator config. Use the already-installed Mac8 agent and
+isolated atlas-deploy namespace. Do not overwrite existing Multica or other services.
+The Mac8 user can update atlas-deploy/bin through reviewed pipeline steps; no root
+or human is required for ordinary application release updates.
+
+T39/T40 must generate a verified deployment receipt bound to actual merge SHA,
+container image identities, schema version, health checks and backup/rollback result.
+Publish it as atlas-deployment-receipt pipeline artifact. Product tasks T39, T40,
+T42, T43 and T44 must not complete on the preparation container's health response.
+AI code review, real deterministic gates, Azure build validation, actual merge and
+post-merge deployment evidence are distinct requirements. Do not bypass policies.
+
+All PR source SHAs are checked against the reviewed and verified candidate. A new
+candidate requires fresh review and QA. The coordinator pushes and merges only
+after required checks pass; implementation agents do not approve their own work.
+The main branch is protected by actual Azure build validation. The coordinator
+uses private host credentials, and its child model processes must not inherit PATs.
+
+Use persisted SQLite leases/fences and independent worktrees. Preserve evidence
+across restart. Model/API faults never become completed tasks. Retry transient
+failures within limits; preserve blockers and continue unaffected dependency-ready
+work. A report that all gates passed must identify actual commits, tests, PRs and
+deployments. If an external condition cannot be resolved, report incomplete instead
+of inventing evidence. Daily autonomy is not a guarantee of infallible models,
+permanent credentials, unlimited quota or nonexistent external business facts.
+
+Runtime controls and logs live outside Git. Continuous development is disabled
+until an explicit start command. This preparation session does not mark T01–T44
+complete and does not silently begin the complete product implementation.

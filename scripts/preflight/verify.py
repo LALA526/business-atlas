@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Clean-checkout validation of preparation inputs; not product acceptance."""
 from pathlib import Path
-import hashlib, json, subprocess, sys, tarfile, tempfile
+import hashlib, json, os, subprocess, sys, tarfile, tempfile
 
 root = Path(__file__).resolve().parents[2]
 baseline = root / 'docs/baselines/T1.0'
@@ -25,3 +25,7 @@ if not runner_tests.is_dir():
     raise RuntimeError('Autonomous runner verification is not yet implemented')
 subprocess.run([sys.executable, '-m', 'unittest', 'discover', '-s', str(runner_tests), '-v'], cwd=root, check=True)
 print('Preparation inputs verified. Product T01–T44 acceptance remains separate.')
+
+product = root / "scripts/ci/verify"
+if product.is_file() and not os.environ.get("ATLAS_PRODUCT_VERIFY_ACTIVE"):
+    subprocess.run([str(product)], cwd=root, check=True, env={**os.environ, "ATLAS_PRODUCT_VERIFY_ACTIVE": "1"})

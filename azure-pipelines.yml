@@ -17,8 +17,10 @@ stages:
             persistCredentials: false
           - bash: |
               set -euo pipefail
-              source /Users/fox/Workspace/projects/business-atlas-preflight/env.sh
-              /Users/fox/Workspace/projects/business-atlas-preflight/.venv/bin/python scripts/preflight/verify.py
+              export PATH="/opt/homebrew/opt/node@24/bin:/opt/homebrew/opt/dotnet@10/bin:/opt/homebrew/bin:/usr/bin:/bin:$PATH"
+              export DOTNET_ROOT=/opt/homebrew/opt/dotnet@10/libexec
+              export DOCKER_CONTEXT=colima-atlas-build
+              /Users/_atlasbuild/toolchains/verify-venv/bin/python scripts/preflight/verify.py
               IMAGE=$(python3.13 -c 'import json; print(json.load(open("preparation/policy.json"))["image"])')
               python3.13 scripts/preflight/package.py --out "$BUILD_ARTIFACTSTAGINGDIRECTORY/release" --release-id "prep-$BUILD_BUILDID" --image "$IMAGE"
             displayName: Validate baseline, UI and runner; package preparation container

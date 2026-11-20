@@ -293,11 +293,11 @@ class OpenCodeProtocolTests(RunnerFixture):
     def test_real_command_is_explicit_and_never_continue(self):
         adapter = ar.OpenCodeAdapter()
         command = adapter.command("atlas-builder", "do work")
-        self.assertEqual(command[:8], [
-            "opencode", "run", "--format", "json", "--agent", "atlas-builder", "-m", ar.DEFAULT_MODEL,
-        ])
+        self.assertEqual(command[:3], ["opencode", "run", "do work"])
+        self.assertEqual(command[command.index("--agent")+1], "atlas-builder")
+        self.assertEqual(command[command.index("-m")+1], ar.DEFAULT_MODEL)
+        self.assertIn("--auto", command)
         self.assertNotIn("--continue", command)
-        self.assertEqual(command[-1], "do work")
 
     def test_plain_self_claim_is_not_a_verdict(self):
         runner = self.make_runner()

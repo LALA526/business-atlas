@@ -1,6 +1,6 @@
 """Concrete Azure PR/build/deployment gate for the Atlas preparation runner."""
 from pathlib import Path
-import json, subprocess, time, urllib.parse
+import json, subprocess, time, urllib.parse, urllib.error
 from atlas_runner import IntegrationResult, RunnerError
 
 class AzureGateBackend:
@@ -33,7 +33,7 @@ class AzureGateBackend:
         except Exception:
             return {'ready': False, 'reason': 'Azure live preflight failed; no readiness assumed'}
 
-    def successful_deployment(self, sha):
+    def successful_deployment(self, sha, require_product=False):
         query = urllib.parse.urlencode({'definitions': self.config['pipelineId'], 'branchName': 'refs/heads/main', '$top': 10, 'api-version': '7.1'})
         builds = self.api(self.path('/_apis/build/builds?' + query))['value']
         for build in builds:
@@ -43,10 +43,23 @@ class AzureGateBackend:
                 return 'failed', str(build['id'])
             timeline = self.api(self.path('/_apis/build/builds/' + str(build['id']) + '/timeline?api-version=7.1'))
             if any(r.get('type') == 'Stage' and r.get('identifier') == self.config.get('deployStage', 'DeployPreparationMac8') and r.get('result') == 'succeeded' for r in timeline.get('records', [])):
+                if require_product:
+                    artifacts = self.api(self.path('/_apis/build/builds/' + str(build['id']) + '/artifacts?api-version=7.1'))['value']
+                    if not any(a.get('name') == 'atlas-deployment-receipt' and a.get('resource', {}).get('type') == 'PipelineArtifact' and a.get('resource', {}).get('data') for a in artifacts):
+                        return 'failed', str(build['id'])
                 return 'succeeded', str(build['id'])
         return 'pending', ''
 
     def integrate(self, task, candidate_sha, evidence_dir):
+        try:
+            return self._integrate(task, candidate_sha, evidence_dir)
+        except urllib.error.HTTPError as error:
+            reason = "blocked_credential" if error.code in (401, 403) else "Azure HTTP request pending"
+            return IntegrationResult("pending", candidate_sha, detail=reason)
+        except (OSError, ValueError, subprocess.TimeoutExpired):
+            return IntegrationResult("pending", candidate_sha, detail="Azure transport or process temporarily unavailable")
+
+    def _integrate(self, task, candidate_sha, evidence_dir):
         evidence_dir = Path(evidence_dir)
         branch = task['plannedBranch']
         result = subprocess.run(['git', 'push', 'origin', candidate_sha + ':refs/heads/' + branch], cwd=self.repo,
@@ -84,7 +97,8 @@ class AzureGateBackend:
                 merge_sha = pr.get('lastMergeCommit', {}).get('commitId', '')
                 if not merge_sha:
                     return IntegrationResult('failed', candidate_sha, pr_id=pr_id, detail='merge SHA missing')
-                state, build_id = self.successful_deployment(merge_sha)
+                product_required = task.get('taskId') in {'T39', 'T40', 'T42', 'T43', 'T44'}
+                state, build_id = self.successful_deployment(merge_sha, product_required)
                 if state == 'succeeded':
                     evidence_dir.mkdir(parents=True, exist_ok=True)
                     (evidence_dir / 'azure-gates.json').write_text(json.dumps({'prId': pr_id, 'candidateSha': candidate_sha,
@@ -92,6 +106,8 @@ class AzureGateBackend:
                     subprocess.run(['git', 'fetch', 'origin', 'main'], cwd=self.repo, check=True, capture_output=True)
                     return IntegrationResult('merged', candidate_sha, merge_sha, build_id, pr_id)
                 if state == 'failed':
-                    return IntegrationResult('failed', candidate_sha, merge_sha=merge_sha, pr_id=pr_id, detail='Post-merge build or deployment failed')
+                    diagnostic = evidence_dir / 'azure-deployment-failure.json'
+                    diagnostic.write_text(json.dumps({'buildId': build_id, 'mergeSha': merge_sha, 'requireProductReceipt': product_required}, indent=2))
+                    return IntegrationResult('failed', candidate_sha, merge_sha=merge_sha, pr_id=pr_id, detail='Build/deployment/product receipt failed. Read ' + str(diagnostic))
             self.sleep(self.config.get('pollSeconds', 15))
         return IntegrationResult('pending', candidate_sha, pr_id=pr_id, detail='Awaiting required Azure checks or deployment')

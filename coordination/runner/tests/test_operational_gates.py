@@ -58,6 +58,16 @@ class AzureOperationalGateTests(unittest.TestCase):
         backend = AzureGateBackend(self.config, self.tmp.name, api)
         self.assertEqual(backend.successful_deployment(self.merge), ('pending', ''))
 
+    def test_product_tasks_cannot_accept_preparation_artifact(self):
+        def api(path, *args):
+            if '/timeline?' in path:
+                return {'records': [{'type': 'Stage', 'identifier': 'DeployPreparationMac8', 'result': 'succeeded'}]}
+            if '/artifacts?' in path:
+                return {'value': [{'name': 'atlas-preparation-release', 'resource': {'type': 'PipelineArtifact', 'data': 'actual-preparation-artifact'}}]}
+            return {'value': [{'id': 9, 'sourceVersion': self.merge, 'status': 'completed', 'result': 'succeeded'}]}
+        backend = AzureGateBackend(self.config, self.tmp.name, api)
+        self.assertEqual(backend.successful_deployment(self.merge, require_product=True), ('failed', '9'))
+
     @mock.patch('azure_gate_backend.subprocess.run')
     def test_changed_pr_source_is_not_merged(self, run):
         run.return_value.returncode = 0

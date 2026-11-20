@@ -218,7 +218,7 @@ def git_head(repo: Path) -> str:
 def assert_candidate_immutable(worktree: Path, candidate_sha: str) -> None:
     if git_head(worktree) != candidate_sha:
         raise RunnerError("source_mutated", "review/QA changed the candidate HEAD")
-    status = git(worktree, "status", "--porcelain", "--untracked-files=no").stdout
+    status = git(worktree, "status", "--porcelain", "--untracked-files=all").stdout
     if status:
         raise RunnerError("source_mutated", "review/QA modified tracked source")
     diff = git(worktree, "diff", "--exit-code", candidate_sha, "--", ".", check=False)
@@ -263,6 +263,7 @@ class ProcessSupervisor:
                 stdout=stdout,
                 stderr=stderr,
                 start_new_session=True,
+                env={**{k: v for k, v in os.environ.items() if k not in {"AZURE_DEVOPS_PAT", "PERSONAL_ACCESS_TOKEN", "ADO_MCP_AUTH_TOKEN", "AZURE_DEVOPS_EXT_PAT"}}, "PWD": str(cwd.resolve())},
             )
             with self._lock:
                 self._children.add(child)
@@ -316,7 +317,7 @@ def classify_role_failure(output: str, default: str = "model_failed") -> tuple[s
         return "blocked_credential", False
     if re.search(r"(?:^|\D)402(?:\D|$)|payment.required|quota|insufficient.balance", output, re.I):
         return "blocked_quota", False
-    if re.search(r"(?:^|\D)429(?:\D|$)|rate.limit|(?:^|\D)5[0-9]{2}(?:\D|$)|temporarily.unavailable", output, re.I):
+    if re.search(r"(?:^|\D)429(?:\D|$)|rate.limit|(?:^|\D)5[0-9]{2}(?:\D|$)|temporarily.unavailable|unexpected.server.error", output, re.I):
         return "transient_provider", True
     return default, False
 
@@ -335,7 +336,7 @@ class OpenCodeAdapter:
     def command(self, role: str, prompt: str) -> list[str]:
         if not role or role.startswith("-"):
             raise RunnerError("role_invalid", "invalid OpenCode role")
-        return ["opencode", "run", "--format", "json", "--agent", role, "-m", self.model, "--auto", prompt]
+        return ["opencode", "run", prompt, "--auto", "--format", "json", "--agent", role, "-m", self.model]
 
     def run(
         self,
@@ -379,157 +380,13 @@ class PendingIntegrationBackend:
         return IntegrationResult("pending", candidate_sha, detail="integration backend unavailable")
 
 
-class AzureIntegrationBackend:
-    """Minimal Azure DevOps PR/status/merge/deployment reconciliation backend.
-
-    A queued PR/build is never completion.  The configured deployment endpoint
-    must independently report success for the actual merge SHA.
-    """
-
-    def __init__(self, config: dict[str, Any], sleep: Callable[[float], None] = time.sleep) -> None:
+class AzureIntegrationBackend(PendingIntegrationBackend):
+    """Retired manual-merge backend. Kept as an explicitly disabled sentinel."""
+    def __init__(self, config, **kwargs):
         self.config = config
-        self.sleep = sleep
 
-    def preflight(self) -> dict[str, Any]:
-        required = (
-            "organization", "project", "repositoryId", "targetBranch",
-            "ciDefinitionUrl", "deploymentStatusUrl",
-        )
-        missing = [key for key in required if not self.config.get(key)]
-        contexts = self.config.get("requiredContexts") or []
-        if not contexts:
-            missing.append("requiredContexts")
-        pat_name = self.config.get("patEnvironment", "AZURE_DEVOPS_PAT")
-        credential = bool(os.environ.get(pat_name))
-        for key in ("ciDefinitionUrl", "deploymentStatusUrl"):
-            value = self.config.get(key, "")
-            if value and urllib.parse.urlparse(value).scheme != "https":
-                missing.append(key + "Https")
-        result = {
-            "ready": not missing and credential,
-            "missing": missing,
-            "credentialPresent": credential,
-            "requiredCheckCount": len(contexts),
-            "remoteReadinessVerified": False,
-        }
-        if result["ready"]:
-            try:
-                # Read-only requests prove that configured Azure, CI and deployment
-                # endpoints are actually reachable; nonempty config is not evidence.
-                self._request("GET", self._pr_url())
-                self._request("GET", self.config["ciDefinitionUrl"])
-                self._request("GET", self.config["deploymentStatusUrl"])
-                result["remoteReadinessVerified"] = True
-            except RunnerError as error:
-                result["ready"] = False
-                result["reason"] = error.category
-        return result
-
-    def _request(self, method: str, url: str, body: dict[str, Any] | None = None) -> Any:
-        pat_name = self.config.get("patEnvironment", "AZURE_DEVOPS_PAT")
-        pat = os.environ.get(pat_name)
-        if not pat:
-            raise RunnerError("integration_credential", "Azure PAT is unavailable")
-        token = base64.b64encode((":" + pat).encode("utf-8")).decode("ascii")
-        data = json.dumps(body).encode("utf-8") if body is not None else None
-        request = urllib.request.Request(
-            url,
-            data=data,
-            method=method,
-            headers={
-                "Authorization": "Basic " + token,
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-            },
-        )
-        try:
-            with urllib.request.urlopen(request, timeout=30) as response:
-                return json.load(response)
-        except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as error:
-            raise RunnerError("integration_unavailable", "Azure request failed") from error
-
-    def _pr_url(self, pr_id: int | str | None = None) -> str:
-        organization = urllib.parse.quote(str(self.config["organization"]), safe="")
-        project = urllib.parse.quote(str(self.config["project"]), safe="")
-        repository = urllib.parse.quote(str(self.config["repositoryId"]), safe="")
-        suffix = f"/{pr_id}" if pr_id is not None else ""
-        return (
-            f"https://dev.azure.com/{organization}/{project}/_apis/git/repositories/"
-            f"{repository}/pullrequests{suffix}?api-version=7.1"
-        )
-
-    def _find_or_create_pr(self, task: dict[str, Any], candidate_sha: str) -> dict[str, Any]:
-        source = "refs/heads/" + task["plannedBranch"]
-        target = "refs/heads/" + self.config["targetBranch"]
-        query = urllib.parse.urlencode({"searchCriteria.sourceRefName": source, "searchCriteria.targetRefName": target})
-        existing = self._request("GET", self._pr_url() + "&" + query).get("value", [])
-        if existing:
-            return existing[0]
-        return self._request(
-            "POST",
-            self._pr_url(),
-            {
-                "sourceRefName": source,
-                "targetRefName": target,
-                "title": f"{task['taskId']}: {task['title']}",
-                "description": "Coordinator-created candidate; required checks and independent QA already recorded.",
-            },
-        )
-
-    def _checks_passed(self, pr_id: int | str) -> bool:
-        organization = urllib.parse.quote(str(self.config["organization"]), safe="")
-        project = urllib.parse.quote(str(self.config["project"]), safe="")
-        repository = urllib.parse.quote(str(self.config["repositoryId"]), safe="")
-        url = (
-            f"https://dev.azure.com/{organization}/{project}/_apis/git/repositories/{repository}/"
-            f"pullrequests/{pr_id}/statuses?api-version=7.1-preview.1"
-        )
-        statuses = self._request("GET", url).get("value", [])
-        latest: dict[str, str] = {}
-        for status in statuses:
-            context = status.get("context", {}).get("name")
-            state = status.get("state")
-            if isinstance(context, str):
-                latest[context] = state
-        return all(latest.get(context) == "succeeded" for context in self.config["requiredContexts"])
-
-    def _deployment_passed(self, merge_sha: str) -> str:
-        deployment = self._request("GET", self.config["deploymentStatusUrl"])
-        if (
-            deployment.get("status") == "succeeded"
-            and deployment.get("commitSha") == merge_sha
-            and isinstance(deployment.get("deploymentId"), str)
-            and deployment["deploymentId"]
-        ):
-            return deployment["deploymentId"]
-        return ""
-
-    def integrate(
-        self, task: dict[str, Any], candidate_sha: str, evidence_dir: Path
-    ) -> IntegrationResult:
-        deadline = time.monotonic() + int(self.config.get("timeoutSeconds", 1800))
-        poll_seconds = int(self.config.get("pollSeconds", 15))
-        pr_id = ""
-        while time.monotonic() < deadline:
-            try:
-                pr = self._find_or_create_pr(task, candidate_sha)
-                pr_id = str(pr["pullRequestId"])
-                source_sha = pr.get("lastMergeSourceCommit", {}).get("commitId")
-                if source_sha and source_sha != candidate_sha:
-                    return IntegrationResult("failed", candidate_sha, pr_id=pr_id, detail="PR source SHA changed")
-                if pr.get("status") == "completed" and self._checks_passed(pr_id):
-                    merge_sha = pr.get("lastMergeCommit", {}).get("commitId", "")
-                    if not merge_sha:
-                        return IntegrationResult("failed", candidate_sha, pr_id=pr_id, detail="merge SHA absent")
-                    deployment_id = self._deployment_passed(merge_sha)
-                    if deployment_id:
-                        return IntegrationResult("merged", candidate_sha, merge_sha, deployment_id, pr_id)
-                elif pr.get("status") in ("abandoned", "failed"):
-                    return IntegrationResult("failed", candidate_sha, pr_id=pr_id, detail="PR was not merged")
-            except RunnerError as error:
-                return IntegrationResult("pending", candidate_sha, pr_id=pr_id, detail=error.category)
-            self.sleep(poll_seconds)
-        return IntegrationResult("pending", candidate_sha, pr_id=pr_id, detail="integration wait deadline reached")
+    def preflight(self):
+        return {"ready": False, "missing": ["unsupported_legacy_backend", "requiredContexts"], "credentialPresent": False}
 
 
 class Ledger:
@@ -817,7 +674,7 @@ class Ledger:
                     raise RunnerError("completion_gate", "merge SHA, PR and deployment confirmation are required")
                 phase = "done"
             elif result.status == "failed":
-                phase = "integration"
+                phase = "developer"
             elif result.status != "pending":
                 raise RunnerError("integration_invalid", "unknown integration status")
             payload = dataclasses.asdict(result)
@@ -1059,7 +916,7 @@ class AtlasRunner:
     def _run_developer(self, row: sqlite3.Row) -> None:
         worktree = self._development_worktree(row)
         feedback = ""
-        if row["failure_category"] in ("review_rejected", "qa_rejected"):
+        if row["failure_category"] in ("review_rejected", "qa_rejected", "integration_failed"):
             feedback = (
                 "\nAddress the persisted independent review/QA findings; do not weaken acceptance checks. "
                 f"Previous findings: {row['failure_detail'] or 'see evidence'}"
@@ -1165,7 +1022,9 @@ class AtlasRunner:
             category = "qa_blocked" if verdict["verdict"] == "blocked" else "qa_rejected"
             self.ledger.fail(row["task_id"], self.owner, row["fence"], category, "; ".join(verdict["findings"]), self.clock(), phase="developer")
             return verdict["verdict"]
-        verification_path = self._run_verification(row, worktree)
+        verification_tree = self._detached_worktree(row, "verification")
+        verification_path = self._run_verification(row, verification_tree)
+        assert_candidate_immutable(verification_tree, row["candidate_sha"])
         assert_candidate_immutable(worktree, row["candidate_sha"])
         combined = self._persist_output(
             row,
@@ -1274,6 +1133,14 @@ class AtlasRunner:
         ).stdout.strip()
         checks["git"]["identityConfigured"] = bool(identity)
         checks["git"]["ready"] = checks["git"]["ready"] and bool(identity)
+        clean = not git(self.repo, "status", "--porcelain").stdout.strip()
+        checks["git"]["clean"] = clean
+        checks["git"]["ready"] = checks["git"]["ready"] and clean
+        if self.controls.get("integration", {}).get("backend") == "azure_gates":
+            remote = git(self.repo, "rev-parse", "origin/main", check=False)
+            synced = remote.returncode == 0 and remote.stdout.strip() == head.stdout.strip()
+            checks["git"]["syncedWithOriginMain"] = synced
+            checks["git"]["ready"] = checks["git"]["ready"] and synced
         dag_path = self.repo / DEFAULT_DAG
         baseline_ready = self.baseline.is_dir() and dag_path.is_file() and (self.baseline / "README.md").is_file()
         checks["baseline"] = {"ready": baseline_ready}
@@ -1310,7 +1177,9 @@ class AtlasRunner:
             "expectedModelSelected": exact_model,
         }
         pat_name = self.controls.get("integration", {}).get("patEnvironment", "AZURE_DEVOPS_PAT")
-        checks["credentials"] = {"azurePatPresent": bool(os.environ.get(pat_name)), "valuesIncluded": False}
+        file_credential = (Path.home() / ".config/atlas/azure-pat").is_file()
+        present = file_credential if self.controls.get("integration", {}).get("backend") == "azure_gates" else bool(os.environ.get(pat_name))
+        checks["credentials"] = {"ready": present, "azurePatPresent": present, "valuesIncluded": False}
         policy_committed = False
         if head.returncode == 0:
             relative = self.policy_path.resolve().relative_to(self.repo).as_posix()
@@ -1417,7 +1286,7 @@ def build_real_runner(repo: Path, state_dir: Path, controls_path: Path) -> Atlas
         from azure_api import request
         integration: IntegrationBackend = AzureGateBackend(integration_config, repo, request)
     elif integration_config.get("backend") == "azure":
-        integration = AzureIntegrationBackend(integration_config)
+        raise RunnerError("integration_invalid", "Legacy manual-merge backend is disabled; use azure_gates")
     elif integration_config.get("backend") == "pending":
         integration = PendingIntegrationBackend()
     else:
