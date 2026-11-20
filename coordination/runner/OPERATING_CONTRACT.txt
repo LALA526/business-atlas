@@ -71,3 +71,12 @@ is completed only after its exact reviewed candidate is merged and deployed.
 Execution sub-issues are role-run receipts, not completed product requirements.
 Leader is read-only and returns its plan in the response; the coordinator persists it.
 The old runner-state and Windows workspace remain paused and are never resumed here.
+
+Quota recovery: Kimi remains primary. The four RoutinAI standby roles are allowed
+only after an actual OpenCode read/write tool probe succeeds. Catalog presence or
+HTTP success alone is not readiness. Switch only after the previous native run
+is terminal and its managed brief is cleaned. Preserve the same task, candidate,
+accepted plan/review/QA, worktree and dependency gates. Provider waits do not spend
+product repair attempts or become done. Deterministic wakeups probe due providers,
+respect explicit stop/STOP, and resume only quota checkpoints; never source, test,
+review, security or business-fact blockers. Every requirement still requires PR.

@@ -71,16 +71,19 @@ def serve():
         signal.signal(signum, runner.request_stop)
     try:
         with ar.ProcessLock(STATE / 'runner.lock'):
+            if hasattr(getattr(runner, 'adapter', None), 'health'):
+                from provider_recovery import normalize_legacy_quota_waits
+                normalize_legacy_quota_waits(runner, runner.adapter.health)
             result = runner.loop()
         save(STATE / 'last-run-result.json', result)
         print(json.dumps(result), flush=True)
-        return 0 if result['status'] in ('idle', 'stopped', 'disabled') else 2
+        return 0 if result['status'] in ('idle', 'stopped', 'disabled', 'provider_wait') else 2
     finally:
         runner.close()
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument('command', choices=['prepare', 'status', 'preflight', 'start', 'stop', 'serve'])
+    p.add_argument('command', choices=['prepare', 'status', 'preflight', 'start', 'stop', 'serve', 'wake'])
     args = p.parse_args()
     if args.command == 'prepare':
         prepare()
@@ -91,6 +94,14 @@ def main():
         value = snapshot()
         print(json.dumps(value, ensure_ascii=False, indent=2))
         return 0 if value['ready'] else 2
+    if args.command == 'wake':
+        from provider_recovery import wake
+        runner = ar.build_real_runner(REPO, STATE, CONTROLS)
+        try:
+            print(json.dumps(wake(runner, STATE, PREP), ensure_ascii=False))
+        finally:
+            runner.close()
+        return 0
     if args.command == 'start':
         value = snapshot()
         if not value['ready']:

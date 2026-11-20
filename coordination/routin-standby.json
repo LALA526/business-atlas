@@ -1,0 +1,44 @@
+{
+  "workspaceId": "567b4222-884b-4e09-9356-e98b78614d23",
+  "daemonId": "01a1958d-ea1d-7167-b939-c21fc53ae637",
+  "runtimeId": "b1be1486-1198-4ca3-a557-1c210cb7dc48",
+  "provider": "routinai",
+  "model": "routinai/gpt-6.2-sol",
+  "roles": {
+    "atlas-leader": {
+      "agentId": "fa3d1e4e-12ea-4cee-a743-a6f1d1a93cee",
+      "projectId": "5dd3ceca-2e12-45c3-a8c2-a1c14abcfbfb",
+      "resourceId": "bc2832f6-3e90-4cb4-bcfc-c959d025d388"
+    },
+    "atlas-builder": {
+      "agentId": "30bba847-ab44-4464-a4d5-2122745d6cfc",
+      "projectId": "c4784d7a-8010-4167-a117-1f67af8a7ac1",
+      "resourceId": "5dc1c4ca-75a2-4d6d-8dea-ebb598fd983b"
+    },
+    "atlas-reviewer": {
+      "agentId": "d74e8dc7-ae49-43c4-8b27-d593d48ef676",
+      "projectId": "f46a1960-34c6-44af-ba21-dd7805642ec2",
+      "resourceId": "fc7ba602-e2b8-4c98-8bfb-a6ea0df84c26"
+    },
+    "atlas-qa": {
+      "agentId": "08c7cd7b-fa71-43c6-868b-c357d980558e",
+      "projectId": "c6ea688b-ee11-47f5-bf84-fbee509ef0aa",
+      "resourceId": "f9ff5314-d2c1-41fe-a8b4-a210184afa9b"
+    }
+  },
+  "activation": "Actual OpenCode nonce read/write probe required; catalog/configuration is not verification",
+  "observedStatus": "HTTP 402 plan_quota_exceeded; standby inference not yet verified",
+  "wakeup": {
+    "workspaceId": "567b4222-884b-4e09-9356-e98b78614d23",
+    "daemonId": "1febb8c6-c7e2-4083-b28e-4181d1598b21",
+    "runtimeId": "15e63095-647e-4fbb-80bd-247784ce6118",
+    "agentId": "61242afa-4617-4f1d-b646-437970f51d26",
+    "projectId": "84cdf7f3-2e81-4feb-bd44-ccb6eb150341",
+    "issueId": "01a1f7ea-1a62-737c-ac67-0890cff308ab",
+    "identifier": "BAM-64",
+    "noLLM": true,
+    "nativeEvery": "30m",
+    "launchdCheckSeconds": 60,
+    "quotaProbeRetrySeconds": 1800
+  }
+}

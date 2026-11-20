@@ -251,6 +251,7 @@ class ProcessSupervisor:
         timeout_seconds: int,
         stdout_path: Path,
         stderr_path: Path,
+        environment: dict[str, str] | None = None,
     ) -> int:
         if self.stop_event.is_set():
             raise StopRequested()
@@ -263,7 +264,7 @@ class ProcessSupervisor:
                 stdout=stdout,
                 stderr=stderr,
                 start_new_session=True,
-                env={**{k: v for k, v in os.environ.items() if k not in {"AZURE_DEVOPS_PAT", "PERSONAL_ACCESS_TOKEN", "ADO_MCP_AUTH_TOKEN", "AZURE_DEVOPS_EXT_PAT"}}, "PWD": str(cwd.resolve())},
+                env={**{k: v for k, v in (os.environ if environment is None else environment).items() if k not in {"AZURE_DEVOPS_PAT", "PERSONAL_ACCESS_TOKEN", "ADO_MCP_AUTH_TOKEN", "AZURE_DEVOPS_EXT_PAT"}}, "PWD": str(cwd.resolve())},
             )
             with self._lock:
                 self._children.add(child)
@@ -546,7 +547,8 @@ class Ledger:
                 if not self._dependencies_done(row):
                     continue
                 category = row["failure_category"] or ""
-                exhausted = max_attempts is not None and row["attempt"] >= max_attempts and row["phase"] not in ("integration", "pending_integration")
+                provider_waits = self.connection.execute("SELECT COUNT(*) FROM events WHERE task_id=? AND event_type='provider_wait'", (row["task_id"],)).fetchone()[0]
+                exhausted = max_attempts is not None and row["attempt"] - provider_waits >= max_attempts and row["phase"] not in ("integration", "pending_integration")
                 if row["phase"] == "blocked":
                     continue
                 if exhausted or category.startswith("blocked_") or category.endswith("_blocked"):
@@ -636,6 +638,12 @@ class Ledger:
                 (phase or row["phase"], category, detail[:500], now, task_id),
             )
             self._event(task_id, "failed", fence, category, now)
+
+    def defer_provider(self, task_id, owner, fence, detail, now):
+        with self.connection:
+            self._owned(task_id, owner, fence, now)
+            self.connection.execute("UPDATE tasks SET lease_owner=NULL,lease_expires_at=NULL,failure_category='provider_wait',failure_detail=?,updated_at=? WHERE task_id=?", (detail[:500], now, task_id))
+            self._event(task_id, "provider_wait", fence, detail, now)
 
     def latest_accepted(self, task_id: str, stage: str, candidate_sha: str | None = None) -> sqlite3.Row | None:
         if candidate_sha is None:
@@ -1103,7 +1111,10 @@ class AtlasRunner:
             return {"status": "stopped", "taskId": task_id, "attempt": row["attempt"]}
         except RunnerError as error:
             row = self.ledger.get(task_id)
-            self.ledger.fail(task_id, self.owner, row["fence"], error.category, str(error), self.clock())
+            if error.category == "provider_wait":
+                self.ledger.defer_provider(task_id, self.owner, row["fence"], "All verified model providers are waiting for quota recovery", self.clock())
+            else:
+                self.ledger.fail(task_id, self.owner, row["fence"], error.category, str(error), self.clock())
             return {"status": "failed", "taskId": task_id, "attempt": row["attempt"], "category": error.category}
 
     def status(self) -> dict[str, Any]:
@@ -1114,6 +1125,8 @@ class AtlasRunner:
                 state = "planned"
             elif row["lease_owner"]:
                 state = "running"
+            elif row["failure_category"] == "provider_wait":
+                state = "waiting_provider"
             tasks.append(
                 {
                     "taskId": row["task_id"],
@@ -1221,6 +1234,8 @@ class AtlasRunner:
             iterations += 1
             if result["status"] == "idle":
                 return {"status": "idle", "iterations": iterations}
+            if result.get("category") == "provider_wait":
+                return {"status": "provider_wait", "last": result, "iterations": iterations}
             if result.get("category") in ("blocked_credential", "blocked_quota"):
                 return {"status": "provider_blocked", "last": result, "iterations": iterations}
             if limit and iterations >= limit:
@@ -1294,7 +1309,11 @@ def build_real_runner(repo: Path, state_dir: Path, controls_path: Path) -> Atlas
     if controls.get("roleBackend") == "multica":
         from multica_adapter import MulticaAdapter
         binding = read_json(Path(controls["multicaBindingPath"]))
-        adapter = MulticaAdapter(binding, supervisor)
+        if controls.get("providerRecovery", {}).get("enabled"):
+            from provider_recovery import ProviderRouter
+            adapter = ProviderRouter(binding, supervisor, controls["providerRecovery"], state_dir)
+        else:
+            adapter = MulticaAdapter(binding, supervisor)
     else:
         adapter = OpenCodeAdapter(model, supervisor)
     integration_config = controls["integration"]

@@ -94,8 +94,7 @@ class MulticaAdapter:
                         self.command('issue','cancel-task',run['id'],'--issue',issue['id'],'--output','json')
                     raise RunnerError('wrong_runtime','Native run is not bound to the approved Mac16 runtime')
                 if run and run['status'] in ('completed','failed','cancelled'):
-                    receipt.write_text(json.dumps({'issueId':issue['id'],'identifier':issue['identifier'],'cwd':str(cwd),'role':role,'run':run},ensure_ascii=False,indent=2))
-                    active.unlink(missing_ok=True)
+                    receipt.write_text(json.dumps({'issueId':issue['id'],'identifier':issue['identifier'],'cwd':str(cwd),'role':role,'run':run,'dispatchJournal':str(active)},ensure_ascii=False,indent=2))
                     result=run.get('result') or {}
                     text=result.get('output') or ''
                     if run['status']=='completed' and text.strip():
@@ -109,9 +108,15 @@ class MulticaAdapter:
                         else:
                             write_json(active,saved)
                             return RoleResult(False,category='runtime_cleanup_pending',retryable=True,log_paths=(str(receipt),))
+                        active.unlink(missing_ok=True)
                         self.command('issue','status',issue['id'],'done','--no-start','--output','json')
                         return RoleResult(True,text=text,log_paths=(str(receipt),))
                     category,retryable=classify_role_failure(str(run.get('error'))+' '+text)
+                    if category=='blocked_quota':
+                        saved['quotaFailureReceipt']=str(receipt)
+                        write_json(active,saved)
+                    else:
+                        active.unlink(missing_ok=True)
                     return RoleResult(False,category=category,retryable=retryable,log_paths=(str(receipt),))
                 self.sleep(3)
             if run and run['status'] not in ('completed','failed','cancelled'):
@@ -121,6 +126,41 @@ class MulticaAdapter:
         except RunnerError as error:
             write_json(receipt,{'category':error.category,'detail':str(error),'issueId':issue.get('id') if issue else None})
             return RoleResult(False,category=error.category,log_paths=(str(receipt),))
+
+    def settle_quota_run(self,result):
+        """Retire native retries before another provider may own this stage."""
+        try:
+            if not result.log_paths:return False
+            receipt=json.loads(Path(result.log_paths[0]).read_text())
+            if receipt.get('run',{}).get('status')!='failed' or not receipt.get('issueId'):return False
+            issue_id=receipt['issueId']
+            self.command('issue','status',issue_id,'blocked','--no-start','--output','json')
+            for _ in range(10):
+                runs=self.command('issue','runs',issue_id,'--output','json')
+                active=[r for r in runs if r['status'] not in ('completed','failed','cancelled')]
+                if not active:
+                    if not receipt.get('cwd'):return False
+                    brief=Path(receipt['cwd'])/'AGENTS.md'
+                    for _ in range(30):
+                        if not brief.exists() or '<!-- BEGIN MULTICA-RUNTIME (auto-managed; do not edit) -->' not in brief.read_text():break
+                        self.sleep(1)
+                    else:return False
+                    if receipt.get('dispatchJournal'):
+                        journal=Path(receipt['dispatchJournal']).resolve()
+                        folder=Path.home()/'Workspace/projects/business-atlas-preflight/runner-state-multica/native-dispatch'
+                        if not journal.is_relative_to(folder.resolve()):return False
+                        try:
+                            saved=json.loads(journal.read_text())
+                            if (saved.get('issue') or {}).get('id')==issue_id:
+                                archive=folder.parent/'dispatch-archive';archive.mkdir(exist_ok=True)
+                                journal.rename(archive/(journal.stem+'-'+str(time.time_ns())+'.json'))
+                        except FileNotFoundError:pass
+                    return True
+                for run in active:self.command('issue','cancel-task',run['id'],'--issue',issue_id,'--output','json')
+                self.sleep(1)
+            return False
+        except (OSError,ValueError,RunnerError):
+            return False
 
     def sync_status(self,status):
         for task in status['tasks']:
@@ -132,7 +172,7 @@ class MulticaAdapter:
                     raise RunnerError('completion_gate','Ledger completion lacks PR/candidate/deployment receipt')
                 state='done'
             else:
-                state='blocked' if task['state']=='blocked' else ('in_review' if task['phase'] in ('review','qa','integration','pending_integration') else 'in_progress')
+                state='blocked' if task['state'] in ('blocked','waiting_provider') else ('in_review' if task['phase'] in ('review','qa','integration','pending_integration') else 'in_progress')
             self.command('issue','status',item['id'],state,'--no-start','--output','json')
 
 class MulticaIntegration:

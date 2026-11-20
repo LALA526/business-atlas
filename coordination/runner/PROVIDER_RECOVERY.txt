@@ -1,0 +1,28 @@
+Quota recovery policy
+
+Kimi stays primary. Four RoutinAI GPT-6.2-sol standby agents use the same Mac16
+runtime and canonical T1.0 task ledger. Their inline OpenCode configuration wins
+over Kimi-only configuration in an already frozen task worktree; no candidate
+source rewrite is needed to change providers. Private environment contains no
+API key; OpenCode reads the existing private credential file on this Mac.
+
+Only terminal quota failure triggers automatic handoff. The prior native issue
+is blocked and queued/running retries are cancelled and confirmed terminal before
+another provider runs. A durable retirement record survives restart. Keep phase,
+candidate SHA, accepted evidence and partial builder changes. Quota waits do not
+spend product repair attempts and never count as task completion.
+
+Do not enable an unverified standby. HTTP 402 currently prevents validation of
+GPT-6.2-sol and GPT-6.2-astra on this plan. A due probe first checks the plan API,
+then requires an actual isolated OpenCode read/write nonce test. HTTP success or
+an echo alone cannot activate the model. Failed probes remain waiting.
+
+Mac16 launchd checks every 60 seconds; due quota probes are spaced 30 minutes.
+A dedicated no-LLM Multica runtime also hosts a native repeating operational
+wakeup. It uses no model to decide whether to retry, so exhausted model quota
+cannot prevent the wakeup itself. It does not share development concurrency.
+
+Wakeups respect enabled=false, stopRequested, STOP and the writer lock. They may
+resume only provider_wait or legacy blocked_quota checkpoints, never source,
+test, review, security or business-fact blockers. Completed work and PR/CI/
+deployment gates are preserved. Use atlasctl stop to pause all future resumption.
