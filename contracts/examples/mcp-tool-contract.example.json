@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "1.2.0",
+  "name": "knowledge.read",
+  "description": "读取指定知识与基线，所有权限由服务端重新判断",
+  "requiredScopes": [
+    "project.knowledge.read"
+  ],
+  "destructive": false,
+  "idempotent": true,
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "projectId": {
+        "type": "string"
+      },
+      "entityId": {
+        "type": "string"
+      },
+      "baselineId": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "projectId",
+      "entityId"
+    ]
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "code": {
+        "type": "string"
+      },
+      "data": {
+        "type": "object"
+      }
+    }
+  },
+  "auditActions": [
+    "knowledge.read"
+  ],
+  "rateLimitPolicy": "project-user-default"
+}

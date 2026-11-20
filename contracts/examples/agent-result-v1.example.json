@@ -1,0 +1,46 @@
+{
+  "status": "need_evidence",
+  "sections": [
+    {
+      "key": "decision",
+      "title": "需要确认实际匹配语义",
+      "blocks": [
+        {
+          "blockId": "b1",
+          "kind": "paragraph",
+          "text": "当前代码行为不能决定目标业务规则。",
+          "references": []
+        }
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "text": "缺少真实业务规则与代码版本，无法认定已完成影响调查。",
+      "factKind": "assumption",
+      "references": [],
+      "evidence": [],
+      "unknownReason": "EX样例"
+    }
+  ],
+  "issues": [],
+  "unknowns": [
+    {
+      "key": "actual-repo",
+      "description": "未连接实际仓库",
+      "severity": "blocking",
+      "reason": "missing"
+    }
+  ],
+  "candidateChanges": [
+    {
+      "action": "revise",
+      "description": "EX 删除物理字段，保持原业务匹配目标",
+      "reason": "候选"
+    }
+  ],
+  "candidateRevisions": [],
+  "nextActions": [
+    "连接授权的实际资料并提交带证据的调查。"
+  ]
+}

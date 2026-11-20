@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "T01",
+  "testId": "AT-T01",
+  "executedAt": "2026-11-20",
+  "candidateSha": null,
+  "candidateShaReason": "The coordinator commits the resulting worktree after this builder run.",
+  "commands": [
+    {
+      "command": "/Users/fox/Workspace/projects/business-atlas-preflight/.venv/bin/python scripts/ci/verify_contracts.py --write-manifest",
+      "exitCode": 0,
+      "observed": "37 frozen source files; tree SHA256 cd5ff0e65914de567a048a0f41a49ac022936f92aacdc0ffcc7c98b5376cfa97"
+    },
+    {
+      "command": "/Users/fox/Workspace/projects/business-atlas-preflight/.venv/bin/python -m unittest discover -s tests/Contract -v",
+      "exitCode": 0,
+      "observed": "8 tests passed in 1.846s: positive lint, malformed/ref/example/freeze/manifest rejection, 32 concurrent digest readers, interrupted/corrupt manifest recovery"
+    },
+    {
+      "command": "/Users/fox/Workspace/projects/business-atlas-preflight/.venv/bin/python scripts/ci/verify_task.py T01",
+      "exitCode": 0,
+      "observed": "Preflight static checks passed (114 operations, 35 MCP tools, 52 types, 23 predicates, 44 tasks, 154 trace rows); V9.4 21/21; coordinator regression 53/53; AT-T01 8/8 in final run"
+    }
+  ],
+  "environment": {
+    "python": "/Users/fox/Workspace/projects/business-atlas-preflight/.venv/bin/python",
+    "pyYaml": "6.0.3",
+    "jsonschema": "4.26.0",
+    "platform": "Mac16 worktree"
+  },
+  "notEvidenced": [
+    "No candidate SHA existed during this uncommitted builder run.",
+    "No independent Reviewer or QA result, PR, Azure CI, merge, deployment or post-merge Manifest exists yet.",
+    "No live PostgreSQL, OIDC, MCP, product security, performance, backup or recovery test was performed.",
+    "The concurrent/recovery tests cover deterministic contract artifact handling only, not product publishing or Worker behavior."
+  ]
+}

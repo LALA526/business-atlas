@@ -1,0 +1,102 @@
+{
+  "schemaVersion": "1.3.0",
+  "proposalId": "KCP-T01-CANDIDATE",
+  "projectId": "PRJ-SELF",
+  "taskId": "T01",
+  "requirementIds": [
+    "BA-VIS-001",
+    "BA-VIS-004",
+    "BA-VIS-007",
+    "BA-VIS-008",
+    "BA-QA-003",
+    "ENG-ARCH-001",
+    "ENG-ARCH-005",
+    "ENG-DEL-001",
+    "ENG-DEL-002",
+    "ENG-DEL-003",
+    "ENG-DEL-006",
+    "PD-36",
+    "PD-37",
+    "PD-38"
+  ],
+  "changeKind": "documentation",
+  "repo": {
+    "url": "https://dev.azure.com/2717243207/Business%20Atlas/_git/Business%20Atlas",
+    "branch": "task/T01",
+    "pullRequestId": "PENDING-NO-PR-CREATED-BY-BUILDER",
+    "baseSha": "f5fd21836f9f7fda163575153170a86c678311c4"
+  },
+  "changedFiles": [
+    {"path": "contracts/manifest.json", "changeType": "added"},
+    {"path": "docs/adr/T01-scope-architecture-and-contracts.md", "changeType": "added"},
+    {"path": "docs/adr/T01-verification-plan.md", "changeType": "added"},
+    {"path": "docs/decisions/T01-contract-freeze.json", "changeType": "added"},
+    {"path": "scripts/ci/verify_contracts.py", "changeType": "added"},
+    {"path": "scripts/ci/verify_task.py", "changeType": "modified"},
+    {"path": "tests/Contract/test_t01_contracts.py", "changeType": "added"}
+  ],
+  "entityChanges": [
+    {
+      "stableId": "DECISION-T01-TEXT-FIRST",
+      "kind": "added",
+      "factLevel": "documented_intent",
+      "summary": "Freeze text-first semantics while retaining external diagrams, Flow/State facts and the G0 Owner blocker.",
+      "sourceAnchorIds": ["docs/decisions/T01-contract-freeze.json"]
+    },
+    {
+      "stableId": "DECISION-T01-MODULAR-MONOLITH",
+      "kind": "added",
+      "factLevel": "documented_intent",
+      "summary": "Use modular monolith, one PostgreSQL, persistent Worker, OIDC+BFF, private Blob and immutable baselines.",
+      "sourceAnchorIds": ["docs/adr/T01-scope-architecture-and-contracts.md"]
+    }
+  ],
+  "assertionChanges": [
+    {
+      "stableId": "OBSERVATION-T01-STATIC-CONTRACTS",
+      "kind": "added",
+      "factLevel": "observed",
+      "summary": "Local AT-T01 static lint and eight positive/negative/concurrency/artifact-recovery tests passed; this is not product acceptance.",
+      "sourceAnchorIds": ["docs/decisions/T01-test-evidence.json"]
+    }
+  ],
+  "apiChanges": [],
+  "dataChanges": [],
+  "testEvidence": [
+    {
+      "testId": "AT-T01",
+      "result": "passed",
+      "artifactUri": "docs/decisions/T01-test-evidence.json",
+      "artifactSha256": "558812c1ca98e74286ed4d2a97d7449f4296598085bb1ae8a1ddcac32516b98c"
+    }
+  ],
+  "sourceAnchors": [
+    {"path": "docs/baselines/T1.0/03_开发执行/task-dag.json", "locator": "tasks[T01]", "contentSha256": "33917a5cbedfb33a5d289bad4d5cd6517bd0691c3523db3b6efb4939254b4ea1"},
+    {"path": "docs/decisions/T01-contract-freeze.json", "locator": "scope, protocolVersions, unknowns"},
+    {"path": "docs/adr/T01-scope-architecture-and-contracts.md", "locator": "Decision and requirement matrix"},
+    {"path": "docs/decisions/T01-test-evidence.json", "locator": "commands and notEvidenced"}
+  ],
+  "knowledgeStatus": "proposed",
+  "unknowns": [
+    "This is an unreviewed candidate; PENDING-NO-PR-CREATED-BY-BUILDER is not a real PR identifier and must be replaced by the coordinator's actual delivery evidence.",
+    "G0 business Owner confirmation of text-first replacing dedicated drawing remains pending.",
+    "Production identities, CPQ facts, credentials and deployment accounts remain unknown.",
+    "No merge SHA or post-merge Manifest exists; this file must not be treated as a delivered Manifest."
+  ],
+  "errorsObserved": [
+    {
+      "patternId": "T01-CSV-UTF8-BOM",
+      "symptom": "Initial catalog lint saw a BOM-prefixed operationId header; utf-8-sig decoding corrected it without modifying frozen bytes.",
+      "preventionTestId": "AT-T01"
+    },
+    {
+      "patternId": "T01-SUBSCHEMA-REF-ROOT",
+      "symptom": "Initial isolated RevisionInput validation lacked the domain $defs root; validation now retains $defs while selecting the subschema.",
+      "preventionTestId": "AT-T01"
+    }
+  ],
+  "contractDigests": [
+    "sha256:3d30d2e3f8f664930ad2ae17ede998913e1612724dd04ef362dfcf95d3d4422e",
+    "sha256:cd5ff0e65914de567a048a0f41a49ac022936f92aacdc0ffcc7c98b5376cfa97"
+  ]
+}

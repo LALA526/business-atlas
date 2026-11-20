@@ -1,0 +1,117 @@
+{
+  "schemaVersion": "1.0.0",
+  "decisionId": "T01-CONTRACT-FREEZE",
+  "technicalBaseline": "T1.0",
+  "baseSha": "f5fd21836f9f7fda163575153170a86c678311c4",
+  "inputDagSha256": "33917a5cbedfb33a5d289bad4d5cd6517bd0691c3523db3b6efb4939254b4ea1",
+  "inputContractDigest": "3d30d2e3f8f664930ad2ae17ede998913e1612724dd04ef362dfcf95d3d4422e",
+  "inputContractDigestAlgorithm": "coordinator contract_digest: canonical public T01 task JSON, then sorted contractRef path, NUL and original bytes",
+  "machineContractFreeze": {
+    "manifest": "contracts/manifest.json",
+    "fileCount": 37,
+    "treeSha256": "cd5ff0e65914de567a048a0f41a49ac022936f92aacdc0ffcc7c98b5376cfa97"
+  },
+  "baselineCounts": {
+    "tasks": 44,
+    "requirements": 154,
+    "invariants": 14
+  },
+  "taskId": "T01",
+  "testId": "AT-T01",
+  "requirementIds": [
+    "BA-VIS-001",
+    "BA-VIS-004",
+    "BA-VIS-007",
+    "BA-VIS-008",
+    "BA-QA-003",
+    "ENG-ARCH-001",
+    "ENG-ARCH-005",
+    "ENG-DEL-001",
+    "ENG-DEL-002",
+    "ENG-DEL-003",
+    "ENG-DEL-006",
+    "PD-36",
+    "PD-37",
+    "PD-38"
+  ],
+  "workpackageIds": ["W11", "W19", "W26"],
+  "scope": {
+    "textFirst": true,
+    "dedicatedDrawing": false,
+    "status": "technical-freeze-with-G0-owner-confirmation-blocker",
+    "preserved": [
+      "external diagram attachments, descriptions and citations",
+      "Flow and State semantics and stable node/edge identity",
+      "historical import through governed proposals",
+      "presentation, collapse and focus operations never mutate knowledge facts"
+    ],
+    "excludedPendingOwnerDecision": [
+      "dedicated drawing canvas and layout persistence",
+      "hotspot editing",
+      "graphical export",
+      "layout engine"
+    ],
+    "completionBoundary": "Contract and architecture preparation only; no product implementation, G0-G7 acceptance, production approval or deployment is asserted."
+  },
+  "approval": {
+    "kind": "delegated-ai",
+    "authority": "User-delegated daily technical implementation decisions in coordination/runner/OPERATING_CONTRACT.txt",
+    "humanOwnerSignature": null,
+    "businessScopeSignoff": "pending",
+    "notes": "This is a traceable AI technical decision, not a business Owner approval."
+  },
+  "executionIdentity": {
+    "machine": "16GB Mac16 workspace",
+    "runtime": "OpenCode 1.19.5 + kimi-code-plan-cn/k3.1-pro",
+    "branch": "task/T01",
+    "productionAccounts": "unknown",
+    "realBusinessOwner": "unknown"
+  },
+  "protocolVersions": {
+    "openapi": "3.1.0",
+    "registry": "atlas-registry/1.0",
+    "builtinType": "1.0",
+    "domain": "v1",
+    "rule": "v1",
+    "taskContext": "v1",
+    "impact": "v1",
+    "agentResult": "v1",
+    "taskDag": "v1",
+    "knowledgeChangeProposal": "v1.3",
+    "knowledgeDeliveryManifest": "v1.3",
+    "legacyCompatibilityOnly": ["akp-v0.1", "agent-run-events-v0.1", "v1.2 schemas"]
+  },
+  "browserAuthenticationControlPlane": {
+    "login": "GET /auth/login accepts only same-origin relative returnUrl and starts Authorization Code + PKCE with one-time state/nonce",
+    "callback": "GET /signin-oidc is framework controlled",
+    "session": "GET /auth/session is no-store and returns only principalId, displayName, expiresAt and csrfToken; never Bearer tokens",
+    "logout": "POST /auth/logout requires CSRF, clears the local session and uses controlled same-origin redirect or 204",
+    "cookie": "Secure, HttpOnly, SameSite=Lax; callback correlation cookies are framework managed",
+    "verificationOwner": "T05/T33 real end-to-end authentication tests; not executed by T01"
+  },
+  "dataFlow": [
+    "candidate original bytes and content hash to delivery.proposal_intake",
+    "independent review, QA and mandatory CI for the same candidate SHA",
+    "post-merge CI creates the delivery Manifest bound to the real merge SHA and candidate bytes",
+    "search projections bind exact baseline entry revisions",
+    "T02 onward consumes these contracts; T03 exclusively owns the EF migration chain"
+  ],
+  "changeControl": "Any contract change requires ADR, diff, migration assessment, consumer updates, versioning and compatibility tests before a new unified freeze.",
+  "unknowns": [
+    "G0 business Owner confirmation of text-first formally replacing dedicated drawing is not granted.",
+    "True CPQ business facts and the real business Owner identity are unknown.",
+    "Production OIDC issuer, client, audience, personnel, roles and role assignments are unknown.",
+    "External Agent/model credentials and target deployment accounts are unknown.",
+    "Installed patch locks, SDK/image digests, licenses, CVEs, ARM64 compatibility and performance require later real verification.",
+    "PR, independent review, independent QA, Azure CI, merge, deployment and post-merge Manifest evidence do not yet exist for this candidate."
+  ],
+  "blockers": [
+    {
+      "id": "T01-BLOCK-G0-DRAWING",
+      "gate": "G0",
+      "owner": "real business Owner (identity unknown)",
+      "scope": "Formal approval of text-first as replacement for dedicated drawing",
+      "disposition": "retained; AI technical freeze does not clear this blocker"
+    }
+  ]
+}

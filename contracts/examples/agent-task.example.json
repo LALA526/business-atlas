@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "1.2.0",
+  "taskId": "T-W15-03",
+  "workpackageId": "W15",
+  "title": "导入决策/冲突/历史与来源UI",
+  "ownerRole": "Frontend Developer",
+  "moduleBoundary": "M06 / ImportEvidence",
+  "requirementIds": [
+    "BA-IMP-001",
+    "BA-IMP-002",
+    "BA-IMP-003",
+    "BA-IMP-004",
+    "BA-IMP-005",
+    "BA-IMP-006",
+    "BA-IMP-007",
+    "BA-IMP-008",
+    "BA-IMP-009"
+  ],
+  "dependencyTaskIds": [
+    "T-W15-02"
+  ],
+  "contractRefs": [
+    "V1.2:M06 / ImportEvidence",
+    "V1.1:W15",
+    "V1.2:INV-01..14"
+  ],
+  "resourceLocks": [],
+  "plannedOutputs": [
+    "import workflow UI",
+    "实现变更+相应合同/迁移/运行证据（按工作项适用）"
+  ],
+  "acceptanceTestIds": [
+    "AT-IMP-001",
+    "AT-IMP-002",
+    "AT-IMP-003",
+    "AT-IMP-004",
+    "AT-IMP-005",
+    "AT-IMP-006",
+    "AT-W15-REMAINDER"
+  ],
+  "knowledgeOutputs": [
+    "KnowledgeChangeProposal v1.2",
+    "Merge Manifest / 后续 Self Project Proposal 与审查引用"
+  ],
+  "status": "queued",
+  "attempt": 0,
+  "taskRevision": 1
+}

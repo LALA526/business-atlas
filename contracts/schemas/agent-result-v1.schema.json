@@ -1,0 +1,825 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:business-atlas:AgentResult:1.0",
+  "$defs": {
+    "AgentResult": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "ok",
+            "partial",
+            "need_evidence",
+            "conflict",
+            "forbidden",
+            "stale",
+            "failed"
+          ]
+        },
+        "context": {
+          "$ref": "#/$defs/ResolvedContext"
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Section"
+          }
+        },
+        "claims": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Claim"
+          }
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ReviewIssue"
+          }
+        },
+        "unknowns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Unknown"
+          }
+        },
+        "candidateChanges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TargetChange"
+          }
+        },
+        "candidateRevisions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RevisionInput"
+          }
+        },
+        "nextActions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "status",
+        "sections",
+        "claims",
+        "issues",
+        "unknowns",
+        "candidateChanges",
+        "candidateRevisions",
+        "nextActions"
+      ],
+      "additionalProperties": false
+    },
+    "RevisionInput": {
+      "type": "object",
+      "properties": {
+        "unitId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "schemaVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "schemaDefinitionRevisionId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "factKind": {
+          "type": "string",
+          "enum": [
+            "normative",
+            "observed",
+            "documented_intent",
+            "design_decision",
+            "inferred",
+            "assumption"
+          ]
+        },
+        "verification": {
+          "type": "string",
+          "enum": [
+            "unverified",
+            "verified",
+            "contradicted",
+            "insufficient",
+            "stale"
+          ]
+        },
+        "applicability": {
+          "$ref": "#/$defs/Applicability"
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "blocks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ContentBlock"
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          }
+        },
+        "unknowns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Unknown"
+          }
+        },
+        "categoryKeys": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "externalId": {
+          "type": "object",
+          "properties": {
+            "namespace": {
+              "type": "string",
+              "minLength": 1
+            },
+            "externalType": {
+              "type": "string",
+              "minLength": 1
+            },
+            "id": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "namespace",
+            "externalType",
+            "id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "title",
+        "kind",
+        "schemaVersion",
+        "factKind",
+        "verification",
+        "applicability",
+        "body",
+        "blocks",
+        "evidence",
+        "unknowns",
+        "categoryKeys"
+      ],
+      "additionalProperties": false
+    },
+    "Unknown": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "info",
+            "warning",
+            "blocking"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "enum": [
+            "missing",
+            "conflict",
+            "insufficient",
+            "unverified",
+            "stale",
+            "not_applicable",
+            "restricted_context"
+          ]
+        },
+        "nextAction": {
+          "type": "string"
+        },
+        "references": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RevisionRef"
+          }
+        }
+      },
+      "required": [
+        "key",
+        "description",
+        "severity",
+        "reason"
+      ],
+      "additionalProperties": false
+    },
+    "RevisionRef": {
+      "type": "object",
+      "properties": {
+        "unitId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "revisionId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "unitId",
+        "revisionId"
+      ],
+      "additionalProperties": false
+    },
+    "EvidenceRef": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "$ref": "#/$defs/RevisionRef"
+        },
+        "locator": {
+          "$ref": "#/$defs/SourceLocator"
+        },
+        "support": {
+          "type": "string",
+          "enum": [
+            "supports",
+            "refutes",
+            "contextual"
+          ]
+        },
+        "captureKind": {
+          "type": "string",
+          "enum": [
+            "rawCaptured",
+            "verifiedScript",
+            "reconstructed",
+            "proposed",
+            "humanAttestation"
+          ]
+        }
+      },
+      "required": [
+        "source",
+        "locator",
+        "support",
+        "captureKind"
+      ],
+      "additionalProperties": false
+    },
+    "SourceLocator": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "file",
+            "git",
+            "url",
+            "test",
+            "human",
+            "document"
+          ]
+        },
+        "path": {
+          "type": "string"
+        },
+        "repo": {
+          "type": "string"
+        },
+        "commitSha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40,64}$"
+        },
+        "blobSha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40,64}$"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "lineStart": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "lineEnd": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "uri": {
+          "type": "string"
+        },
+        "quote": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "ContentBlock": {
+      "type": "object",
+      "properties": {
+        "blockId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "paragraph",
+            "table",
+            "list",
+            "notice"
+          ]
+        },
+        "text": {
+          "type": "string"
+        },
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "references": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RevisionRef"
+          }
+        }
+      },
+      "required": [
+        "blockId",
+        "kind",
+        "references"
+      ],
+      "additionalProperties": false
+    },
+    "Applicability": {
+      "type": "object",
+      "properties": {
+        "unrestricted": {
+          "type": "boolean"
+        },
+        "contexts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "organizations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "products": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "environments": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "validFrom": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "validTo": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expression": {
+          "$ref": "#/$defs/Expr"
+        }
+      },
+      "required": [
+        "unrestricted"
+      ],
+      "additionalProperties": false
+    },
+    "Expr": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "type": "string",
+              "enum": [
+                "exists",
+                "missing",
+                "isNull"
+              ]
+            },
+            "operand": {
+              "$ref": "#/$defs/Operand"
+            }
+          },
+          "required": [
+            "op",
+            "operand"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "type": "string",
+              "enum": [
+                "eq",
+                "ne",
+                "gt",
+                "gte",
+                "lt",
+                "lte",
+                "contains",
+                "startsWith",
+                "in"
+              ]
+            },
+            "left": {
+              "$ref": "#/$defs/Operand"
+            },
+            "right": {
+              "$ref": "#/$defs/Operand"
+            },
+            "comparison": {
+              "type": "string",
+              "enum": [
+                "ordinal",
+                "ordinalIgnoreCase",
+                "typed"
+              ]
+            }
+          },
+          "required": [
+            "op",
+            "left",
+            "right",
+            "comparison"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "type": "string",
+              "enum": [
+                "all",
+                "any"
+              ]
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/Expr"
+              },
+              "minItems": 1,
+              "maxItems": 1000
+            }
+          },
+          "required": [
+            "op",
+            "args"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "not"
+            },
+            "arg": {
+              "$ref": "#/$defs/Expr"
+            }
+          },
+          "required": [
+            "op",
+            "arg"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "Operand": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "field"
+            },
+            "attributeId": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "required": [
+            "kind",
+            "attributeId"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "literal"
+            },
+            "valueType": {
+              "type": "string",
+              "enum": [
+                "string",
+                "decimal",
+                "integer",
+                "boolean",
+                "date",
+                "datetime",
+                "enum",
+                "null",
+                "list"
+              ]
+            },
+            "value": {}
+          },
+          "required": [
+            "kind",
+            "valueType",
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "TargetChange": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": [
+            "add",
+            "revise",
+            "retire",
+            "preserve",
+            "revalidate"
+          ]
+        },
+        "current": {
+          "$ref": "#/$defs/RevisionRef"
+        },
+        "candidate": {
+          "$ref": "#/$defs/RevisionRef"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "action",
+        "description",
+        "reason"
+      ],
+      "additionalProperties": false
+    },
+    "ReviewIssue": {
+      "type": "object",
+      "properties": {
+        "criterion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "info",
+            "warning",
+            "blocking"
+          ]
+        },
+        "location": {
+          "type": "string"
+        },
+        "explanation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "referenceRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RevisionRef"
+          }
+        },
+        "suggestion": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "criterion",
+        "severity",
+        "explanation",
+        "referenceRefs"
+      ],
+      "additionalProperties": false
+    },
+    "Claim": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "factKind": {
+          "type": "string",
+          "enum": [
+            "normative",
+            "observed",
+            "documented_intent",
+            "design_decision",
+            "inferred",
+            "assumption"
+          ]
+        },
+        "references": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RevisionRef"
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          }
+        },
+        "unknownReason": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "text",
+        "factKind",
+        "references",
+        "evidence"
+      ],
+      "additionalProperties": false
+    },
+    "Section": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "blocks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ContentBlock"
+          }
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Section"
+          }
+        },
+        "expandRef": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "title",
+        "blocks"
+      ],
+      "additionalProperties": false
+    },
+    "ResolvedContext": {
+      "type": "object",
+      "properties": {
+        "projectId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "baselineId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "published",
+            "historical",
+            "draft"
+          ]
+        },
+        "changeSetId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "changeSetVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "policyEpoch": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "contextHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "asOf": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "purpose": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "projectId",
+        "baselineId",
+        "mode",
+        "policyEpoch",
+        "contextHash",
+        "asOf",
+        "purpose"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$ref": "#/$defs/AgentResult"
+}

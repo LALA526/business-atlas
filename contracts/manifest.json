@@ -1,0 +1,193 @@
+{
+  "schemaVersion": "1.0.0",
+  "algorithm": "sha256(path UTF-8 || NUL || lowercase-content-sha256 || LF), sorted by relative POSIX path; manifest excluded",
+  "fileCount": 37,
+  "treeSha256": "cd5ff0e65914de567a048a0f41a49ac022936f92aacdc0ffcc7c98b5376cfa97",
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "e050e149fec5a0c03990b0f0733389f37b44627f00aab51944ddd7fbce630018",
+      "bytes": 5118
+    },
+    {
+      "path": "api-catalog.csv",
+      "sha256": "bca1bc426edbaf56095869122688d8f7e951dd7f4bcb33c031ec75da8410414c",
+      "bytes": 11141
+    },
+    {
+      "path": "database.sql",
+      "sha256": "041b36843ff17da4b081d9b89a1b285de88e6a54b35ef452e55f5c9e6a12f7a7",
+      "bytes": 60247
+    },
+    {
+      "path": "examples/agent-result-v1.example.json",
+      "sha256": "be4046d1215d96516cc6caa32f4da7db32ce818b0e14d0287b786dc1f0708a5f",
+      "bytes": 1045
+    },
+    {
+      "path": "examples/agent-task.example.json",
+      "sha256": "c26d529019467e1f85a01d7c62f41b3c38d579acf4ba42cff59b5b26798cae03",
+      "bytes": 1047
+    },
+    {
+      "path": "examples/deployment-reconciliation.example.json",
+      "sha256": "fb7004f02f8d4a99f44c32559f9f1b96460fb766928bb205a33d8e5b95a8933a",
+      "bytes": 418
+    },
+    {
+      "path": "examples/domain-event.example.json",
+      "sha256": "ac51b48ba15faca3462b3627b5cb39ec0650af003cf84b457e1f81f5a79f8dee",
+      "bytes": 432
+    },
+    {
+      "path": "examples/error-pattern.example.json",
+      "sha256": "1948396219abcdcb7e01fd7586f578f355213f8fcc466059c10876c955dfc0b9",
+      "bytes": 592
+    },
+    {
+      "path": "examples/impact-v1.example.json",
+      "sha256": "9add639d0cb6c5aa1876a6978d6c294f96c8482860219d079dda6f2c37af064f",
+      "bytes": 619
+    },
+    {
+      "path": "examples/knowledge-change-proposal-v1.3.example.json",
+      "sha256": "e7e8c8499a526f4da6305f810bb652c65d39ad93f296eb3b2a9f9b8cfabc270a",
+      "bytes": 1836
+    },
+    {
+      "path": "examples/knowledge-change-proposal.example.json",
+      "sha256": "6df3e592043c064cedc7ef41565440e432a3d752eec4eeecb96e61c3b01320ff",
+      "bytes": 1881
+    },
+    {
+      "path": "examples/knowledge-delivery-manifest-v1.3.example.json",
+      "sha256": "fd00701ed24affad0bc2c870dd4a1ee57c1845383d9d343a6f768a347b868306",
+      "bytes": 1100
+    },
+    {
+      "path": "examples/knowledge-delivery-manifest.example.json",
+      "sha256": "58653f046036e5e8628ae3f5a6243ad234c5068241537d2fa631d75f6c566740",
+      "bytes": 1099
+    },
+    {
+      "path": "examples/mcp-tool-contract.example.json",
+      "sha256": "456b327555b4b5b1a4e897b94267eec6c7a87ad23dcbf96f4337239e2e85afaf",
+      "bytes": 807
+    },
+    {
+      "path": "examples/revision-v1.example.json",
+      "sha256": "f118221fccbdb42c8f11fd546f231c692d3f3824101b071fab9648f9eab744b0",
+      "bytes": 2203
+    },
+    {
+      "path": "examples/rule-v1.example.json",
+      "sha256": "5a44484568acc61590e6355d08a6e9867cecb0415139c6ad0c10c7d9841e77e2",
+      "bytes": 1612
+    },
+    {
+      "path": "examples/task-context-v1.example.json",
+      "sha256": "7ae3daed8d6dbf0eef64abfbfd806a42e3f9b1000bcb10061ba6a4cdead0d5d4",
+      "bytes": 1189
+    },
+    {
+      "path": "mcp-tools.json",
+      "sha256": "262b3fcfaedf7d6858c2721a9e7e4349ab171c12042096403fede5367a0b70ce",
+      "bytes": 390955
+    },
+    {
+      "path": "openapi.yaml",
+      "sha256": "335a6fcb4886fbb9bea46bda82676f1f471c1c8ef1af3fd414b7ab4e5d579edf",
+      "bytes": 386342
+    },
+    {
+      "path": "registry.json",
+      "sha256": "395976107db79dc189bacfc11023b786c2921033ab701e2819b6f5ff7551ff00",
+      "bytes": 23899
+    },
+    {
+      "path": "schemas/agent-result-v1.schema.json",
+      "sha256": "e7e091820e7f2c7c82e261f1551f4d86290cbbbc45d1b179d61ca11fcf796db7",
+      "bytes": 17664
+    },
+    {
+      "path": "schemas/agent-run-events-v0.1.schema.json",
+      "sha256": "30f7b500470d63a029cf61879a5c8b6e56d858fc8494b075ed6c943979cb411c",
+      "bytes": 3267
+    },
+    {
+      "path": "schemas/agent-task-v1.2.schema.json",
+      "sha256": "073b69fe70ee5ce4ea27e2825875f9f7ccbfdedb105ca291f86372275963f88e",
+      "bytes": 3416
+    },
+    {
+      "path": "schemas/akp-v0.1.schema.json",
+      "sha256": "3bece4eed5ba11313043abda9a9c6f9e633d9c3955cae18726e988f3425964db",
+      "bytes": 7140
+    },
+    {
+      "path": "schemas/deployment-reconciliation-v1.2.schema.json",
+      "sha256": "6f6a89cfa4225c5fd70eaff200781b5da0ca59e58bea5e8272b98d143b4b2271",
+      "bytes": 1299
+    },
+    {
+      "path": "schemas/domain-event-v1.2.schema.json",
+      "sha256": "ad345197350331a6e333e8cddf1eea93f8fe01c03b45d50b133cdc61e5804ba1",
+      "bytes": 1235
+    },
+    {
+      "path": "schemas/domain-v1.schema.json",
+      "sha256": "8a25bdb3b491ae33321d7eb89975813067a74779933d80fe1eb18e2c08539925",
+      "bytes": 108222
+    },
+    {
+      "path": "schemas/error-pattern-v1.2.schema.json",
+      "sha256": "4c04a7fcf875c0803ede51fc32448562664df973594996e44596d0de23b2b6be",
+      "bytes": 1403
+    },
+    {
+      "path": "schemas/impact-v1.schema.json",
+      "sha256": "ed19811ce55cd26d04ffa3e9c3a01ed92b717ff9fbfb175196d101997dbc58b3",
+      "bytes": 6427
+    },
+    {
+      "path": "schemas/knowledge-change-proposal-v1.2.schema.json",
+      "sha256": "a74201d106749f7deabf8fe3415253f5e2b3f9d73ef26449269a8d04c244ae56",
+      "bytes": 8223
+    },
+    {
+      "path": "schemas/knowledge-change-proposal-v1.3.schema.json",
+      "sha256": "ca2f0813d321cc0ca316f55720bc8840f2478160772360a0671b74f21801d060",
+      "bytes": 8137
+    },
+    {
+      "path": "schemas/knowledge-delivery-manifest-v1.2.schema.json",
+      "sha256": "94820d571ab38eb62167536207492a236659f9585134284c4f7280cb220a85fd",
+      "bytes": 3751
+    },
+    {
+      "path": "schemas/knowledge-delivery-manifest-v1.3.schema.json",
+      "sha256": "102faa8d05e6669e211311470272037c1a6543146ecd7b7187251190fc501afc",
+      "bytes": 3752
+    },
+    {
+      "path": "schemas/mcp-tool-contract-v1.2.schema.json",
+      "sha256": "89e9ae4b9695c9f96d3601cb2ff803ab42f377530ab315558e7c15c433f324a2",
+      "bytes": 1232
+    },
+    {
+      "path": "schemas/rule-v1.schema.json",
+      "sha256": "26a903bb49831614ff39520baaf16f3e13338a33ac70159aa4caf012a1f6eaca",
+      "bytes": 11335
+    },
+    {
+      "path": "schemas/task-context-v1.schema.json",
+      "sha256": "48cb3cfa3d3e208bde355b516e242498a0c876eb424af2b18c252fa7bd3643fc",
+      "bytes": 7009
+    },
+    {
+      "path": "schemas/task-dag-v1.schema.json",
+      "sha256": "02159af6415c67473c30726aa7441ba9c39a97ed47473ce55dccb577319e259d",
+      "bytes": 3275
+    }
+  ]
+}

@@ -1,0 +1,534 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:business-atlas:RuleBody:1.0",
+  "$defs": {
+    "RuleBody": {
+      "type": "object",
+      "properties": {
+        "purpose": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evaluationMode": {
+          "type": "string",
+          "enum": [
+            "structured",
+            "human_only"
+          ]
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RuleInput"
+          }
+        },
+        "priorityPolicy": {
+          "type": "string",
+          "enum": [
+            "unique",
+            "ordered",
+            "collect"
+          ]
+        },
+        "collectOperator": {
+          "type": "string",
+          "enum": [
+            "set_union",
+            "ordered_list"
+          ]
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/DecisionRow"
+          },
+          "minItems": 1
+        },
+        "defaultOutcome": {
+          "$ref": "#/$defs/Outcome"
+        },
+        "exceptionExplanation": {
+          "type": "string"
+        },
+        "caseRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/UnitRef"
+          }
+        }
+      },
+      "required": [
+        "purpose",
+        "evaluationMode",
+        "inputs",
+        "priorityPolicy",
+        "rows",
+        "exceptionExplanation",
+        "caseRefs"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "evaluationMode": {
+                "const": "structured"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "rows": {
+                "items": {
+                  "required": [
+                    "when"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "priorityPolicy": {
+                "const": "collect"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "collectOperator"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "priorityPolicy": {
+                "const": "ordered"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "rows": {
+                "items": {
+                  "required": [
+                    "priority"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "UnitRef": {
+      "type": "object",
+      "properties": {
+        "unitId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "revisionId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "unitId"
+      ],
+      "additionalProperties": false
+    },
+    "Outcome": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "perform",
+            "deny",
+            "skip",
+            "set_state",
+            "emit",
+            "manual",
+            "unknown"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "actionRef": {
+          "$ref": "#/$defs/UnitRef"
+        },
+        "stateRef": {
+          "$ref": "#/$defs/UnitRef"
+        },
+        "value": {}
+      },
+      "required": [
+        "kind",
+        "description"
+      ],
+      "additionalProperties": false
+    },
+    "DecisionRow": {
+      "type": "object",
+      "properties": {
+        "rowId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "situation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "comparisonExplanation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "when": {
+          "$ref": "#/$defs/Expr"
+        },
+        "priority": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "outcome": {
+          "$ref": "#/$defs/Outcome"
+        },
+        "otherwise": {
+          "$ref": "#/$defs/Outcome"
+        },
+        "evidenceRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          }
+        }
+      },
+      "required": [
+        "rowId",
+        "situation",
+        "comparisonExplanation",
+        "outcome",
+        "evidenceRefs"
+      ],
+      "additionalProperties": false
+    },
+    "EvidenceRef": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "$ref": "#/$defs/RevisionRef"
+        },
+        "locator": {
+          "$ref": "#/$defs/SourceLocator"
+        },
+        "support": {
+          "type": "string",
+          "enum": [
+            "supports",
+            "refutes",
+            "contextual"
+          ]
+        },
+        "captureKind": {
+          "type": "string",
+          "enum": [
+            "rawCaptured",
+            "verifiedScript",
+            "reconstructed",
+            "proposed",
+            "humanAttestation"
+          ]
+        }
+      },
+      "required": [
+        "source",
+        "locator",
+        "support",
+        "captureKind"
+      ],
+      "additionalProperties": false
+    },
+    "SourceLocator": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "file",
+            "git",
+            "url",
+            "test",
+            "human",
+            "document"
+          ]
+        },
+        "path": {
+          "type": "string"
+        },
+        "repo": {
+          "type": "string"
+        },
+        "commitSha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40,64}$"
+        },
+        "blobSha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40,64}$"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "lineStart": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "lineEnd": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "uri": {
+          "type": "string"
+        },
+        "quote": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "RevisionRef": {
+      "type": "object",
+      "properties": {
+        "unitId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "revisionId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "unitId",
+        "revisionId"
+      ],
+      "additionalProperties": false
+    },
+    "Expr": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "type": "string",
+              "enum": [
+                "exists",
+                "missing",
+                "isNull"
+              ]
+            },
+            "operand": {
+              "$ref": "#/$defs/Operand"
+            }
+          },
+          "required": [
+            "op",
+            "operand"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "type": "string",
+              "enum": [
+                "eq",
+                "ne",
+                "gt",
+                "gte",
+                "lt",
+                "lte",
+                "contains",
+                "startsWith",
+                "in"
+              ]
+            },
+            "left": {
+              "$ref": "#/$defs/Operand"
+            },
+            "right": {
+              "$ref": "#/$defs/Operand"
+            },
+            "comparison": {
+              "type": "string",
+              "enum": [
+                "ordinal",
+                "ordinalIgnoreCase",
+                "typed"
+              ]
+            }
+          },
+          "required": [
+            "op",
+            "left",
+            "right",
+            "comparison"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "type": "string",
+              "enum": [
+                "all",
+                "any"
+              ]
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/Expr"
+              },
+              "minItems": 1,
+              "maxItems": 1000
+            }
+          },
+          "required": [
+            "op",
+            "args"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "not"
+            },
+            "arg": {
+              "$ref": "#/$defs/Expr"
+            }
+          },
+          "required": [
+            "op",
+            "arg"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "Operand": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "field"
+            },
+            "attributeId": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "required": [
+            "kind",
+            "attributeId"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "literal"
+            },
+            "valueType": {
+              "type": "string",
+              "enum": [
+                "string",
+                "decimal",
+                "integer",
+                "boolean",
+                "date",
+                "datetime",
+                "enum",
+                "null",
+                "list"
+              ]
+            },
+            "value": {}
+          },
+          "required": [
+            "kind",
+            "valueType",
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "RuleInput": {
+      "type": "object",
+      "properties": {
+        "attribute": {
+          "$ref": "#/$defs/UnitRef"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "valueType": {
+          "type": "string",
+          "enum": [
+            "string",
+            "decimal",
+            "integer",
+            "boolean",
+            "date",
+            "datetime",
+            "enum",
+            "list"
+          ]
+        },
+        "unit": {
+          "type": "string"
+        },
+        "missingSemantics": {
+          "type": "string"
+        },
+        "nullSemantics": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "attribute",
+        "label",
+        "valueType",
+        "missingSemantics",
+        "nullSemantics"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$ref": "#/$defs/RuleBody"
+}

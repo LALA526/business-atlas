@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "1.2.0",
+  "deploymentId": "DEP-EXAMPLE-1",
+  "repository": "https://example.invalid/business-atlas.git",
+  "deployedCommitSha": "dddddddddddddddddddddddddddddddddddddddd",
+  "deliveryId": "KDEL-EXAMPLE-001",
+  "knowledgeBaselineId": "BL-SELF-EXAMPLE",
+  "status": "pending_review",
+  "checkedAt": "2026-11-16T00:00:00Z",
+  "discrepancies": [
+    "工程观察候选尚未经过知识审查"
+  ]
+}

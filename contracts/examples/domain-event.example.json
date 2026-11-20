@@ -1,0 +1,15 @@
+{
+  "eventId": "EV-EXAMPLE-1",
+  "eventType": "KnowledgeDeliveryRecorded.v1",
+  "schemaVersion": "1.2.0",
+  "projectId": "PRJ-SELF",
+  "aggregateId": "KDEL-EXAMPLE-001",
+  "aggregateRevision": 1,
+  "occurredAt": "2026-11-16T00:00:00Z",
+  "actorId": "CI-SERVICE",
+  "correlationId": "CI-EXAMPLE-123",
+  "idempotencyKey": "PR-123:KDEL-EXAMPLE-001",
+  "payload": {
+    "finalCommitSha": "dddddddddddddddddddddddddddddddddddddddd"
+  }
+}

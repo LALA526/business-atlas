@@ -1,0 +1,45 @@
+{
+  "contextId": "00000000-0000-4000-8000-000000000009",
+  "projectId": "00000000-0000-4000-8000-000000000010",
+  "taskId": "00000000-0000-4000-8000-000000000011",
+  "baselineId": "00000000-0000-4000-8000-000000000012",
+  "policyEpoch": 1,
+  "phase": "candidate",
+  "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+  "target": [
+    {
+      "action": "revise",
+      "description": "EX 删除物理字段，保持原业务匹配目标",
+      "reason": "候选"
+    }
+  ],
+  "preserve": [
+    {
+      "unitId": "00000000-0000-4000-8000-000000000013",
+      "revisionId": "00000000-0000-4000-8000-000000000014"
+    }
+  ],
+  "requiredRefs": [
+    {
+      "unitId": "00000000-0000-4000-8000-000000000013",
+      "revisionId": "00000000-0000-4000-8000-000000000014"
+    }
+  ],
+  "evidence": [],
+  "impactIds": [],
+  "approvalIds": [],
+  "acceptanceCases": [],
+  "knowledgeRequirements": [
+    "PD-32 PR候选和合并后清单"
+  ],
+  "unknowns": [
+    {
+      "key": "actual-repo",
+      "description": "未连接实际仓库",
+      "severity": "blocking",
+      "reason": "missing"
+    }
+  ],
+  "status": "insufficient",
+  "expiresAt": "2027-01-01T00:00:00Z"
+}

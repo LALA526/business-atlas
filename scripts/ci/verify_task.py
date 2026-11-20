@@ -20,4 +20,6 @@ assert decision.get('scope', {}).get('dedicatedDrawing') is False
 assert decision.get('approval', {}).get('kind') == 'delegated-ai', 'Do not fabricate a human signature'
 assert isinstance(decision.get('unknowns'), list), 'Preserve unavailable business/production inputs explicitly'
 assert (root / 'docs/ui-reference/source-manifest.json').is_file()
+subprocess.run([sys.executable, str(root / 'scripts/ci/verify_contracts.py')], check=True)
+subprocess.run([sys.executable, '-m', 'unittest', 'discover', '-s', 'tests/Contract', '-v'], cwd=root, check=True)
 print('T01 freeze input and explicit AI delegation record verified; not a product acceptance result')

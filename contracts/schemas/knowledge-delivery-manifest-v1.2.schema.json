@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/business-atlas/schemas/knowledge-delivery-manifest-v1.2.schema.json",
+  "title": "KnowledgeDeliveryManifest v1.2 (trusted post merge CI artifact)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "deliveryId",
+    "proposalId",
+    "proposalSha256",
+    "projectId",
+    "taskId",
+    "repo",
+    "finalCommitSha",
+    "mergeStrategy",
+    "buildId",
+    "buildDigest",
+    "verifiedAt",
+    "testEvidence",
+    "anchorResolutions",
+    "status"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.2.0"
+    },
+    "deliveryId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "proposalId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "proposalSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "projectId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "taskId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "url",
+        "pullRequestId"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pullRequestId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "finalCommitSha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40,64}$"
+    },
+    "mergeStrategy": {
+      "enum": [
+        "merge",
+        "squash",
+        "rebase"
+      ]
+    },
+    "buildId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "buildDigest": {
+      "type": "string",
+      "pattern": "^(sha256:)?[0-9a-f]{64}$"
+    },
+    "verifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "testEvidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "testId",
+          "result",
+          "artifactUri"
+        ],
+        "properties": {
+          "testId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "result": {
+            "enum": [
+              "passed",
+              "failed",
+              "skipped"
+            ]
+          },
+          "artifactUri": {
+            "type": "string",
+            "minLength": 1
+          },
+          "artifactSha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "anchorResolutions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "locator",
+          "resolvedBlobSha",
+          "verification"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "locator": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resolvedBlobSha": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{40,64}$"
+          },
+          "verification": {
+            "enum": [
+              "matched",
+              "remapped",
+              "missing",
+              "mismatch"
+            ]
+          },
+          "explanation": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "status": {
+      "enum": [
+        "verified",
+        "evidence_missing",
+        "rejected"
+      ]
+    },
+    "artifactUri": {
+      "type": "string",
+      "minLength": 1
+    },
+    "ciRunId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "signerId": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

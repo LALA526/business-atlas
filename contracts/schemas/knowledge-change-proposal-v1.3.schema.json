@@ -1,0 +1,378 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/business-atlas/schemas/knowledge-change-proposal-v1.3.schema.json",
+  "title": "KnowledgeChange Proposal v1.3 (PR time; no mergedCommitSha)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "proposalId",
+    "projectId",
+    "taskId",
+    "requirementIds",
+    "changeKind",
+    "repo",
+    "changedFiles",
+    "entityChanges",
+    "assertionChanges",
+    "apiChanges",
+    "dataChanges",
+    "testEvidence",
+    "sourceAnchors",
+    "knowledgeStatus",
+    "unknowns",
+    "errorsObserved"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.3.0"
+    },
+    "proposalId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "projectId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "taskId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "requirementIds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^((BA|ENG)-[A-Z]+-[0-9]{3}|PD-[0-9]{2})$"
+      }
+    },
+    "changeKind": {
+      "enum": [
+        "feature",
+        "fix",
+        "refactor",
+        "migration",
+        "security",
+        "documentation",
+        "operations"
+      ]
+    },
+    "repo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "url",
+        "branch",
+        "pullRequestId"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "minLength": 1
+        },
+        "branch": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pullRequestId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "baseSha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40,64}$"
+        }
+      }
+    },
+    "changedFiles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "changeType"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "changeType": {
+            "enum": [
+              "added",
+              "modified",
+              "removed",
+              "renamed"
+            ]
+          },
+          "blobSha": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{40,64}$"
+          },
+          "contentSha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "entityChanges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId",
+          "kind",
+          "factLevel",
+          "summary"
+        ],
+        "properties": {
+          "stableId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "enum": [
+              "added",
+              "modified",
+              "removed"
+            ]
+          },
+          "factLevel": {
+            "enum": [
+              "observed",
+              "documented_intent",
+              "inferred",
+              "unknown",
+              "conflicting"
+            ]
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sourceAnchorIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "assertionChanges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId",
+          "kind",
+          "factLevel",
+          "summary"
+        ],
+        "properties": {
+          "stableId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "enum": [
+              "added",
+              "modified",
+              "removed"
+            ]
+          },
+          "factLevel": {
+            "enum": [
+              "observed",
+              "documented_intent",
+              "inferred",
+              "unknown",
+              "conflicting"
+            ]
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sourceAnchorIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "apiChanges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operationId",
+          "kind",
+          "contractPath"
+        ],
+        "properties": {
+          "operationId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "enum": [
+              "added",
+              "modified",
+              "removed"
+            ]
+          },
+          "contractPath": {
+            "type": "string",
+            "minLength": 1
+          },
+          "authorizationPolicy": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "dataChanges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "migrationId",
+          "description"
+        ],
+        "properties": {
+          "migrationId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "testEvidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "testId",
+          "result",
+          "artifactUri"
+        ],
+        "properties": {
+          "testId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "result": {
+            "enum": [
+              "passed",
+              "failed",
+              "skipped"
+            ]
+          },
+          "artifactUri": {
+            "type": "string",
+            "minLength": 1
+          },
+          "artifactSha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "sourceAnchors": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "locator"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "locator": {
+            "type": "string",
+            "minLength": 1
+          },
+          "blobSha": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{40,64}$"
+          },
+          "contentSha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "sourceRevision": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "knowledgeStatus": {
+      "const": "proposed"
+    },
+    "unknowns": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "errorsObserved": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "patternId",
+          "symptom",
+          "preventionTestId"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "patternId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "symptom": {
+            "type": "string",
+            "minLength": 1
+          },
+          "preventionTestId": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "contractDigests": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
