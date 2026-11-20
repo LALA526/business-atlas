@@ -1,4 +1,4 @@
-import dataclasses,hashlib,json,sys,tempfile,unittest
+import dataclasses,hashlib,json,sys,tempfile,unittest,subprocess
 from types import SimpleNamespace
 from pathlib import Path
 from unittest.mock import patch
@@ -11,7 +11,7 @@ class NativeMulticaTests(unittest.TestCase):
         self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup)
         self.home=Path(self.tmp.name).resolve()
         self.cwd=self.home/'Workspace/projects/business-atlas';self.cwd.mkdir(parents=True)
-        (self.cwd/'.git').mkdir()
+        subprocess.run(['git','init','-q',str(self.cwd)],check=True)
         self.log=self.home/'logs'
         self.binding={'profile':'test','workspaceId':'new','daemonId':'mac16','runtimeId':'runtime-mac16','tasks':{},'roles':{'atlas-leader':{'agentId':'leader','projectId':'role-project','resourceId':'resource'}}}
         self.calls=[];self.runtime='runtime-mac16';self.agent_runtime='runtime-mac16';self.actual_dir=str(self.cwd)

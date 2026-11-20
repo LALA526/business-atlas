@@ -74,7 +74,9 @@ def serve():
             if hasattr(getattr(runner, 'adapter', None), 'health'):
                 from provider_recovery import normalize_legacy_quota_waits
                 normalize_legacy_quota_waits(runner, runner.adapter.health)
-            result = runner.loop()
+            from parallel_executor import prepare_stopped_dispatches, run_parallel
+            prepare_stopped_dispatches(runner)
+            result = run_parallel(runner, CONTROLS) if runner.controls.get('maxConcurrentTasks', 1) > 1 else runner.loop()
         save(STATE / 'last-run-result.json', result)
         print(json.dumps(result), flush=True)
         return 0 if result['status'] in ('idle', 'stopped', 'disabled', 'provider_wait') else 2

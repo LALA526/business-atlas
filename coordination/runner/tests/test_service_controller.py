@@ -1,4 +1,5 @@
 import importlib.util,json,sys,tempfile,unittest
+from types import SimpleNamespace
 from pathlib import Path
 from unittest.mock import patch
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
@@ -10,6 +11,8 @@ class ServiceControllerTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             state=Path(tmp); controls=state/'controls.json';controls.write_text('{"enabled":true,"roleBackend":"multica","multicaBindingPath":"private-binding"}')
             class Runner:
+                ledger=SimpleNamespace(rows=lambda:[])
+                controls={}
                 called=False
                 closed=False
                 def request_stop(self,*a):pass

@@ -34,10 +34,11 @@ class ProviderHealth:
             state['providers'][name].update(verified=verified,status='available' if verified else category,nextProbeAt=0 if verified else int(self.clock()+max(60,retry_seconds)),lastProbeAt=int(self.clock()))
 
 class ProviderRouter:
-    def __init__(self,primary_binding,supervisor,config,state_dir,clock=time.time,adapters=None):
+    def __init__(self,primary_binding,supervisor,config,state_dir,clock=time.time,adapters=None,slot=1):
         self.binding=primary_binding;self.supervisor=supervisor;self.config=config;self.clock=clock
         self.health=ProviderHealth(Path(state_dir)/'provider-health.json',config['providers'],clock)
-        self.adapters=adapters or {name:MulticaAdapter(json.loads(Path(p['bindingPath']).read_text()),supervisor) for name,p in config['providers'].items()}
+        from parallel_executor import binding_for_slot
+        self.adapters=adapters or {name:MulticaAdapter(binding_for_slot(json.loads(Path(p['bindingPath']).read_text()),slot),supervisor) for name,p in config['providers'].items()}
         self.command=self.adapters['kimi'].command
     def preflight(self):
         result=self.adapters['kimi'].preflight()

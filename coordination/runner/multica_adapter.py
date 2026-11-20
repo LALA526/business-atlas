@@ -1,6 +1,6 @@
 """Native Multica dispatch on a pinned Mac16 runtime, with coordinator-owned gates."""
 from pathlib import Path
-import dataclasses, hashlib, json, os, re, subprocess, time, uuid
+import dataclasses, hashlib, json, os, re, subprocess, time, uuid, fcntl
 from atlas_runner import RoleResult, RunnerError, StopRequested, classify_role_failure, write_json
 
 class MulticaAdapter:
@@ -47,16 +47,24 @@ class MulticaAdapter:
             saved=json.loads(active.read_text()) if active.exists() else None
             if saved and (saved['cwd']!=str(cwd) or saved['prompt']!=prompt):
                 raise RunnerError('dispatch_conflict','Unfinished native dispatch has different context; refuse duplicate execution')
-            inputs=Path.home()/'Workspace/projects/business-atlas-preflight/evidence/native-inputs'
-            inputs.mkdir(parents=True,exist_ok=True)
-            input_file=inputs/(role+'.json')
-            prompt_file=inputs/(role+'.txt')
+            with (state/'source-ignore.lock').open('a+') as ignore_lock:
+                fcntl.flock(ignore_lock,fcntl.LOCK_EX)
+                resolved=subprocess.run(['git','rev-parse','--git-common-dir'],cwd=cwd,capture_output=True,text=True,check=True).stdout.strip()
+                common=Path(resolved) if Path(resolved).is_absolute() else (cwd/resolved).resolve()
+                exclude=common/'info/exclude';exclude.parent.mkdir(parents=True,exist_ok=True)
+                content=exclude.read_text() if exclude.exists() else ''
+                if '.atlas-runtime/' not in content.splitlines():exclude.write_text(content.rstrip('\n')+'\n.atlas-runtime/\n')
+            inputs=cwd/'.atlas-runtime'
+            inputs.mkdir(parents=True,exist_ok=True);inputs.chmod(0o700)
+            input_file=inputs/'task-input.json'
+            prompt_file=inputs/'task-input.txt'
             temporary=prompt_file.with_suffix('.tmp')
             temporary.write_text(prompt,encoding='utf-8')
             temporary.chmod(0o600)
             temporary.replace(prompt_file)
             write_json(input_file,{'workspaceId':self.binding['workspaceId'],'cwd':str(cwd),'role':role,'prompt':'Use the read tool to read the complete plain-text task at '+str(prompt_file)+'. Execute that task and return only its required response.','promptSha256':hashlib.sha256(prompt.encode()).hexdigest()})
             input_file.chmod(0o600)
+            input_digest=hashlib.sha256(input_file.read_bytes()).hexdigest()
             if not saved:
                 title=task_id+' · '+role+' · '+uuid.uuid4().hex[:12]
                 saved={'cwd':str(cwd),'prompt':prompt,'title':title,'issue':None}
@@ -108,6 +116,8 @@ class MulticaAdapter:
                         else:
                             write_json(active,saved)
                             return RoleResult(False,category='runtime_cleanup_pending',retryable=True,log_paths=(str(receipt),))
+                        if not input_file.is_file() or not prompt_file.is_file() or hashlib.sha256(input_file.read_bytes()).hexdigest()!=input_digest or prompt_file.read_text()!=prompt:
+                            raise RunnerError('input_mutated','Native role changed its coordinator-owned input')
                         active.unlink(missing_ok=True)
                         self.command('issue','status',issue['id'],'done','--no-start','--output','json')
                         return RoleResult(True,text=text,log_paths=(str(receipt),))

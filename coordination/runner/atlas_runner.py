@@ -527,27 +527,16 @@ class Ledger:
         evidence_root: Path,
         reconciler: Callable[[sqlite3.Row], None],
         max_attempts: int | None = None,
+        worker_slot: int | None = None,
     ) -> sqlite3.Row | None:
         self.connection.execute("BEGIN IMMEDIATE")
         try:
-            active = self.connection.execute(
-                "SELECT COUNT(*) FROM tasks WHERE lease_owner IS NOT NULL AND lease_expires_at > ? AND phase != 'done'",
-                (now,),
-            ).fetchone()[0]
-            if active >= max_tasks:
-                self.connection.execute("COMMIT")
-                return None
-            candidates = self.connection.execute(
-                "SELECT * FROM tasks WHERE phase != 'done' ORDER BY task_order"
-            ).fetchall()
+            from parallel_executor import eligible_rows
+            candidates = eligible_rows(self, now, max_tasks, worker_slot)
             selected: sqlite3.Row | None = None
             for row in candidates:
-                if row["lease_owner"] is not None and row["lease_expires_at"] > now:
-                    continue
-                if not self._dependencies_done(row):
-                    continue
                 category = row["failure_category"] or ""
-                provider_waits = self.connection.execute("SELECT COUNT(*) FROM events WHERE task_id=? AND event_type='provider_wait'", (row["task_id"],)).fetchone()[0]
+                provider_waits = self.connection.execute("SELECT COUNT(*) FROM events WHERE task_id=? AND event_type IN ('provider_wait','pause_wait')", (row["task_id"],)).fetchone()[0]
                 exhausted = max_attempts is not None and row["attempt"] - provider_waits >= max_attempts and row["phase"] not in ("integration", "pending_integration")
                 if row["phase"] == "blocked":
                     continue
@@ -561,6 +550,8 @@ class Ledger:
             if selected is None:
                 self.connection.execute("COMMIT")
                 return None
+            if worker_slot is not None:
+                self.set_metadata("workerSlot:" + selected["task_id"], str(worker_slot))
             fence = selected["fence"] + 1
             attempt = selected["attempt"] + 1
             evidence = evidence_root / selected["task_id"] / f"attempt-{attempt}"
@@ -789,8 +780,8 @@ class AtlasRunner:
             raise RunnerError("state_location", "ledger, worktrees and evidence must be outside the Git repository")
         if self.max_retries < 0 or self.max_retries > 2:
             raise RunnerError("retry_invalid", "maxRetries must be between 0 and 2")
-        if self.max_tasks != 1:
-            raise RunnerError("concurrency_invalid", "this preparation runner deliberately supports exactly one running task")
+        if self.max_tasks not in (1, 2):
+            raise RunnerError("concurrency_invalid", "Mac16 supports one or two leased task workers")
         if self.lease_seconds <= self.timeout_seconds:
             raise RunnerError("lease_invalid", "leaseSeconds must exceed the model/verification timeout")
         self.stop_event = threading.Event()
@@ -1058,11 +1049,15 @@ class AtlasRunner:
             row["task_id"], self.owner, row["fence"], result, path, self.clock()
         )
 
-    def run_once(self) -> dict[str, Any]:
+    def current_base(self):
         base = git_head(self.repo)
         if self.controls.get("integration", {}).get("backend") == "azure_gates":
             git(self.repo, "fetch", "origin", "main")
             base = git(self.repo, "rev-parse", "origin/main").stdout.strip()
+        return base
+
+    def run_once(self) -> dict[str, Any]:
+        base = self.current_base()
         try:
             row = self.ledger.claim(
                 self.owner,
@@ -1073,6 +1068,7 @@ class AtlasRunner:
                 self.evidence_root,
                 self.reconcile,
                 max_attempts=int(self.controls.get("maxTaskAttempts", 3)),
+                worker_slot=self.controls.get("workerSlot"),
             )
         except RunnerError as error:
             return {"status": "recovery_blocked", "category": error.category}
@@ -1302,16 +1298,19 @@ def load_controls(repo: Path, path: Path, state_dir: Path = DEFAULT_STATE) -> di
     return controls
 
 
-def build_real_runner(repo: Path, state_dir: Path, controls_path: Path) -> AtlasRunner:
+def build_real_runner(repo: Path, state_dir: Path, controls_path: Path, overrides=None) -> AtlasRunner:
     controls = load_controls(repo, controls_path, state_dir)
+    controls.update(overrides or {})
     supervisor = ProcessSupervisor()
     model = controls["model"]["id"]
     if controls.get("roleBackend") == "multica":
         from multica_adapter import MulticaAdapter
         binding = read_json(Path(controls["multicaBindingPath"]))
+        from parallel_executor import binding_for_slot
+        binding = binding_for_slot(binding, controls.get("workerSlot", 1))
         if controls.get("providerRecovery", {}).get("enabled"):
             from provider_recovery import ProviderRouter
-            adapter = ProviderRouter(binding, supervisor, controls["providerRecovery"], state_dir)
+            adapter = ProviderRouter(binding, supervisor, controls["providerRecovery"], state_dir, slot=controls.get("workerSlot", 1))
         else:
             adapter = MulticaAdapter(binding, supervisor)
     else:
@@ -1330,7 +1329,11 @@ def build_real_runner(repo: Path, state_dir: Path, controls_path: Path) -> Atlas
     if controls.get("roleBackend") == "multica":
         from multica_adapter import MulticaIntegration
         integration = MulticaIntegration(integration, adapter)
-    return AtlasRunner(
+    runner_class = AtlasRunner
+    if controls.get("parallelValidation") or controls.get("maxConcurrentTasks", 1) > 1:
+        from parallel_executor import ParallelAtlasRunner
+        runner_class = ParallelAtlasRunner
+    return runner_class(
         repo,
         repo / DEFAULT_BASELINE,
         state_dir,
