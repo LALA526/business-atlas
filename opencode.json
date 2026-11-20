@@ -11,7 +11,7 @@
       "description": "在独立任务分支中按冻结合同实现完整行为",
       "mode": "primary",
       "prompt": "先读AGENTS.md、指定T-ID与关联合同。由调用方用-m显式选择已经验证可用的Kimi或RoutinAI模型。分析完整数据流和调用方后实施，覆盖成功、拒绝、并发和失败恢复。不得自行批准自己的实现，不得改写共享合同或其他任务迁移。交付实际diff、测试日志、需求追溯和知识候选。遇到402停止当前provider，不无限重试。",
-      "model": "kimi-code-plan-cn/kimi-for-coding"
+      "model": "kimi-code-plan-cn/k3.1-pro"
     },
     "atlas-reviewer": {
       "description": "独立检查需求、全量影响和实现差异",
@@ -28,7 +28,7 @@
       "description": "独立验收工作树中执行领域、集成、安全和浏览器验证",
       "mode": "primary",
       "prompt": "使用独立QA工作树和隔离测试数据库。从已确认目标和Golden Case设计独立预期，运行实际测试。禁止通过改动产品源代码使测试变绿。失败返回可复现条件和真实日志；通过也列未覆盖项。保存commit、contract digest、环境、结果及证据路径。",
-      "model": "kimi-code-plan-cn/kimi-for-coding"
+      "model": "kimi-code-plan-cn/k3.1-pro"
     }
   },
   "model": "kimi-code-plan-cn/k3.1-pro",
@@ -48,5 +48,8 @@
       "**/secrets/*": "deny",
       "**/azure-pat": "deny"
     }
-  }
+  },
+  "enabled_providers": [
+    "kimi-code-plan-cn"
+  ]
 }

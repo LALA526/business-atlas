@@ -1,0 +1,31 @@
+{
+  "enabled": false,
+  "stopRequested": false,
+  "maxConcurrentTasks": 1,
+  "maxRetries": 2,
+  "timeoutSeconds": 2700,
+  "leaseSeconds": 3600,
+  "retryBackoffSeconds": 2,
+  "loopPollSeconds": 2,
+  "maxLoopIterations": 0,
+  "model": {
+    "id": "kimi-code-plan-cn/k3.1-pro",
+    "verified": false
+  },
+  "policyPath": "coordination/runner/policy.json",
+  "worktreeRoot": "/Users/fox/Workspace/projects/business-atlas-preflight/runner-state/worktrees",
+  "evidenceRoot": "/Users/fox/Workspace/projects/business-atlas-preflight/runner-state/evidence",
+  "integration": {
+    "backend": "pending",
+    "organization": "",
+    "project": "",
+    "repositoryId": "",
+    "targetBranch": "main",
+    "requiredContexts": [],
+    "patEnvironment": "AZURE_DEVOPS_PAT",
+    "ciDefinitionUrl": "",
+    "deploymentStatusUrl": "",
+    "timeoutSeconds": 1800,
+    "pollSeconds": 15
+  }
+}

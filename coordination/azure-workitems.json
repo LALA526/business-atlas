@@ -1,0 +1,227 @@
+{
+  "project": "Business Atlas",
+  "epicId": 168,
+  "taskCount": 44,
+  "tasks": {
+    "T01": {
+      "id": 169,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/169",
+      "initialState": "To Do"
+    },
+    "T02": {
+      "id": 170,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/170",
+      "initialState": "To Do"
+    },
+    "T03": {
+      "id": 171,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/171",
+      "initialState": "To Do"
+    },
+    "T04": {
+      "id": 172,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/172",
+      "initialState": "To Do"
+    },
+    "T05": {
+      "id": 173,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/173",
+      "initialState": "To Do"
+    },
+    "T06": {
+      "id": 174,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/174",
+      "initialState": "To Do"
+    },
+    "T07": {
+      "id": 175,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/175",
+      "initialState": "To Do"
+    },
+    "T08": {
+      "id": 176,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/176",
+      "initialState": "To Do"
+    },
+    "T09": {
+      "id": 177,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/177",
+      "initialState": "To Do"
+    },
+    "T10": {
+      "id": 178,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/178",
+      "initialState": "To Do"
+    },
+    "T11": {
+      "id": 179,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/179",
+      "initialState": "To Do"
+    },
+    "T12": {
+      "id": 180,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/180",
+      "initialState": "To Do"
+    },
+    "T13": {
+      "id": 181,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/181",
+      "initialState": "To Do"
+    },
+    "T14": {
+      "id": 182,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/182",
+      "initialState": "To Do"
+    },
+    "T15": {
+      "id": 183,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/183",
+      "initialState": "To Do"
+    },
+    "T16": {
+      "id": 184,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/184",
+      "initialState": "To Do"
+    },
+    "T17": {
+      "id": 185,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/185",
+      "initialState": "To Do"
+    },
+    "T18": {
+      "id": 186,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/186",
+      "initialState": "To Do"
+    },
+    "T19": {
+      "id": 187,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/187",
+      "initialState": "To Do"
+    },
+    "T20": {
+      "id": 188,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/188",
+      "initialState": "To Do"
+    },
+    "T21": {
+      "id": 189,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/189",
+      "initialState": "To Do"
+    },
+    "T22": {
+      "id": 190,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/190",
+      "initialState": "To Do"
+    },
+    "T23": {
+      "id": 191,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/191",
+      "initialState": "To Do"
+    },
+    "T24": {
+      "id": 192,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/192",
+      "initialState": "To Do"
+    },
+    "T25": {
+      "id": 193,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/193",
+      "initialState": "To Do"
+    },
+    "T26": {
+      "id": 194,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/194",
+      "initialState": "To Do"
+    },
+    "T27": {
+      "id": 195,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/195",
+      "initialState": "To Do"
+    },
+    "T28": {
+      "id": 196,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/196",
+      "initialState": "To Do"
+    },
+    "T29": {
+      "id": 197,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/197",
+      "initialState": "To Do"
+    },
+    "T30": {
+      "id": 198,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/198",
+      "initialState": "To Do"
+    },
+    "T31": {
+      "id": 199,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/199",
+      "initialState": "To Do"
+    },
+    "T32": {
+      "id": 200,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/200",
+      "initialState": "To Do"
+    },
+    "T33": {
+      "id": 201,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/201",
+      "initialState": "To Do"
+    },
+    "T34": {
+      "id": 202,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/202",
+      "initialState": "To Do"
+    },
+    "T35": {
+      "id": 203,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/203",
+      "initialState": "To Do"
+    },
+    "T36": {
+      "id": 204,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/204",
+      "initialState": "To Do"
+    },
+    "T37": {
+      "id": 205,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/205",
+      "initialState": "To Do"
+    },
+    "T38": {
+      "id": 206,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/206",
+      "initialState": "To Do"
+    },
+    "T39": {
+      "id": 207,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/207",
+      "initialState": "To Do"
+    },
+    "T40": {
+      "id": 208,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/208",
+      "initialState": "To Do"
+    },
+    "T41": {
+      "id": 209,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/209",
+      "initialState": "To Do"
+    },
+    "T42": {
+      "id": 210,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/210",
+      "initialState": "To Do"
+    },
+    "T43": {
+      "id": 211,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/211",
+      "initialState": "To Do"
+    },
+    "T44": {
+      "id": 212,
+      "url": "https://dev.azure.com/2717243207/dd3e7018-2931-4702-8812-ef2a69a00103/_apis/wit/workItems/212",
+      "initialState": "To Do"
+    }
+  }
+}
