@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "1.2.0",
+  "patternId": "PATTERN-V92-STAGE-GROUP",
+  "symptom": "7 个 Stage 被合并为 GROUP-undefined",
+  "rootCause": "布局器按缺失 typeId 分组",
+  "trigger": "v9-2-reading stageGraph -> layoutSemantic",
+  "detector": "stageCount==7 && executionEdgeCount==14 && no GROUP-undefined",
+  "prevention": "阶段实体按稳定 stageId 保留，压缩需要显式 collapsedMembers",
+  "regressionTestId": "GOLD-01",
+  "appliesTo": [
+    "ReadSearchExplain",
+    "Visual"
+  ],
+  "reviewer": "QA-ROLE",
+  "status": "reviewed",
+  "evidenceRefs": [
+    "DEF-001"
+  ]
+}

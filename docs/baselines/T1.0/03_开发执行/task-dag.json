@@ -1,0 +1,3309 @@
+{
+  "schemaVersion": "1.0.0",
+  "project": "Business Atlas",
+  "status": "planned",
+  "tasks": [
+    {
+      "taskId": "T01",
+      "title": "范围及合同冻结",
+      "ownerRole": "Leader",
+      "modules": [
+        "ALL"
+      ],
+      "dependsOn": [],
+      "repoPaths": [
+        "contracts",
+        "docs/adr",
+        "AGENTS.md"
+      ],
+      "implementation": "核对原始基线、决定图形范围与协议版本、确定实际机器/账号/批准者、冻结公共合同digest及目录",
+      "acceptance": "范围签署、ADR测试计划、机器合同lint；保留未批准事项及阻断范围",
+      "testIds": [
+        "AT-T01"
+      ],
+      "productIds": [
+        "PD-36",
+        "PD-37",
+        "PD-38"
+      ],
+      "workpackageIds": [
+        "W11",
+        "W19",
+        "W26"
+      ],
+      "resourceLocks": [
+        "contracts"
+      ],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T01",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-VIS-001",
+        "BA-VIS-004",
+        "BA-VIS-007",
+        "BA-VIS-008",
+        "BA-QA-003",
+        "ENG-ARCH-001",
+        "ENG-ARCH-005",
+        "ENG-DEL-001",
+        "ENG-DEL-002",
+        "ENG-DEL-003",
+        "ENG-DEL-006",
+        "PD-36",
+        "PD-37",
+        "PD-38"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/02_数据与持久化.md"
+      ],
+      "operationIds": []
+    },
+    {
+      "taskId": "T02",
+      "title": "解决方案与构建",
+      "ownerRole": "PlatformDev",
+      "modules": [
+        "M12"
+      ],
+      "dependsOn": [
+        "T01"
+      ],
+      "repoPaths": [
+        "BusinessAtlas.slnx",
+        "global.json",
+        "Directory.Build.props",
+        "Directory.Packages.props",
+        "apps/Atlas.Api",
+        "apps/Atlas.Worker",
+        "apps/web",
+        "src/BuildingBlocks",
+        "scripts/knowledge",
+        "knowledge/proposals",
+        "azure-pipelines.yml"
+      ],
+      "implementation": "创建解决方案与模块引用限制、依赖锁、健康端点、测试项目、跨平台干净构建；初始化首个PR的知识候选Git账本、PR/merge CI最小门禁与真实manifest脚本（可移植旧V1.2的参考校验器并支持v1.3），T02自身首次提交记录真实原始证据；T31后续实现服务摄入和完整对账，不等待T31才写知识",
+      "acceptance": "CI build、架构引用测试、SDK及ARM64镜像可用性；下一条真实PR缺知识候选被CI阻断，合并后绑定实际SHA并保存Manifest；首个启动PR的候选/真实合并证据保留于Git/CI制品",
+      "testIds": [
+        "AT-T02"
+      ],
+      "productIds": [
+        "PD-37"
+      ],
+      "workpackageIds": [
+        "W11"
+      ],
+      "resourceLocks": [
+        "pipeline",
+        "knowledge-protocol"
+      ],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T02",
+      "actualEvidence": null,
+      "requirementIds": [
+        "ENG-ARCH-001",
+        "ENG-ARCH-002",
+        "ENG-DEL-003",
+        "PD-37"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/09_服务安全与任务恢复.md"
+      ],
+      "operationIds": [
+        "listErrorPatterns",
+        "proposeErrorPattern",
+        "reviewErrorPattern",
+        "getJob",
+        "getJobResult",
+        "cancelJob",
+        "retryJob",
+        "listAudit",
+        "healthLive",
+        "healthReady"
+      ]
+    },
+    {
+      "taskId": "T03",
+      "title": "数据库基座与迁移",
+      "ownerRole": "SchemaOwner",
+      "modules": [
+        "ALL"
+      ],
+      "dependsOn": [
+        "T02"
+      ],
+      "repoPaths": [
+        "db/migrations",
+        "src/BuildingBlocks/Persistence"
+      ],
+      "implementation": "按DDL落地EF映射与顺序迁移、运行用户/RLS、事务和封闭触发器、迁移历史",
+      "acceptance": "PG真实执行空库升级及FK/RLS/封闭负例；迁移单Owner",
+      "testIds": [
+        "AT-T03"
+      ],
+      "productIds": [
+        "PD-17",
+        "PD-18",
+        "PD-20",
+        "PD-37"
+      ],
+      "workpackageIds": [
+        "W11"
+      ],
+      "resourceLocks": [
+        "db/migrations"
+      ],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T03",
+      "actualEvidence": null,
+      "requirementIds": [
+        "ENG-ARCH-002",
+        "ENG-ARCH-004",
+        "ENG-ARCH-008",
+        "PD-17",
+        "PD-18",
+        "PD-20",
+        "PD-37"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/02_数据与持久化.md"
+      ],
+      "operationIds": []
+    },
+    {
+      "taskId": "T04",
+      "title": "命令审计与幂等",
+      "ownerRole": "PlatformDev",
+      "modules": [
+        "M12"
+      ],
+      "dependsOn": [
+        "T02",
+        "T03"
+      ],
+      "repoPaths": [
+        "src/BuildingBlocks",
+        "src/Modules/PlatformOps"
+      ],
+      "implementation": "命令pipeline、请求hash/幂等键、CAS、事务审计、错误响应、outbox与事务钩子",
+      "acceptance": "重放同键同请求相同结果；冲突/失败全回滚",
+      "testIds": [
+        "AT-T04"
+      ],
+      "productIds": [
+        "PD-17",
+        "PD-20",
+        "PD-37"
+      ],
+      "workpackageIds": [
+        "W11",
+        "W24"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T04",
+      "actualEvidence": null,
+      "requirementIds": [
+        "ENG-OPS-001",
+        "ENG-OPS-002",
+        "ENG-OPS-003",
+        "PD-17",
+        "PD-20",
+        "PD-37"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/09_服务安全与任务恢复.md"
+      ],
+      "operationIds": [
+        "listErrorPatterns",
+        "proposeErrorPattern",
+        "reviewErrorPattern",
+        "getJob",
+        "getJobResult",
+        "cancelJob",
+        "retryJob",
+        "listAudit",
+        "healthLive",
+        "healthReady"
+      ]
+    },
+    {
+      "taskId": "T05",
+      "title": "OIDC与多项目身份",
+      "ownerRole": "IdentityDev",
+      "modules": [
+        "M01"
+      ],
+      "dependsOn": [
+        "T03",
+        "T04"
+      ],
+      "repoPaths": [
+        "src/Modules/ProjectIdentity",
+        "apps/Atlas.Api/Auth"
+      ],
+      "implementation": "BFF及Bearer、主体映射、成员/角色管理、项目创建及空基线、独立profile与政策版本；实现浏览器登录、session/CSRF、OIDC callback、logout认证控制面，按机器合同README附录",
+      "acceptance": "双项目、无成员、过期audience拒绝；首次项目无伪知识",
+      "testIds": [
+        "AT-T05"
+      ],
+      "productIds": [
+        "PD-01",
+        "PD-20",
+        "PD-37"
+      ],
+      "workpackageIds": [
+        "W12",
+        "W14"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T05",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-PRJ-001",
+        "BA-PRJ-002",
+        "BA-PRJ-003",
+        "BA-PRJ-004",
+        "BA-PRJ-006",
+        "BA-ACC-001",
+        "BA-ACC-002",
+        "BA-ACC-003",
+        "BA-ACC-006",
+        "BA-ACC-007",
+        "ENG-ARCH-003",
+        "PD-01",
+        "PD-20",
+        "PD-37"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/09_服务安全与任务恢复.md"
+      ],
+      "operationIds": [
+        "listProjects",
+        "createProject",
+        "getProject",
+        "updateProjectShell",
+        "listMembers",
+        "changeMembership",
+        "removeMembership"
+      ]
+    },
+    {
+      "taskId": "T06",
+      "title": "统一授权读取与适用性",
+      "ownerRole": "SecurityDev",
+      "modules": [
+        "M04"
+      ],
+      "dependsOn": [
+        "T05"
+      ],
+      "repoPaths": [
+        "src/Modules/AccessApplicability"
+      ],
+      "implementation": "权限门面、角色/资源/字段/source和关系端点读写复核、baseline上下文、policy epoch、适用性四态",
+      "acceptance": "Reader写入、藏端点、历史/缓存撤权均拒绝；缺上下文不猜true",
+      "testIds": [
+        "AT-T06"
+      ],
+      "productIds": [
+        "PD-14",
+        "PD-15",
+        "PD-20",
+        "PD-28"
+      ],
+      "workpackageIds": [
+        "W14"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T06",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-ACC-001",
+        "BA-ACC-002",
+        "BA-ACC-003",
+        "BA-ACC-004",
+        "BA-ACC-005",
+        "BA-ACC-006",
+        "BA-ACC-007",
+        "ENG-ARCH-003",
+        "PD-14",
+        "PD-15",
+        "PD-20",
+        "PD-28"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/09_服务安全与任务恢复.md"
+      ],
+      "operationIds": [
+        "setResourceGrant",
+        "listGrants",
+        "evaluateApplicability"
+      ]
+    },
+    {
+      "taskId": "T07",
+      "title": "注册表和五维目录",
+      "ownerRole": "KnowledgeDev",
+      "modules": [
+        "M02"
+      ],
+      "dependsOn": [
+        "T03",
+        "T06"
+      ],
+      "repoPaths": [
+        "src/Modules/SchemaCatalog"
+      ],
+      "implementation": "版本化type/predicate/content profile、项目扩展提案及兼容、禁止同义谓词乱建",
+      "acceptance": "扩展类型历史可读，Schema冲突可解释、五维目录可用",
+      "testIds": [
+        "AT-T07"
+      ],
+      "productIds": [
+        "PD-02",
+        "PD-04",
+        "PD-10"
+      ],
+      "workpackageIds": [
+        "W13",
+        "W17"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T07",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-CAT-001",
+        "BA-CAT-002",
+        "BA-CAT-003",
+        "ENG-ARCH-005",
+        "PD-02",
+        "PD-04",
+        "PD-10"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/04_知识语义与读取.md"
+      ],
+      "operationIds": [
+        "getCatalog",
+        "listTypes",
+        "proposeType",
+        "listPredicates",
+        "proposePredicate"
+      ]
+    },
+    {
+      "taskId": "T08",
+      "title": "稳定知识身份与修订",
+      "ownerRole": "KnowledgeDev",
+      "modules": [
+        "M03"
+      ],
+      "dependsOn": [
+        "T06",
+        "T07"
+      ],
+      "repoPaths": [
+        "src/Modules/KnowledgeCore/Identity",
+        "src/Modules/KnowledgeCore/Revisions"
+      ],
+      "implementation": "unit/revision/ref/evidence、外部identity、canonical hash、不可变封闭、规范观察多轴",
+      "acceptance": "相同身份不同版本；跨项目同名不混；修订/引用写后不可变",
+      "testIds": [
+        "AT-T08"
+      ],
+      "productIds": [
+        "PD-03",
+        "PD-05",
+        "PD-07",
+        "PD-15",
+        "PD-18"
+      ],
+      "workpackageIds": [
+        "W13"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T08",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-SEM-001",
+        "BA-SEM-002",
+        "BA-SEM-007",
+        "BA-SEM-008",
+        "BA-SEM-009",
+        "PD-03",
+        "PD-05",
+        "PD-07",
+        "PD-15",
+        "PD-18"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/04_知识语义与读取.md"
+      ],
+      "operationIds": [
+        "listUnits",
+        "getUnit",
+        "createUnitDraft",
+        "reviseUnitDraft",
+        "listRevisions",
+        "listRelations",
+        "evaluateRule"
+      ]
+    },
+    {
+      "taskId": "T09",
+      "title": "领域术语与字段映射",
+      "ownerRole": "KnowledgeDev",
+      "modules": [
+        "M03"
+      ],
+      "dependsOn": [
+        "T08"
+      ],
+      "repoPaths": [
+        "src/Modules/KnowledgeCore/Vocabulary",
+        "src/Modules/KnowledgeCore/Relations"
+      ],
+      "implementation": "术语语境/别名、业务属性独立、数据字段映射、有类型的双向关系及适用证据",
+      "acceptance": "字段改名不删除业务语义；从字段找多条规则且无泄露",
+      "testIds": [
+        "AT-T09"
+      ],
+      "productIds": [
+        "PD-02",
+        "PD-03",
+        "PD-05",
+        "PD-06"
+      ],
+      "workpackageIds": [
+        "W13",
+        "W17"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T09",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-CAT-001",
+        "BA-CAT-002",
+        "BA-CAT-004",
+        "BA-SEM-001",
+        "BA-SEM-002",
+        "BA-SEM-003",
+        "BA-SEM-005",
+        "BA-VIS-003",
+        "PD-02",
+        "PD-03",
+        "PD-05",
+        "PD-06"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/04_知识语义与读取.md"
+      ],
+      "operationIds": [
+        "listUnits",
+        "getUnit",
+        "createUnitDraft",
+        "reviseUnitDraft",
+        "listRevisions",
+        "listRelations",
+        "evaluateRule"
+      ]
+    },
+    {
+      "taskId": "T10",
+      "title": "规则语义与确定性判断",
+      "ownerRole": "KnowledgeDev",
+      "modules": [
+        "M03"
+      ],
+      "dependsOn": [
+        "T08",
+        "T09"
+      ],
+      "repoPaths": [
+        "src/Modules/KnowledgeCore/Rules"
+      ],
+      "implementation": "条件AST、多值逻辑、缺键/null、比较口径、优先级冲突/默认、案例与未知",
+      "acceptance": "黄金A独立判断；unknown、冲突、无依据默认负例；不得猜业务",
+      "testIds": [
+        "AT-T10"
+      ],
+      "productIds": [
+        "PD-07",
+        "PD-08",
+        "PD-11"
+      ],
+      "workpackageIds": [
+        "W13"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T10",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-SEM-004",
+        "BA-SEM-006",
+        "PD-07",
+        "PD-08",
+        "PD-11"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/04_知识语义与读取.md"
+      ],
+      "operationIds": [
+        "listUnits",
+        "getUnit",
+        "createUnitDraft",
+        "reviseUnitDraft",
+        "listRevisions",
+        "listRelations",
+        "evaluateRule"
+      ]
+    },
+    {
+      "taskId": "T11",
+      "title": "流程状态与关系语义",
+      "ownerRole": "KnowledgeDev",
+      "modules": [
+        "M03"
+      ],
+      "dependsOn": [
+        "T08",
+        "T09",
+        "T10"
+      ],
+      "repoPaths": [
+        "src/Modules/KnowledgeCore/Flows"
+      ],
+      "implementation": "阶段/节点/边/guard/转移验证、语义守恒、合法引用、回流、非执行关系",
+      "acceptance": "制造7阶段12节点14边可还原；guard引用不漏；无虚构时序",
+      "testIds": [
+        "AT-T11"
+      ],
+      "productIds": [
+        "PD-06",
+        "PD-09",
+        "PD-36"
+      ],
+      "workpackageIds": [
+        "W13",
+        "W19"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T11",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-SEM-003",
+        "BA-SEM-005",
+        "BA-SEM-006",
+        "BA-VIS-002",
+        "BA-VIS-003",
+        "PD-06",
+        "PD-09",
+        "PD-36"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/04_知识语义与读取.md"
+      ],
+      "operationIds": [
+        "listUnits",
+        "getUnit",
+        "createUnitDraft",
+        "reviseUnitDraft",
+        "listRevisions",
+        "listRelations",
+        "evaluateRule"
+      ]
+    },
+    {
+      "taskId": "T12",
+      "title": "资料来源与私有Blob",
+      "ownerRole": "IntakeDev",
+      "modules": [
+        "M06"
+      ],
+      "dependsOn": [
+        "T04",
+        "T06",
+        "T08"
+      ],
+      "repoPaths": [
+        "src/Modules/ImportEvidence/Blob",
+        "src/Modules/ImportEvidence/Sources"
+      ],
+      "implementation": "文件扫描/hash、私有路径、上传下载二次授权、source修订和定位",
+      "acceptance": "未扫描拒绝、跨项目下载拒绝、异常重试及hash一致、权威事实未污染",
+      "testIds": [
+        "AT-T12"
+      ],
+      "productIds": [
+        "PD-12",
+        "PD-20",
+        "PD-21",
+        "PD-30"
+      ],
+      "workpackageIds": [
+        "W15",
+        "W24"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T12",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-SEM-007",
+        "ENG-OPS-002",
+        "PD-12",
+        "PD-20",
+        "PD-21",
+        "PD-30"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/08_导入与工程知识交付.md"
+      ],
+      "operationIds": [
+        "uploadSource",
+        "getUpload",
+        "getSource",
+        "readSourceContent",
+        "uploadAkp",
+        "listImports",
+        "previewImport",
+        "decideImport",
+        "stageImport",
+        "discardImport"
+      ]
+    },
+    {
+      "taskId": "T13",
+      "title": "变更草稿和提交",
+      "ownerRole": "GovernanceDev",
+      "modules": [
+        "M05"
+      ],
+      "dependsOn": [
+        "T08",
+        "T10",
+        "T11",
+        "T12"
+      ],
+      "repoPaths": [
+        "src/Modules/Governance/ChangeSets"
+      ],
+      "implementation": "change set、候选修订依赖组、校验与diff、提交冻结digest、草稿隔离",
+      "acceptance": "草稿不污染批准/搜索/Task；修改重新提交失效旧审批",
+      "testIds": [
+        "AT-T13"
+      ],
+      "productIds": [
+        "PD-14",
+        "PD-16",
+        "PD-17",
+        "PD-25"
+      ],
+      "workpackageIds": [
+        "W16"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T13",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-GOV-001",
+        "BA-GOV-002",
+        "BA-GOV-005",
+        "BA-GOV-006",
+        "PD-14",
+        "PD-16",
+        "PD-17",
+        "PD-25"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/03_领域操作与审批.md"
+      ],
+      "operationIds": [
+        "listChangeSets",
+        "createChangeSet",
+        "getChangeSet",
+        "amendChangeSet",
+        "submitChangeSet",
+        "reviewChangeSet",
+        "reopenChangeSet",
+        "publishChangeSet",
+        "listBaselines",
+        "diffBaseline",
+        "planBaselineRestore",
+        "submitProposal"
+      ]
+    },
+    {
+      "taskId": "T14",
+      "title": "审批授权与原子发布",
+      "ownerRole": "GovernanceDev",
+      "modules": [
+        "M05"
+      ],
+      "dependsOn": [
+        "T13",
+        "T06"
+      ],
+      "repoPaths": [
+        "src/Modules/Governance/Review",
+        "src/Modules/Governance/Publish"
+      ],
+      "implementation": "审批slot、拒绝与重审、依赖权限、并发base CAS、一次事务发布+outbox",
+      "acceptance": "双审批并发冲突、故障全回滚、未经授权/自批拒绝、新基线canonical SHA-256 hash",
+      "testIds": [
+        "AT-T14"
+      ],
+      "productIds": [
+        "PD-16",
+        "PD-17",
+        "PD-20"
+      ],
+      "workpackageIds": [
+        "W16"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T14",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-GOV-002",
+        "BA-GOV-005",
+        "ENG-ARCH-004",
+        "PD-16",
+        "PD-17",
+        "PD-20"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/03_领域操作与审批.md"
+      ],
+      "operationIds": [
+        "listChangeSets",
+        "createChangeSet",
+        "getChangeSet",
+        "amendChangeSet",
+        "submitChangeSet",
+        "reviewChangeSet",
+        "reopenChangeSet",
+        "publishChangeSet",
+        "listBaselines",
+        "diffBaseline",
+        "planBaselineRestore",
+        "submitProposal"
+      ]
+    },
+    {
+      "taskId": "T15",
+      "title": "历史比较与回退",
+      "ownerRole": "GovernanceDev",
+      "modules": [
+        "M05"
+      ],
+      "dependsOn": [
+        "T14"
+      ],
+      "repoPaths": [
+        "src/Modules/Governance/Baselines"
+      ],
+      "implementation": "按基线历史读取、差分、旧schema解析、回退作为新提案、复核过期通知",
+      "acceptance": "历史B1不污染；不隐式latest；回退新B3需审批",
+      "testIds": [
+        "AT-T15"
+      ],
+      "productIds": [
+        "PD-18",
+        "PD-19",
+        "PD-28"
+      ],
+      "workpackageIds": [
+        "W16",
+        "W13"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T15",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-SEM-010",
+        "BA-GOV-003",
+        "PD-18",
+        "PD-19",
+        "PD-28"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/03_领域操作与审批.md"
+      ],
+      "operationIds": [
+        "listChangeSets",
+        "createChangeSet",
+        "getChangeSet",
+        "amendChangeSet",
+        "submitChangeSet",
+        "reviewChangeSet",
+        "reopenChangeSet",
+        "publishChangeSet",
+        "listBaselines",
+        "diffBaseline",
+        "planBaselineRestore",
+        "submitProposal"
+      ]
+    },
+    {
+      "taskId": "T16",
+      "title": "AKP导入兼容",
+      "ownerRole": "IntakeDev",
+      "modules": [
+        "M06"
+      ],
+      "dependsOn": [
+        "T12",
+        "T13",
+        "T14"
+      ],
+      "repoPaths": [
+        "src/Modules/ImportEvidence/Packages",
+        "contracts/akp"
+      ],
+      "implementation": "0.1 adapter、native提案、验证/预览/冲突/原子stage/幂等、旧source映射",
+      "acceptance": "旧真实样本、损坏、同ID异hash、取消、失败无半包；只写候选",
+      "testIds": [
+        "AT-T16"
+      ],
+      "productIds": [
+        "PD-01",
+        "PD-05",
+        "PD-21",
+        "PD-30"
+      ],
+      "workpackageIds": [
+        "W15"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T16",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-IMP-001",
+        "BA-IMP-002",
+        "BA-IMP-003",
+        "BA-IMP-004",
+        "BA-IMP-005",
+        "BA-IMP-006",
+        "BA-IMP-007",
+        "BA-IMP-008",
+        "BA-IMP-009",
+        "ENG-ARCH-005",
+        "PD-01",
+        "PD-05",
+        "PD-21",
+        "PD-30"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/08_导入与工程知识交付.md"
+      ],
+      "operationIds": [
+        "uploadSource",
+        "getUpload",
+        "getSource",
+        "readSourceContent",
+        "uploadAkp",
+        "listImports",
+        "previewImport",
+        "decideImport",
+        "stageImport",
+        "discardImport"
+      ]
+    },
+    {
+      "taskId": "T17",
+      "title": "持久Job与事件",
+      "ownerRole": "PlatformDev",
+      "modules": [
+        "M12"
+      ],
+      "dependsOn": [
+        "T03",
+        "T04",
+        "T06"
+      ],
+      "repoPaths": [
+        "src/Modules/PlatformOps/Jobs",
+        "apps/Atlas.Worker"
+      ],
+      "implementation": "SKIP LOCKED租约/fence、checkpoint、inbox/outbox、重试取消、预算、事件投递",
+      "acceptance": "kill/restart、重复事件、租约争抢、取消、checkpoint恢复",
+      "testIds": [
+        "AT-T17"
+      ],
+      "productIds": [
+        "PD-29",
+        "PD-37"
+      ],
+      "workpackageIds": [
+        "W23",
+        "W24"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T17",
+      "actualEvidence": null,
+      "requirementIds": [
+        "ENG-ARCH-007",
+        "ENG-AI-004",
+        "ENG-AI-005",
+        "ENG-AI-006",
+        "ENG-OPS-003",
+        "PD-29",
+        "PD-37"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/09_服务安全与任务恢复.md"
+      ],
+      "operationIds": [
+        "listErrorPatterns",
+        "proposeErrorPattern",
+        "reviewErrorPattern",
+        "getJob",
+        "getJobResult",
+        "cancelJob",
+        "retryJob",
+        "listAudit",
+        "healthLive",
+        "healthReady"
+      ]
+    },
+    {
+      "taskId": "T18",
+      "title": "搜索与内容授权导出",
+      "ownerRole": "ReadDev",
+      "modules": [
+        "M07"
+      ],
+      "dependsOn": [
+        "T09",
+        "T12",
+        "T14",
+        "T17"
+      ],
+      "repoPaths": [
+        "src/Modules/ReadSearchExplain/Search",
+        "src/Modules/ReadSearchExplain/Export"
+      ],
+      "implementation": "PG中文/别名搜索、按权限筛选及重验、基线索引、导出job/private下载",
+      "acceptance": "不输入ID定位；同名语境；旧缓存、导出撤权无泄漏",
+      "testIds": [
+        "AT-T18"
+      ],
+      "productIds": [
+        "PD-02",
+        "PD-12",
+        "PD-20",
+        "PD-36"
+      ],
+      "workpackageIds": [
+        "W17",
+        "W18",
+        "W19"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T18",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-CAT-001",
+        "BA-CAT-002",
+        "BA-READ-001",
+        "BA-READ-007",
+        "BA-READ-013",
+        "BA-READ-014",
+        "BA-VIS-008",
+        "PD-02",
+        "PD-12",
+        "PD-20",
+        "PD-36"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/04_知识语义与读取.md"
+      ],
+      "operationIds": [
+        "getOverview",
+        "buildReadingPlan",
+        "searchKnowledge",
+        "resolveVocabulary",
+        "reviewContent",
+        "computeCoverage",
+        "createExport",
+        "downloadExport"
+      ]
+    },
+    {
+      "taskId": "T19",
+      "title": "认知阅读组合投影",
+      "ownerRole": "ReadDev",
+      "modules": [
+        "M07"
+      ],
+      "dependsOn": [
+        "T11",
+        "T14",
+        "T18"
+      ],
+      "repoPaths": [
+        "src/Modules/ReadSearchExplain/Reading"
+      ],
+      "implementation": "按目的有界投影、需求/规则/设计三Tab、实际观察分离、来源与焦点返回、覆盖缺口",
+      "acceptance": "复杂流程文字守恒；条件与比较不重复；不给无依据总结",
+      "testIds": [
+        "AT-T19"
+      ],
+      "productIds": [
+        "PD-06",
+        "PD-07",
+        "PD-09",
+        "PD-10",
+        "PD-12",
+        "PD-36"
+      ],
+      "workpackageIds": [
+        "W17",
+        "W18",
+        "W19"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T19",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-CAT-004",
+        "BA-SEM-007",
+        "BA-SEM-009",
+        "BA-READ-001",
+        "BA-READ-002",
+        "BA-READ-003",
+        "BA-READ-004",
+        "BA-READ-005",
+        "BA-READ-006",
+        "BA-READ-007",
+        "BA-READ-008",
+        "BA-READ-010",
+        "BA-READ-013",
+        "BA-READ-014",
+        "BA-VIS-002",
+        "BA-VIS-003",
+        "BA-VIS-005",
+        "BA-VIS-006",
+        "PD-06",
+        "PD-07",
+        "PD-09",
+        "PD-10",
+        "PD-12",
+        "PD-36"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/04_知识语义与读取.md"
+      ],
+      "operationIds": [
+        "getOverview",
+        "buildReadingPlan",
+        "searchKnowledge",
+        "resolveVocabulary",
+        "reviewContent",
+        "computeCoverage",
+        "createExport",
+        "downloadExport"
+      ]
+    },
+    {
+      "taskId": "T20",
+      "title": "内容检查与规则质量",
+      "ownerRole": "ReadDev",
+      "modules": [
+        "M07"
+      ],
+      "dependsOn": [
+        "T10",
+        "T19"
+      ],
+      "repoPaths": [
+        "src/Modules/ReadSearchExplain/ContentCheck"
+      ],
+      "implementation": "类型轮廓验证、业务语义缺失、混写/证据冲突；确定性+模型解释插件",
+      "acceptance": "一致则应用产生缺比较依据；缺证据为未知；非必填堆叠",
+      "testIds": [
+        "AT-T20"
+      ],
+      "productIds": [
+        "PD-08",
+        "PD-10",
+        "PD-11",
+        "PD-12"
+      ],
+      "workpackageIds": [
+        "W17",
+        "W18"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T20",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-CAT-005",
+        "BA-READ-001",
+        "BA-READ-002",
+        "BA-READ-003",
+        "BA-READ-004",
+        "BA-READ-007",
+        "BA-READ-009",
+        "BA-READ-013",
+        "BA-READ-014",
+        "ENG-OPS-006",
+        "PD-08",
+        "PD-10",
+        "PD-11",
+        "PD-12"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/04_知识语义与读取.md"
+      ],
+      "operationIds": [
+        "getOverview",
+        "buildReadingPlan",
+        "searchKnowledge",
+        "resolveVocabulary",
+        "reviewContent",
+        "computeCoverage",
+        "createExport",
+        "downloadExport"
+      ]
+    },
+    {
+      "taskId": "T21",
+      "title": "任务、问题与反馈",
+      "ownerRole": "TaskDev",
+      "modules": [
+        "M08"
+      ],
+      "dependsOn": [
+        "T14",
+        "T19"
+      ],
+      "repoPaths": [
+        "src/Modules/TaskCollab/Tasks",
+        "src/Modules/TaskCollab/Issues",
+        "src/Modules/TaskCollab/Feedback"
+      ],
+      "implementation": "最小意图创建、Task版本、现状/目标/保持/未知、问题归属及反馈转proposal",
+      "acceptance": "空泛描述不能构造READY合同；Reader不能创建；反馈可闭合",
+      "testIds": [
+        "AT-T21"
+      ],
+      "productIds": [
+        "PD-13",
+        "PD-22",
+        "PD-34"
+      ],
+      "workpackageIds": [
+        "W20"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T21",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-COL-001",
+        "BA-COL-002",
+        "BA-COL-003",
+        "BA-COL-007",
+        "PD-13",
+        "PD-22",
+        "PD-34"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/05_变更调查与交付.md"
+      ],
+      "operationIds": [
+        "listTasks",
+        "createTask",
+        "getTask",
+        "amendTask",
+        "analyzeIntent",
+        "findImpacts",
+        "listImpacts",
+        "submitInvestigation",
+        "decideImpact",
+        "planChange",
+        "transitionTask",
+        "listIssues",
+        "createIssue",
+        "resolveIssue",
+        "listFeedbacks",
+        "createFeedback",
+        "resolveFeedback",
+        "listComments",
+        "createComment",
+        "resolveComment",
+        "listActivity"
+      ]
+    },
+    {
+      "taskId": "T22",
+      "title": "影响候选与关系遍历",
+      "ownerRole": "TaskDev",
+      "modules": [
+        "M08"
+      ],
+      "dependsOn": [
+        "T09",
+        "T19",
+        "T21"
+      ],
+      "repoPaths": [
+        "src/Modules/TaskCollab/Impact"
+      ],
+      "implementation": "语义方向、范围/预算、证据路径、blind spots与候选状态，禁无界遍历",
+      "acceptance": "字段反查三规则及需求；非执行边不误判；缺代码标候选",
+      "testIds": [
+        "AT-T22"
+      ],
+      "productIds": [
+        "PD-06",
+        "PD-23",
+        "PD-24"
+      ],
+      "workpackageIds": [
+        "W16",
+        "W20"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T22",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-GOV-004",
+        "PD-06",
+        "PD-23",
+        "PD-24"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/05_变更调查与交付.md"
+      ],
+      "operationIds": [
+        "listTasks",
+        "createTask",
+        "getTask",
+        "amendTask",
+        "analyzeIntent",
+        "findImpacts",
+        "listImpacts",
+        "submitInvestigation",
+        "decideImpact",
+        "planChange",
+        "transitionTask",
+        "listIssues",
+        "createIssue",
+        "resolveIssue",
+        "listFeedbacks",
+        "createFeedback",
+        "resolveFeedback",
+        "listComments",
+        "createComment",
+        "resolveComment",
+        "listActivity"
+      ]
+    },
+    {
+      "taskId": "T23",
+      "title": "真实调查与变更计划",
+      "ownerRole": "TaskDev",
+      "modules": [
+        "M08"
+      ],
+      "dependsOn": [
+        "T22",
+        "T17",
+        "T21"
+      ],
+      "repoPaths": [
+        "src/Modules/TaskCollab/Investigation",
+        "src/Modules/TaskCollab/ChangePlanner"
+      ],
+      "implementation": "调查证据、范围排除/未查项、处置五类、依赖组、保持约束、主动消冗建议",
+      "acceptance": "真实代码已知入口/旧路径识别；无权限不假查；证据不足禁止no_change",
+      "testIds": [
+        "AT-T23"
+      ],
+      "productIds": [
+        "PD-24",
+        "PD-25",
+        "PD-26",
+        "PD-27"
+      ],
+      "workpackageIds": [
+        "W16",
+        "W20"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T23",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-GOV-004",
+        "PD-24",
+        "PD-25",
+        "PD-26",
+        "PD-27"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/05_变更调查与交付.md"
+      ],
+      "operationIds": [
+        "listTasks",
+        "createTask",
+        "getTask",
+        "amendTask",
+        "analyzeIntent",
+        "findImpacts",
+        "listImpacts",
+        "submitInvestigation",
+        "decideImpact",
+        "planChange",
+        "transitionTask",
+        "listIssues",
+        "createIssue",
+        "resolveIssue",
+        "listFeedbacks",
+        "createFeedback",
+        "resolveFeedback",
+        "listComments",
+        "createComment",
+        "resolveComment",
+        "listActivity"
+      ]
+    },
+    {
+      "taskId": "T24",
+      "title": "任务上下文与失效",
+      "ownerRole": "DeliveryDev",
+      "modules": [
+        "M09"
+      ],
+      "dependsOn": [
+        "T14",
+        "T15",
+        "T22",
+        "T23"
+      ],
+      "repoPaths": [
+        "src/Modules/ContractDelivery/Context"
+      ],
+      "implementation": "按基线/主体/权限/阶段/任务冻结上下文依赖、重授权、变更失效/复核",
+      "acceptance": "read-only上下文可读但不写；变更相关revision或policy使stale",
+      "testIds": [
+        "AT-T24"
+      ],
+      "productIds": [
+        "PD-20",
+        "PD-22",
+        "PD-26",
+        "PD-28"
+      ],
+      "workpackageIds": [
+        "W20"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T24",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-GOV-004",
+        "BA-COL-005",
+        "BA-COL-006",
+        "ENG-DEL-006",
+        "PD-20",
+        "PD-22",
+        "PD-26",
+        "PD-28"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/05_变更调查与交付.md"
+      ],
+      "operationIds": [
+        "buildTaskContext",
+        "getTaskContext",
+        "exportContext",
+        "checkConformance",
+        "recordConformance",
+        "recordAcceptance",
+        "checkClosure",
+        "requestTaskClosure",
+        "ingestKnowledgeProposal",
+        "ingestDeliveryManifest",
+        "recordDeployment",
+        "listDeliveries",
+        "reconcileDelivery"
+      ]
+    },
+    {
+      "taskId": "T25",
+      "title": "符合性与验收闭合",
+      "ownerRole": "DeliveryDev",
+      "modules": [
+        "M09"
+      ],
+      "dependsOn": [
+        "T10",
+        "T23",
+        "T24"
+      ],
+      "repoPaths": [
+        "src/Modules/ContractDelivery/Conformance",
+        "src/Modules/ContractDelivery/Closure"
+      ],
+      "implementation": "绑定规则/观察/证据/版本、反向观察失效、实际验收、真实知识和部署要求",
+      "acceptance": "反向观察旧结论失效；缺批准/影响/测试/交付不得completed",
+      "testIds": [
+        "AT-T25"
+      ],
+      "productIds": [
+        "PD-19",
+        "PD-25",
+        "PD-26",
+        "PD-31"
+      ],
+      "workpackageIds": [
+        "W21",
+        "W26"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T25",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-SEM-009",
+        "BA-SEM-010",
+        "BA-COL-005",
+        "BA-COL-006",
+        "BA-DLV-001",
+        "PD-19",
+        "PD-25",
+        "PD-26",
+        "PD-31"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/05_变更调查与交付.md"
+      ],
+      "operationIds": [
+        "buildTaskContext",
+        "getTaskContext",
+        "exportContext",
+        "checkConformance",
+        "recordConformance",
+        "recordAcceptance",
+        "checkClosure",
+        "requestTaskClosure",
+        "ingestKnowledgeProposal",
+        "ingestDeliveryManifest",
+        "recordDeployment",
+        "listDeliveries",
+        "reconcileDelivery"
+      ]
+    },
+    {
+      "taskId": "T26",
+      "title": "多人评论与实时通知",
+      "ownerRole": "TaskDev",
+      "modules": [
+        "M08"
+      ],
+      "dependsOn": [
+        "T14",
+        "T17",
+        "T21"
+      ],
+      "repoPaths": [
+        "src/Modules/TaskCollab/Collaboration",
+        "apps/Atlas.Api/Hubs"
+      ],
+      "implementation": "锚点评论、评论解决、版本通知、SignalR授权再读、CAS冲突",
+      "acceptance": "双人并发、撤权后只opaque通知、实际评论反馈流程",
+      "testIds": [
+        "AT-T26"
+      ],
+      "productIds": [
+        "PD-13",
+        "PD-16",
+        "PD-34",
+        "PD-37"
+      ],
+      "workpackageIds": [
+        "W20",
+        "W24"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T26",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-COL-001",
+        "BA-COL-002",
+        "BA-COL-003",
+        "ENG-OPS-003",
+        "PD-13",
+        "PD-16",
+        "PD-34",
+        "PD-37"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/05_变更调查与交付.md"
+      ],
+      "operationIds": [
+        "listTasks",
+        "createTask",
+        "getTask",
+        "amendTask",
+        "analyzeIntent",
+        "findImpacts",
+        "listImpacts",
+        "submitInvestigation",
+        "decideImpact",
+        "planChange",
+        "transitionTask",
+        "listIssues",
+        "createIssue",
+        "resolveIssue",
+        "listFeedbacks",
+        "createFeedback",
+        "resolveFeedback",
+        "listComments",
+        "createComment",
+        "resolveComment",
+        "listActivity"
+      ]
+    },
+    {
+      "taskId": "T27",
+      "title": "真实模型适配与服务调用",
+      "ownerRole": "AiDev",
+      "modules": [
+        "M10"
+      ],
+      "dependsOn": [
+        "T17",
+        "T19",
+        "T20",
+        "T24"
+      ],
+      "repoPaths": [
+        "src/Modules/Assistant/Providers",
+        "src/Modules/Assistant/Reasoning"
+      ],
+      "implementation": "真实OpenAI兼容provider、配置密钥引用、检索/上下文/生成/引用验证/不确定性、预算取消",
+      "acceptance": "实际模型请求、错误超时/cancel、引用可点、注入不越权",
+      "testIds": [
+        "AT-T27"
+      ],
+      "productIds": [
+        "PD-11",
+        "PD-29",
+        "PD-30",
+        "PD-34",
+        "PD-37"
+      ],
+      "workpackageIds": [
+        "W22",
+        "W23"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T27",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-READ-011",
+        "BA-READ-012",
+        "ENG-ARCH-006",
+        "ENG-AI-001",
+        "ENG-AI-003",
+        "ENG-AI-005",
+        "ENG-OPS-006",
+        "PD-11",
+        "PD-29",
+        "PD-30",
+        "PD-34",
+        "PD-37"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/06_AI认知服务与MCP.md"
+      ],
+      "operationIds": [
+        "listConversations",
+        "createConversation",
+        "listMessages",
+        "sendMessage",
+        "conversationEvents",
+        "cancelConversation",
+        "listProviders",
+        "configureProvider"
+      ]
+    },
+    {
+      "taskId": "T28",
+      "title": "项目助手与对话持久化",
+      "ownerRole": "AiDev",
+      "modules": [
+        "M10"
+      ],
+      "dependsOn": [
+        "T27",
+        "T26"
+      ],
+      "repoPaths": [
+        "src/Modules/Assistant/Conversations"
+      ],
+      "implementation": "对象上下文、消息/引用/流式、失败恢复、售前可见范围、反馈提案",
+      "acceptance": "真实问答不越权，无证据不肯定；重开可读历史且重授权",
+      "testIds": [
+        "AT-T28"
+      ],
+      "productIds": [
+        "PD-12",
+        "PD-29",
+        "PD-34"
+      ],
+      "workpackageIds": [
+        "W18",
+        "W22"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T28",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-READ-001",
+        "BA-READ-007",
+        "BA-READ-011",
+        "BA-READ-012",
+        "BA-READ-013",
+        "BA-READ-014",
+        "ENG-AI-001",
+        "ENG-OPS-006",
+        "PD-12",
+        "PD-29",
+        "PD-34"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/06_AI认知服务与MCP.md"
+      ],
+      "operationIds": [
+        "listConversations",
+        "createConversation",
+        "listMessages",
+        "sendMessage",
+        "conversationEvents",
+        "cancelConversation",
+        "listProviders",
+        "configureProvider"
+      ]
+    },
+    {
+      "taskId": "T29",
+      "title": "外部Agent运行和工作协议",
+      "ownerRole": "AgentDev",
+      "modules": [
+        "M11"
+      ],
+      "dependsOn": [
+        "T17",
+        "T23",
+        "T24"
+      ],
+      "repoPaths": [
+        "src/Modules/AgentMcp/Runs",
+        "src/Modules/AgentMcp/Work"
+      ],
+      "implementation": "work请求/领取/fence/续租/结果、真实事件与重建区分、repo证据授权、状态恢复",
+      "acceptance": "外部执行真实repo调查、失败恢复/旧fence拒绝、禁止自动批准",
+      "testIds": [
+        "AT-T29"
+      ],
+      "productIds": [
+        "PD-24",
+        "PD-29",
+        "PD-30",
+        "PD-37"
+      ],
+      "workpackageIds": [
+        "W22",
+        "W23"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T29",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-COL-004",
+        "ENG-ARCH-006",
+        "ENG-AI-001",
+        "ENG-AI-003",
+        "ENG-AI-005",
+        "PD-24",
+        "PD-29",
+        "PD-30",
+        "PD-37"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/06_AI认知服务与MCP.md"
+      ],
+      "operationIds": [
+        "investigateImpact",
+        "listAgentRuns",
+        "startAgentRun",
+        "appendRunEvent",
+        "listRunEvents",
+        "listWorkRequests",
+        "claimWork",
+        "heartbeatWork",
+        "createWorkRequest",
+        "finishWork"
+      ]
+    },
+    {
+      "taskId": "T30",
+      "title": "MCP实际服务和Skill",
+      "ownerRole": "AgentDev",
+      "modules": [
+        "M11"
+      ],
+      "dependsOn": [
+        "T27",
+        "T29",
+        "T25"
+      ],
+      "repoPaths": [
+        "src/Modules/AgentMcp/Mcp",
+        "apps/Atlas.Api/Mcp",
+        "docs/skills"
+      ],
+      "implementation": "Streamable HTTP注册35工具、scope/参数/错误合同、资源重授权、CS-01~15组合Skill",
+      "acceptance": "真实客户端握手/调用，token scope负例、无approve/publish工具",
+      "testIds": [
+        "AT-T30"
+      ],
+      "productIds": [
+        "PD-20",
+        "PD-29",
+        "PD-30"
+      ],
+      "workpackageIds": [
+        "W22",
+        "W23"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T30",
+      "actualEvidence": null,
+      "requirementIds": [
+        "ENG-ARCH-005",
+        "ENG-ARCH-006",
+        "ENG-AI-001",
+        "ENG-AI-002",
+        "ENG-AI-003",
+        "PD-20",
+        "PD-29",
+        "PD-30"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/06_AI认知服务与MCP.md"
+      ],
+      "operationIds": [
+        "investigateImpact",
+        "listAgentRuns",
+        "startAgentRun",
+        "appendRunEvent",
+        "listRunEvents",
+        "listWorkRequests",
+        "claimWork",
+        "heartbeatWork",
+        "createWorkRequest",
+        "finishWork"
+      ]
+    },
+    {
+      "taskId": "T31",
+      "title": "PR知识候选提交与CI",
+      "ownerRole": "DeliveryDev",
+      "modules": [
+        "M09"
+      ],
+      "dependsOn": [
+        "T24",
+        "T25",
+        "T03"
+      ],
+      "repoPaths": [
+        "src/Modules/ContractDelivery/Delivery",
+        "contracts/knowledge-delivery",
+        "knowledge",
+        "azure-pipelines.yml"
+      ],
+      "implementation": "版本协议1.2/1.3、真实差异/blob验、外部manifest生成、可信CI证据；接续T02从首个PR建立的账本，不能推迟早期知识交付；对接真实后端导入及历史回放",
+      "acceptance": "真实PR squash/rebase 后SHA正确；重复/伪造manifest拒绝",
+      "testIds": [
+        "AT-T31"
+      ],
+      "productIds": [
+        "PD-30",
+        "PD-32",
+        "PD-33"
+      ],
+      "workpackageIds": [
+        "W25"
+      ],
+      "resourceLocks": [
+        "azure-pipelines.yml"
+      ],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T31",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-COL-005",
+        "BA-DLV-002",
+        "ENG-KNW-001",
+        "ENG-KNW-002",
+        "ENG-KNW-003",
+        "ENG-KNW-004",
+        "ENG-KNW-005",
+        "ENG-KNW-006",
+        "ENG-DEL-006",
+        "PD-30",
+        "PD-32",
+        "PD-33"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/05_变更调查与交付.md"
+      ],
+      "operationIds": [
+        "buildTaskContext",
+        "getTaskContext",
+        "exportContext",
+        "checkConformance",
+        "recordConformance",
+        "recordAcceptance",
+        "checkClosure",
+        "requestTaskClosure",
+        "ingestKnowledgeProposal",
+        "ingestDeliveryManifest",
+        "recordDeployment",
+        "listDeliveries",
+        "reconcileDelivery"
+      ]
+    },
+    {
+      "taskId": "T32",
+      "title": "部署对账和错误模式",
+      "ownerRole": "DeliveryDev",
+      "modules": [
+        "M09",
+        "M12"
+      ],
+      "dependsOn": [
+        "T25",
+        "T31",
+        "T17"
+      ],
+      "repoPaths": [
+        "src/Modules/ContractDelivery/Reconcile",
+        "src/Modules/PlatformOps/ErrorPatterns"
+      ],
+      "implementation": "部署事实、对账、回滚/知识债、错误模式候选审核和Task预检",
+      "acceptance": "不同部署显示分歧、回滚后复核；错误模式在后续任务命中",
+      "testIds": [
+        "AT-T32"
+      ],
+      "productIds": [
+        "PD-19",
+        "PD-32",
+        "PD-35",
+        "PD-37"
+      ],
+      "workpackageIds": [
+        "W25",
+        "W26"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T32",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-SEM-010",
+        "BA-COL-007",
+        "BA-COL-008",
+        "BA-DLV-002",
+        "ENG-KNW-001",
+        "ENG-KNW-004",
+        "ENG-KNW-007",
+        "ENG-KNW-008",
+        "PD-19",
+        "PD-32",
+        "PD-35",
+        "PD-37"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/05_变更调查与交付.md",
+        "01_技术实施/09_服务安全与任务恢复.md"
+      ],
+      "operationIds": [
+        "buildTaskContext",
+        "getTaskContext",
+        "exportContext",
+        "checkConformance",
+        "recordConformance",
+        "recordAcceptance",
+        "checkClosure",
+        "requestTaskClosure",
+        "ingestKnowledgeProposal",
+        "ingestDeliveryManifest",
+        "recordDeployment",
+        "listDeliveries",
+        "reconcileDelivery",
+        "listErrorPatterns",
+        "proposeErrorPattern",
+        "reviewErrorPattern",
+        "getJob",
+        "getJobResult",
+        "cancelJob",
+        "retryJob",
+        "listAudit",
+        "healthLive",
+        "healthReady"
+      ]
+    },
+    {
+      "taskId": "T33",
+      "title": "Web骨架与项目概览",
+      "ownerRole": "FrontendDev",
+      "modules": [
+        "WEB"
+      ],
+      "dependsOn": [
+        "T02",
+        "T05",
+        "T18",
+        "T19"
+      ],
+      "repoPaths": [
+        "apps/web/src/routes",
+        "apps/web/src/features/project",
+        "apps/web/src/shared"
+      ],
+      "implementation": "六入口及项目切换、真实客户端/auth、概览/目录/搜索、空/错误状态、资源深链",
+      "acceptance": "双项目切换无缓存污染、首页陌生用户可定位业务",
+      "testIds": [
+        "AT-T33"
+      ],
+      "productIds": [
+        "PD-01",
+        "PD-02",
+        "PD-12",
+        "PD-36"
+      ],
+      "workpackageIds": [
+        "W12",
+        "W17",
+        "W18"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T33",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-PRJ-001",
+        "BA-PRJ-002",
+        "BA-PRJ-005",
+        "BA-CAT-001",
+        "BA-CAT-002",
+        "BA-READ-001",
+        "BA-READ-007",
+        "BA-READ-013",
+        "BA-READ-014",
+        "PD-01",
+        "PD-02",
+        "PD-12",
+        "PD-36"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/07_Web产品实现.md"
+      ],
+      "operationIds": []
+    },
+    {
+      "taskId": "T34",
+      "title": "业务阅读及编辑UI",
+      "ownerRole": "FrontendDev",
+      "modules": [
+        "WEB"
+      ],
+      "dependsOn": [
+        "T33",
+        "T10",
+        "T19",
+        "T20"
+      ],
+      "repoPaths": [
+        "apps/web/src/features/knowledge"
+      ],
+      "implementation": "默认三Tab、领域术语、规则案例、flow文字、observed/design差异、证据按需、编辑候选",
+      "acceptance": "用户从业务案例判断，条件非重复，历史focus返回，无图引擎",
+      "testIds": [
+        "AT-T34"
+      ],
+      "productIds": [
+        "PD-03",
+        "PD-07",
+        "PD-08",
+        "PD-09",
+        "PD-10",
+        "PD-11",
+        "PD-12",
+        "PD-36"
+      ],
+      "workpackageIds": [
+        "W18",
+        "W19"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T34",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-READ-001",
+        "BA-READ-002",
+        "BA-READ-003",
+        "BA-READ-004",
+        "BA-READ-005",
+        "BA-READ-007",
+        "BA-READ-009",
+        "BA-READ-013",
+        "BA-READ-014",
+        "BA-VIS-001",
+        "BA-VIS-002",
+        "BA-VIS-003",
+        "BA-VIS-004",
+        "BA-VIS-005",
+        "BA-VIS-006",
+        "BA-VIS-007",
+        "BA-QA-003",
+        "PD-03",
+        "PD-07",
+        "PD-08",
+        "PD-09",
+        "PD-10",
+        "PD-11",
+        "PD-12",
+        "PD-36"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/07_Web产品实现.md"
+      ],
+      "operationIds": []
+    },
+    {
+      "taskId": "T35",
+      "title": "资料接入与审核UI",
+      "ownerRole": "FrontendDev2",
+      "modules": [
+        "WEB"
+      ],
+      "dependsOn": [
+        "T33",
+        "T16",
+        "T14",
+        "T15",
+        "T26"
+      ],
+      "repoPaths": [
+        "apps/web/src/features/review",
+        "apps/web/src/features/import"
+      ],
+      "implementation": "低频接入、预览、冲突、批注、批准差异/拒绝/发布、历史及权限变化",
+      "acceptance": "人审核成果非底层记录；完整成功/拒绝/重审/并发链路",
+      "testIds": [
+        "AT-T35"
+      ],
+      "productIds": [
+        "PD-13",
+        "PD-14",
+        "PD-16",
+        "PD-17",
+        "PD-18",
+        "PD-21"
+      ],
+      "workpackageIds": [
+        "W15",
+        "W16"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T35",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-GOV-001",
+        "BA-GOV-002",
+        "BA-GOV-003",
+        "BA-GOV-005",
+        "PD-13",
+        "PD-14",
+        "PD-16",
+        "PD-17",
+        "PD-18",
+        "PD-21"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/07_Web产品实现.md"
+      ],
+      "operationIds": []
+    },
+    {
+      "taskId": "T36",
+      "title": "任务问题与验收UI",
+      "ownerRole": "FrontendDev3",
+      "modules": [
+        "WEB"
+      ],
+      "dependsOn": [
+        "T33",
+        "T25",
+        "T26",
+        "T23",
+        "T32"
+      ],
+      "repoPaths": [
+        "apps/web/src/features/task",
+        "apps/web/src/features/delivery"
+      ],
+      "implementation": "轻量任务输入、四块默认摘要、调查/决策/保持、审批与知识交付、验收证据对账",
+      "acceptance": "目标/未知可读、从提出至完成、缺证据阻断，不默认十五类手填",
+      "testIds": [
+        "AT-T36"
+      ],
+      "productIds": [
+        "PD-13",
+        "PD-22",
+        "PD-23",
+        "PD-24",
+        "PD-25",
+        "PD-26",
+        "PD-27",
+        "PD-28",
+        "PD-31",
+        "PD-32",
+        "PD-34",
+        "PD-36"
+      ],
+      "workpackageIds": [
+        "W20",
+        "W21",
+        "W26"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T36",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-COL-001",
+        "BA-COL-002",
+        "BA-COL-003",
+        "BA-DLV-001",
+        "PD-13",
+        "PD-22",
+        "PD-23",
+        "PD-24",
+        "PD-25",
+        "PD-26",
+        "PD-27",
+        "PD-28",
+        "PD-31",
+        "PD-32",
+        "PD-34",
+        "PD-36"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/07_Web产品实现.md"
+      ],
+      "operationIds": []
+    },
+    {
+      "taskId": "T37",
+      "title": "助手入口与协作UI",
+      "ownerRole": "FrontendDev4",
+      "modules": [
+        "WEB"
+      ],
+      "dependsOn": [
+        "T33",
+        "T28",
+        "T30",
+        "T26"
+      ],
+      "repoPaths": [
+        "apps/web/src/features/assistant",
+        "apps/web/src/features/collaboration"
+      ],
+      "implementation": "右下上下文助手，授权提案/反馈、引用、真实运行/等待/错误状态、无一级助手页",
+      "acceptance": "不编造工具运行，阅读时上下文与焦点保留，反馈回知识",
+      "testIds": [
+        "AT-T37"
+      ],
+      "productIds": [
+        "PD-29",
+        "PD-30",
+        "PD-34",
+        "PD-36"
+      ],
+      "workpackageIds": [
+        "W18",
+        "W20",
+        "W22"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T37",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-READ-011",
+        "BA-READ-012",
+        "BA-COL-003",
+        "BA-COL-007",
+        "ENG-AI-001",
+        "ENG-AI-003",
+        "ENG-OPS-006",
+        "PD-29",
+        "PD-30",
+        "PD-34",
+        "PD-36"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/07_Web产品实现.md"
+      ],
+      "operationIds": []
+    },
+    {
+      "taskId": "T38",
+      "title": "真实Self Project导入与发布",
+      "ownerRole": "DeliveryDev",
+      "modules": [
+        "M09",
+        "ALL"
+      ],
+      "dependsOn": [
+        "T31",
+        "T35",
+        "T36",
+        "T37"
+      ],
+      "repoPaths": [
+        "knowledge/baseline",
+        "knowledge/proposals",
+        "scripts/self-project"
+      ],
+      "implementation": "从真实仓库PR/source构建自我知识，经过人审核发布，第二次真需求变更回写",
+      "acceptance": "真实源码、PR、测试、审批、版本可追溯；非原型假数据",
+      "testIds": [
+        "AT-T38"
+      ],
+      "productIds": [
+        "PD-32",
+        "PD-33",
+        "PD-38"
+      ],
+      "workpackageIds": [
+        "W25"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T38",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-QA-005",
+        "ENG-KNW-001",
+        "ENG-KNW-002",
+        "ENG-KNW-004",
+        "PD-32",
+        "PD-33",
+        "PD-38"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/05_变更调查与交付.md",
+        "01_技术实施/02_数据与持久化.md"
+      ],
+      "operationIds": [
+        "buildTaskContext",
+        "getTaskContext",
+        "exportContext",
+        "checkConformance",
+        "recordConformance",
+        "recordAcceptance",
+        "checkClosure",
+        "requestTaskClosure",
+        "ingestKnowledgeProposal",
+        "ingestDeliveryManifest",
+        "recordDeployment",
+        "listDeliveries",
+        "reconcileDelivery"
+      ]
+    },
+    {
+      "taskId": "T39",
+      "title": "部署流水线与运行配置",
+      "ownerRole": "ReleaseOwner",
+      "modules": [
+        "OPS"
+      ],
+      "dependsOn": [
+        "T02",
+        "T03",
+        "T17",
+        "T31",
+        "T33",
+        "T34",
+        "T35",
+        "T36",
+        "T37"
+      ],
+      "repoPaths": [
+        "deploy/compose",
+        "deploy/proxy",
+        "deploy/identity",
+        "azure-pipelines.yml",
+        "scripts"
+      ],
+      "implementation": "实际ARM64镜像、TLS、OIDC、专用角色、迁移、secret模板、自动化部署和健康检查",
+      "acceptance": "macOS目标实际安装；发布与失败回退可追踪；资源实测",
+      "testIds": [
+        "AT-T39"
+      ],
+      "productIds": [
+        "PD-32",
+        "PD-37",
+        "PD-38"
+      ],
+      "workpackageIds": [
+        "W24",
+        "W26"
+      ],
+      "resourceLocks": [
+        "azure-pipelines.yml"
+      ],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T39",
+      "actualEvidence": null,
+      "requirementIds": [
+        "ENG-ARCH-001",
+        "ENG-DEL-004",
+        "ENG-OPS-003",
+        "ENG-OPS-004",
+        "PD-32",
+        "PD-37",
+        "PD-38"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/09_服务安全与任务恢复.md"
+      ],
+      "operationIds": []
+    },
+    {
+      "taskId": "T40",
+      "title": "备份恢复与运行监控",
+      "ownerRole": "OpsDev",
+      "modules": [
+        "OPS"
+      ],
+      "dependsOn": [
+        "T39",
+        "T32"
+      ],
+      "repoPaths": [
+        "deploy/backup",
+        "deploy/ops",
+        "scripts/restore"
+      ],
+      "implementation": "一致DB/blob备份、WAL/PITR、隔离恢复、日志指标、告警、容量/升级运行手册",
+      "acceptance": "灾难恢复演练、备份校验、告警触发/可定位、租约恢复",
+      "testIds": [
+        "AT-T40"
+      ],
+      "productIds": [
+        "PD-18",
+        "PD-37",
+        "PD-38"
+      ],
+      "workpackageIds": [
+        "W24",
+        "W26"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T40",
+      "actualEvidence": null,
+      "requirementIds": [
+        "ENG-ARCH-007",
+        "ENG-ARCH-008",
+        "ENG-DEL-004",
+        "ENG-OPS-003",
+        "PD-18",
+        "PD-37",
+        "PD-38"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/09_服务安全与任务恢复.md"
+      ],
+      "operationIds": []
+    },
+    {
+      "taskId": "T41",
+      "title": "独立领域与合同验收",
+      "ownerRole": "IndependentQA",
+      "modules": [
+        "QA"
+      ],
+      "dependsOn": [
+        "T14",
+        "T15",
+        "T16",
+        "T20",
+        "T25",
+        "T30"
+      ],
+      "repoPaths": [
+        "tests/Domain",
+        "tests/Integration",
+        "tests/Contract",
+        "tests/GoldenSemantic"
+      ],
+      "implementation": "独立对照INV、真实PG事务、协议、黄金规则/流程、旧AKP、符合性与Task负例",
+      "acceptance": "关键不变量与已知缺陷100%通过；独立预期及证据",
+      "testIds": [
+        "AT-T41"
+      ],
+      "productIds": [
+        "PD-03",
+        "PD-05",
+        "PD-07",
+        "PD-08",
+        "PD-09",
+        "PD-11",
+        "PD-14",
+        "PD-15",
+        "PD-17",
+        "PD-18",
+        "PD-19",
+        "PD-21",
+        "PD-25",
+        "PD-31",
+        "PD-38"
+      ],
+      "workpackageIds": [
+        "W27",
+        "W26"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T41",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-SEM-004",
+        "BA-SEM-006",
+        "BA-VIS-002",
+        "BA-QA-002",
+        "ENG-ARCH-004",
+        "ENG-DEL-002",
+        "ENG-DEL-005",
+        "ENG-DEL-007",
+        "PD-03",
+        "PD-05",
+        "PD-07",
+        "PD-08",
+        "PD-09",
+        "PD-11",
+        "PD-14",
+        "PD-15",
+        "PD-17",
+        "PD-18",
+        "PD-19",
+        "PD-21",
+        "PD-25",
+        "PD-31",
+        "PD-38"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/04_知识语义与读取.md"
+      ],
+      "operationIds": []
+    },
+    {
+      "taskId": "T42",
+      "title": "独立安全与性能验收",
+      "ownerRole": "SecurityQA",
+      "modules": [
+        "QA"
+      ],
+      "dependsOn": [
+        "T39",
+        "T40",
+        "T30",
+        "T18",
+        "T26"
+      ],
+      "repoPaths": [
+        "tests/Security",
+        "tests/Integration/Performance"
+      ],
+      "implementation": "真实双项目读写/field/source/缓存/MCP/导出及供应链、并发容量与Mac资源",
+      "acceptance": "零越权；关键性能目标实测；秘密/依赖扫描及恢复",
+      "testIds": [
+        "AT-T42"
+      ],
+      "productIds": [
+        "PD-20",
+        "PD-28",
+        "PD-37",
+        "PD-38"
+      ],
+      "workpackageIds": [
+        "W14",
+        "W24",
+        "W26",
+        "W27"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T42",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-ACC-001",
+        "BA-ACC-002",
+        "BA-ACC-003",
+        "BA-ACC-006",
+        "BA-ACC-007",
+        "BA-QA-001",
+        "ENG-ARCH-003",
+        "ENG-DEL-002",
+        "ENG-DEL-005",
+        "ENG-DEL-007",
+        "ENG-OPS-002",
+        "ENG-OPS-003",
+        "ENG-OPS-005",
+        "PD-20",
+        "PD-28",
+        "PD-37",
+        "PD-38"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/04_知识语义与读取.md"
+      ],
+      "operationIds": []
+    },
+    {
+      "taskId": "T43",
+      "title": "真实用户与Agent端到端",
+      "ownerRole": "IndependentQA",
+      "modules": [
+        "QA"
+      ],
+      "dependsOn": [
+        "T38",
+        "T39",
+        "T40",
+        "T41",
+        "T42"
+      ],
+      "repoPaths": [
+        "tests/EndToEnd",
+        "tests/GoldenSemantic",
+        "docs/acceptance"
+      ],
+      "implementation": "真实CPQ或授权真实业务、Self二次变更、盲测规则、人工审批与完整交付、真实模型评估",
+      "acceptance": "AT-P01~14及J1~J9全链路证据，真实资料缺失显式阻断",
+      "testIds": [
+        "AT-T43"
+      ],
+      "productIds": [
+        "PD-12",
+        "PD-13",
+        "PD-24",
+        "PD-29",
+        "PD-30",
+        "PD-31",
+        "PD-32",
+        "PD-33",
+        "PD-34",
+        "PD-38"
+      ],
+      "workpackageIds": [
+        "W27",
+        "W26"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T43",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-DLV-001",
+        "BA-QA-004",
+        "BA-QA-005",
+        "ENG-DEL-002",
+        "ENG-DEL-005",
+        "ENG-DEL-007",
+        "PD-12",
+        "PD-13",
+        "PD-24",
+        "PD-29",
+        "PD-30",
+        "PD-31",
+        "PD-32",
+        "PD-33",
+        "PD-34",
+        "PD-38"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/04_知识语义与读取.md"
+      ],
+      "operationIds": []
+    },
+    {
+      "taskId": "T44",
+      "title": "完整签出与移交",
+      "ownerRole": "Leader,ReleaseOwner,QA,BA",
+      "modules": [
+        "ALL"
+      ],
+      "dependsOn": [
+        "T01",
+        "T38",
+        "T39",
+        "T40",
+        "T41",
+        "T42",
+        "T43"
+      ],
+      "repoPaths": [
+        "docs/release",
+        "knowledge",
+        "deploy",
+        "contracts"
+      ],
+      "implementation": "154条追溯实际回填、G0-G7、批准范围、全部PR/部署/知识基线、未完风险；用户验收",
+      "acceptance": "全量已确认范围实际完成，阻断项0，真实部署与知产归档",
+      "testIds": [
+        "AT-T44"
+      ],
+      "productIds": [
+        "PD-37",
+        "PD-38"
+      ],
+      "workpackageIds": [
+        "W26",
+        "W27"
+      ],
+      "resourceLocks": [],
+      "requiredOutputs": [
+        "实现/合同对应文件",
+        "真实测试与构建日志",
+        "独立评审证据",
+        "本任务KnowledgeChange或获批无影响决定"
+      ],
+      "status": "planned",
+      "plannedBranch": "task/T44",
+      "actualEvidence": null,
+      "requirementIds": [
+        "BA-QA-003",
+        "BA-QA-005",
+        "ENG-DEL-001",
+        "ENG-DEL-002",
+        "ENG-DEL-003",
+        "ENG-DEL-004",
+        "ENG-DEL-006",
+        "ENG-DEL-007",
+        "ENG-DEL-008",
+        "PD-37",
+        "PD-38"
+      ],
+      "knowledgeOutputs": [
+        "对应PD/BA/ENG和实际技术设计/观察/测试/来源差异",
+        "已知未知、决策与保留不变量",
+        "PR候选及合并后真实Manifest"
+      ],
+      "contractRefs": [
+        "01_技术实施/01_目标架构与范围.md",
+        "02_机器合同/README.md",
+        "01_技术实施/02_数据与持久化.md"
+      ],
+      "operationIds": []
+    }
+  ]
+}

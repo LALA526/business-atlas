@@ -1,0 +1,109 @@
+{
+  "title": "Business Atlas P1.0 产品研究与设计基线（待审）",
+  "date": "2026-11-19",
+  "scope": "文档、追溯表与静态一致性校验；非生产实现/非真实业务验收",
+  "checks": {
+    "principles": 12,
+    "mechanisms": 8,
+    "product_requirements": 38,
+    "acceptance_tasks": 14,
+    "design_decisions": 22,
+    "open_questions": 14,
+    "cognitive_services": 15,
+    "prior_invariants": 14,
+    "golden_sample_groups": 5,
+    "prior_requirements_retained_in_trace": 116,
+    "trace_dispositions": {
+      "clarify": 64,
+      "retain": 45,
+      "defer_graph_candidate": 4,
+      "revise_candidate": 3
+    },
+    "checked_relative_links": 16,
+    "markdown_document_count": 15,
+    "markdown_chars": 65808
+  },
+  "source_archive_sha256": "d62b8d438961b7c95c1a07406b77aced8a888f1f0be083b188878cc21b0fcdae",
+  "files": [
+    {
+      "path": "01_概念体系/01_产品宪章与边界.md",
+      "bytes": 8282,
+      "sha256": "c8d2a7177af85d68df9374d8fce1545a46ef7322ed47cdcb12b91e7f473278fe"
+    },
+    {
+      "path": "01_概念体系/02_知识本体_领域语义与词典.md",
+      "bytes": 14158,
+      "sha256": "49da7fdaef4f64eb310c176195421b0945af1040e35f68517d22bae366bd2616"
+    },
+    {
+      "path": "02_核心机制/03_知识组织与语义追溯.md",
+      "bytes": 10863,
+      "sha256": "967b7a72e375a88f6b51a83fa4d1775b3396789db414c83a10ebb5253e91e433"
+    },
+    {
+      "path": "02_核心机制/04_知识表达与认知质量.md",
+      "bytes": 9515,
+      "sha256": "5c39524f03c724a3533849a6beec30d5bf676eae8d3bee59b8d3e0e90cd93b33"
+    },
+    {
+      "path": "02_核心机制/05_权威知识_审批与版本治理.md",
+      "bytes": 9102,
+      "sha256": "465a0d6f3a983e111456b05c7c2fdd910b3db187dfbb4de07e7ba7314e654a0d"
+    },
+    {
+      "path": "02_核心机制/06_变更语义_影响分析与闭合.md",
+      "bytes": 9814,
+      "sha256": "26c4c0e110c30b648acca5dc2f36545781b179df72397c735c141ae454705acd"
+    },
+    {
+      "path": "02_核心机制/07_AI认知服务与开发协作.md",
+      "bytes": 11431,
+      "sha256": "c3e0d30c25af1c20f5924b201e0539f2b9c0ebe743695f0d10cbcb8e7113baf3"
+    },
+    {
+      "path": "03_产品体验/08_信息架构_页面与交互规范.md",
+      "bytes": 9832,
+      "sha256": "250b125ff1172e213a01be96697d4474719a6f08eb8500692f6247b795e0bf42"
+    },
+    {
+      "path": "03_产品体验/09_项目生命周期与用户旅程.md",
+      "bytes": 7237,
+      "sha256": "fe5df6a7a5552df220d0cd814e423cb1021f94c40c1e4eb7cc711232f3bc7506"
+    },
+    {
+      "path": "04_案例与验收/10_业务黄金样本与变更推演.md",
+      "bytes": 15147,
+      "sha256": "dfb47c609121e643853ac73bf6500e658be8131b39056eea9960156829c9bb60"
+    },
+    {
+      "path": "04_案例与验收/11_产品需求与认知验收.md",
+      "bytes": 12645,
+      "sha256": "ca7580aaef8312b94ac56602b19e86966a3175a46e1a0aa65e7a230468a76f0d"
+    },
+    {
+      "path": "05_决策与交接/12_设计决策与开放问题.md",
+      "bytes": 10851,
+      "sha256": "8815d3dc987f17cc11ac435c981e4950eeea8f3cedf3810ad3f29a009b38e27b"
+    },
+    {
+      "path": "05_决策与交接/13_研究依据与既有基线衔接.md",
+      "bytes": 12007,
+      "sha256": "c6179e49e16106494ada6fe74c2a3106dc42015a6adb196ffbf67b1acfad394f"
+    },
+    {
+      "path": "05_决策与交接/14_全量设计交接与维护规范.md",
+      "bytes": 6768,
+      "sha256": "3cb48e611bf89aff9efdf270854a920da1fc5fbc7f10575f2d64d22d474005fa"
+    },
+    {
+      "path": "05_决策与交接/V1.2_116条需求衔接.csv",
+      "bytes": 38156,
+      "sha256": "e7e0d98d1a68c58d843b312fa8497150e18243f6b925a8db9369e8b0ba0df524"
+    },
+    {
+      "path": "README.md",
+      "bytes": 5596,
+      "sha256": "0301653b9f680e9b93dae8cf52158883021ea7e0606b969488491bb8164743f8"
+    }
+  ]
+}

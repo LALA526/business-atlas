@@ -1,0 +1,495 @@
+{
+  "source": "T1.0",
+  "maxConcurrentTasks": 1,
+  "tasks": [
+    {
+      "taskId": "T01",
+      "dependsOn": [],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T02",
+      "dependsOn": [
+        "T01"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T03",
+      "dependsOn": [
+        "T02"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T04",
+      "dependsOn": [
+        "T02",
+        "T03"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T05",
+      "dependsOn": [
+        "T03",
+        "T04"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T06",
+      "dependsOn": [
+        "T05"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T07",
+      "dependsOn": [
+        "T03",
+        "T06"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T08",
+      "dependsOn": [
+        "T06",
+        "T07"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T09",
+      "dependsOn": [
+        "T08"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T10",
+      "dependsOn": [
+        "T08",
+        "T09"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T11",
+      "dependsOn": [
+        "T08",
+        "T09",
+        "T10"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T12",
+      "dependsOn": [
+        "T04",
+        "T06",
+        "T08"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T13",
+      "dependsOn": [
+        "T08",
+        "T10",
+        "T11",
+        "T12"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T14",
+      "dependsOn": [
+        "T13",
+        "T06"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T15",
+      "dependsOn": [
+        "T14"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T16",
+      "dependsOn": [
+        "T12",
+        "T13",
+        "T14"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T17",
+      "dependsOn": [
+        "T03",
+        "T04",
+        "T06"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T18",
+      "dependsOn": [
+        "T09",
+        "T12",
+        "T14",
+        "T17"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T19",
+      "dependsOn": [
+        "T11",
+        "T14",
+        "T18"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T20",
+      "dependsOn": [
+        "T10",
+        "T19"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T21",
+      "dependsOn": [
+        "T14",
+        "T19"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T22",
+      "dependsOn": [
+        "T09",
+        "T19",
+        "T21"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T23",
+      "dependsOn": [
+        "T22",
+        "T17",
+        "T21"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T24",
+      "dependsOn": [
+        "T14",
+        "T15",
+        "T22",
+        "T23"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T25",
+      "dependsOn": [
+        "T10",
+        "T23",
+        "T24"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T26",
+      "dependsOn": [
+        "T14",
+        "T17",
+        "T21"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T27",
+      "dependsOn": [
+        "T17",
+        "T19",
+        "T20",
+        "T24"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T28",
+      "dependsOn": [
+        "T27",
+        "T26"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T29",
+      "dependsOn": [
+        "T17",
+        "T23",
+        "T24"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T30",
+      "dependsOn": [
+        "T27",
+        "T29",
+        "T25"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T31",
+      "dependsOn": [
+        "T24",
+        "T25",
+        "T03"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T32",
+      "dependsOn": [
+        "T25",
+        "T31",
+        "T17"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T33",
+      "dependsOn": [
+        "T02",
+        "T05",
+        "T18",
+        "T19"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T34",
+      "dependsOn": [
+        "T33",
+        "T10",
+        "T19",
+        "T20"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T35",
+      "dependsOn": [
+        "T33",
+        "T16",
+        "T14",
+        "T15",
+        "T26"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T36",
+      "dependsOn": [
+        "T33",
+        "T25",
+        "T26",
+        "T23",
+        "T32"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T37",
+      "dependsOn": [
+        "T33",
+        "T28",
+        "T30",
+        "T26"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T38",
+      "dependsOn": [
+        "T31",
+        "T35",
+        "T36",
+        "T37"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T39",
+      "dependsOn": [
+        "T02",
+        "T03",
+        "T17",
+        "T31",
+        "T33",
+        "T34",
+        "T35",
+        "T36",
+        "T37"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T40",
+      "dependsOn": [
+        "T39",
+        "T32"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T41",
+      "dependsOn": [
+        "T14",
+        "T15",
+        "T16",
+        "T20",
+        "T25",
+        "T30"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T42",
+      "dependsOn": [
+        "T39",
+        "T40",
+        "T30",
+        "T18",
+        "T26"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T43",
+      "dependsOn": [
+        "T38",
+        "T39",
+        "T40",
+        "T41",
+        "T42"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    },
+    {
+      "taskId": "T44",
+      "dependsOn": [
+        "T01",
+        "T38",
+        "T39",
+        "T40",
+        "T41",
+        "T42",
+        "T43"
+      ],
+      "status": "planned",
+      "lease": null,
+      "evidence": []
+    }
+  ]
+}

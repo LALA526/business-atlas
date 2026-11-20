@@ -1,0 +1,306 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:business-atlas:Impact:1.0",
+  "$defs": {
+    "Impact": {
+      "type": "object",
+      "properties": {
+        "impactId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "taskId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "target": {
+          "$ref": "#/$defs/UnitRef"
+        },
+        "locator": {
+          "$ref": "#/$defs/SourceLocator"
+        },
+        "path": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "edge": {
+                "$ref": "#/$defs/RevisionRef"
+              },
+              "predicate": {
+                "type": "string",
+                "minLength": 1
+              },
+              "direction": {
+                "type": "string",
+                "enum": [
+                  "forward",
+                  "reverse"
+                ]
+              }
+            },
+            "required": [
+              "edge",
+              "predicate",
+              "direction"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "disposition": {
+          "type": "string",
+          "enum": [
+            "required",
+            "potential",
+            "no_change",
+            "deferred",
+            "unknown"
+          ]
+        },
+        "inspectionState": {
+          "type": "string",
+          "enum": [
+            "candidate",
+            "inspected",
+            "verified",
+            "stale"
+          ]
+        },
+        "investigationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "risk": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ]
+        },
+        "assignedTaskId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          }
+        },
+        "closeState": {
+          "type": "string",
+          "enum": [
+            "open",
+            "resolved",
+            "deferred"
+          ]
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "taskId",
+        "path",
+        "disposition",
+        "inspectionState",
+        "reason",
+        "risk",
+        "evidence",
+        "closeState"
+      ],
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": [
+            "target"
+          ]
+        },
+        {
+          "required": [
+            "locator"
+          ]
+        }
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "disposition": {
+                "const": "no_change"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "investigationId"
+            ],
+            "properties": {
+              "evidence": {
+                "minItems": 1
+              },
+              "inspectionState": {
+                "enum": [
+                  "inspected",
+                  "verified"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "disposition": {
+                "const": "deferred"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "assignedTaskId"
+            ]
+          }
+        }
+      ]
+    },
+    "EvidenceRef": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "$ref": "#/$defs/RevisionRef"
+        },
+        "locator": {
+          "$ref": "#/$defs/SourceLocator"
+        },
+        "support": {
+          "type": "string",
+          "enum": [
+            "supports",
+            "refutes",
+            "contextual"
+          ]
+        },
+        "captureKind": {
+          "type": "string",
+          "enum": [
+            "rawCaptured",
+            "verifiedScript",
+            "reconstructed",
+            "proposed",
+            "humanAttestation"
+          ]
+        }
+      },
+      "required": [
+        "source",
+        "locator",
+        "support",
+        "captureKind"
+      ],
+      "additionalProperties": false
+    },
+    "SourceLocator": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "file",
+            "git",
+            "url",
+            "test",
+            "human",
+            "document"
+          ]
+        },
+        "path": {
+          "type": "string"
+        },
+        "repo": {
+          "type": "string"
+        },
+        "commitSha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40,64}$"
+        },
+        "blobSha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40,64}$"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "lineStart": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "lineEnd": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "uri": {
+          "type": "string"
+        },
+        "quote": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "RevisionRef": {
+      "type": "object",
+      "properties": {
+        "unitId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "revisionId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "unitId",
+        "revisionId"
+      ],
+      "additionalProperties": false
+    },
+    "UnitRef": {
+      "type": "object",
+      "properties": {
+        "unitId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "revisionId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "unitId"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$ref": "#/$defs/Impact"
+}

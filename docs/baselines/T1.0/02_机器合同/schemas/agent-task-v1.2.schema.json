@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agent Development Task v1.2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "taskId",
+    "workpackageId",
+    "title",
+    "ownerRole",
+    "moduleBoundary",
+    "requirementIds",
+    "dependencyTaskIds",
+    "contractRefs",
+    "resourceLocks",
+    "plannedOutputs",
+    "acceptanceTestIds",
+    "knowledgeOutputs",
+    "status",
+    "attempt",
+    "taskRevision"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.2.0"
+    },
+    "taskId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "workpackageId": {
+      "type": "string",
+      "pattern": "^W[0-9]{2}$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "ownerRole": {
+      "type": "string",
+      "minLength": 1
+    },
+    "moduleBoundary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "requirementIds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^(BA|ENG)-[A-Z]+-[0-9]{3}$"
+      }
+    },
+    "dependencyTaskIds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "contractRefs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "resourceLocks": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "plannedOutputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "acceptanceTestIds": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "knowledgeOutputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "status": {
+      "enum": [
+        "queued",
+        "ready",
+        "leased",
+        "running",
+        "verifying",
+        "review_pending",
+        "integrating",
+        "done",
+        "retryable",
+        "failed",
+        "review_rejected",
+        "integration_conflict",
+        "stale_contract",
+        "blocked",
+        "blocked_external",
+        "cancelled"
+      ]
+    },
+    "attempt": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "taskRevision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "branch": {
+      "type": "string"
+    },
+    "workspacePath": {
+      "type": "string"
+    },
+    "exactFilePaths": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "contractDigest": {
+      "type": "string"
+    },
+    "lease": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "holder",
+        "expiresAt",
+        "fencingToken"
+      ],
+      "properties": {
+        "holder": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "fencingToken": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "resultEvidence": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

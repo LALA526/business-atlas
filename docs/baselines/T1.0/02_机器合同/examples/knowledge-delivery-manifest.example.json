@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "1.2.0",
+  "deliveryId": "KDEL-EXAMPLE-001",
+  "proposalId": "KCP-EXAMPLE-001",
+  "proposalSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "projectId": "PRJ-SELF",
+  "taskId": "T-W15-03",
+  "repo": {
+    "url": "https://example.invalid/business-atlas.git",
+    "pullRequestId": "PR-123"
+  },
+  "finalCommitSha": "dddddddddddddddddddddddddddddddddddddddd",
+  "mergeStrategy": "squash",
+  "buildId": "CI-EXAMPLE-123",
+  "buildDigest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  "verifiedAt": "2026-11-16T00:00:00Z",
+  "testEvidence": [
+    {
+      "testId": "AT-IMP-005",
+      "result": "passed",
+      "artifactUri": "ci://run-123/tests/import.xml"
+    }
+  ],
+  "anchorResolutions": [
+    {
+      "path": "src/Modules/ImportEvidence/StageImport.cs",
+      "locator": "StageImport.Handle",
+      "resolvedBlobSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "verification": "matched"
+    }
+  ],
+  "status": "verified",
+  "artifactUri": "ci://run-123/knowledge-delivery.json",
+  "ciRunId": "CI-EXAMPLE-123"
+}

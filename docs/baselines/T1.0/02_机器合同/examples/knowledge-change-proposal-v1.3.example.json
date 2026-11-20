@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "1.3.0",
+  "proposalId": "KCP-EXAMPLE-001",
+  "projectId": "PRJ-SELF",
+  "taskId": "T-W15-03",
+  "requirementIds": [
+    "BA-IMP-005",
+    "ENG-KNW-001",
+    "PD-32"
+  ],
+  "changeKind": "feature",
+  "repo": {
+    "url": "https://example.invalid/business-atlas.git",
+    "branch": "feature/import-staging",
+    "pullRequestId": "PR-123",
+    "baseSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "changedFiles": [
+    {
+      "path": "src/Modules/ImportEvidence/StageImport.cs",
+      "changeType": "modified",
+      "blobSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    }
+  ],
+  "entityChanges": [
+    {
+      "stableId": "CMP-STAGE",
+      "kind": "modified",
+      "factLevel": "observed",
+      "summary": "Import stage writes draft atomically",
+      "sourceAnchorIds": [
+        "src/Modules/ImportEvidence/StageImport.cs"
+      ]
+    }
+  ],
+  "assertionChanges": [],
+  "apiChanges": [
+    {
+      "operationId": "imports.stage",
+      "kind": "modified",
+      "contractPath": "contracts/openapi/import.yaml",
+      "authorizationPolicy": "project.import.stage"
+    }
+  ],
+  "dataChanges": [
+    {
+      "migrationId": "20261116_import_staging",
+      "description": "external identity unique key"
+    }
+  ],
+  "testEvidence": [
+    {
+      "testId": "AT-IMP-005",
+      "result": "passed",
+      "artifactUri": "ci://run-123/tests/import.xml"
+    }
+  ],
+  "sourceAnchors": [
+    {
+      "path": "src/Modules/ImportEvidence/StageImport.cs",
+      "locator": "StageImport.Handle",
+      "blobSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    }
+  ],
+  "knowledgeStatus": "proposed",
+  "unknowns": [
+    "Contract details are illustrative; no actual PR exists"
+  ],
+  "errorsObserved": [],
+  "contractDigests": [
+    "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+  ]
+}

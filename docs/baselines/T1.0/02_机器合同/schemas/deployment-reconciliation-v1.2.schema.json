@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Knowledge Deployment Reconciliation v1.2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "deploymentId",
+    "repository",
+    "deployedCommitSha",
+    "deliveryId",
+    "knowledgeBaselineId",
+    "status",
+    "checkedAt",
+    "discrepancies"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.2.0"
+    },
+    "deploymentId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repository": {
+      "type": "string",
+      "minLength": 1
+    },
+    "deployedCommitSha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40,64}$"
+    },
+    "deliveryId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "knowledgeBaselineId": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "aligned",
+        "pending_review",
+        "divergent",
+        "rolled_back",
+        "evidence_missing"
+      ]
+    },
+    "checkedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "discrepancies": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "responsibleTaskId": {
+      "type": "string"
+    },
+    "knowledgeDebtId": {
+      "type": "string"
+    }
+  }
+}

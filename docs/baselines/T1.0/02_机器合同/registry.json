@@ -1,0 +1,1116 @@
+{
+  "version": "atlas-registry/1.0",
+  "dimensions": [
+    {
+      "key": "project",
+      "label": "项目认知"
+    },
+    {
+      "key": "business",
+      "label": "业务认知"
+    },
+    {
+      "key": "system",
+      "label": "系统认知"
+    },
+    {
+      "key": "knowledge",
+      "label": "知识资产"
+    },
+    {
+      "key": "governance",
+      "label": "协作治理"
+    }
+  ],
+  "types": [
+    {
+      "kind": "ProjectProfile",
+      "schemaVersion": "1.0",
+      "dimension": "project",
+      "profile": "project",
+      "strictBodySchema": "ProjectBody",
+      "bodyRequiredAtPublish": [
+        "purpose",
+        "scope",
+        "nonScope",
+        "stakeholders",
+        "capabilities",
+        "systems"
+      ]
+    },
+    {
+      "kind": "DomainTerm",
+      "schemaVersion": "1.0",
+      "dimension": "business",
+      "profile": "vocabulary",
+      "strictBodySchema": "TermBody",
+      "bodyRequiredAtPublish": [
+        "definition",
+        "contextKey",
+        "aliases"
+      ]
+    },
+    {
+      "kind": "DomainConcept",
+      "schemaVersion": "1.0",
+      "dimension": "business",
+      "profile": "vocabulary",
+      "strictBodySchema": "TermBody",
+      "bodyRequiredAtPublish": [
+        "definition",
+        "contextKey",
+        "aliases"
+      ]
+    },
+    {
+      "kind": "BusinessObject",
+      "schemaVersion": "1.0",
+      "dimension": "business",
+      "profile": "vocabulary",
+      "strictBodySchema": "TermBody",
+      "bodyRequiredAtPublish": [
+        "definition",
+        "contextKey",
+        "aliases"
+      ]
+    },
+    {
+      "kind": "BusinessAttribute",
+      "schemaVersion": "1.0",
+      "dimension": "business",
+      "profile": "vocabulary",
+      "strictBodySchema": "TermBody",
+      "bodyRequiredAtPublish": [
+        "definition",
+        "contextKey",
+        "aliases"
+      ]
+    },
+    {
+      "kind": "Requirement",
+      "schemaVersion": "1.0",
+      "dimension": "business",
+      "profile": "requirement",
+      "strictBodySchema": "RequirementBody",
+      "bodyRequiredAtPublish": [
+        "problem",
+        "goal",
+        "beneficiaries",
+        "scope",
+        "successCriteria"
+      ]
+    },
+    {
+      "kind": "BusinessRule",
+      "schemaVersion": "1.0",
+      "dimension": "business",
+      "profile": "rule",
+      "strictBodySchema": "RuleBody",
+      "bodyRequiredAtPublish": [
+        "purpose",
+        "evaluationMode",
+        "inputs",
+        "priorityPolicy",
+        "rows",
+        "exceptionExplanation",
+        "caseRefs"
+      ]
+    },
+    {
+      "kind": "Flow",
+      "schemaVersion": "1.0",
+      "dimension": "business",
+      "profile": "flow",
+      "strictBodySchema": "FlowBody",
+      "bodyRequiredAtPublish": [
+        "purpose",
+        "stageOrder",
+        "stages",
+        "nodes",
+        "edges",
+        "entryNodeId",
+        "endNodeIds"
+      ]
+    },
+    {
+      "kind": "Transition",
+      "schemaVersion": "1.0",
+      "dimension": "business",
+      "profile": "state",
+      "strictBodySchema": "TransitionBody",
+      "bodyRequiredAtPublish": [
+        "object",
+        "from",
+        "to",
+        "trigger",
+        "guardRuleRefs"
+      ]
+    },
+    {
+      "kind": "Relationship",
+      "schemaVersion": "1.0",
+      "dimension": "knowledge",
+      "profile": "relation",
+      "strictBodySchema": "RelationBody",
+      "bodyRequiredAtPublish": [
+        "predicate",
+        "from",
+        "to",
+        "meaning"
+      ]
+    },
+    {
+      "kind": "Assertion",
+      "schemaVersion": "1.0",
+      "dimension": "knowledge",
+      "profile": "assertion",
+      "strictBodySchema": "AssertionBody",
+      "bodyRequiredAtPublish": [
+        "subject",
+        "predicate",
+        "qualifiers"
+      ]
+    },
+    {
+      "kind": "Design",
+      "schemaVersion": "1.0",
+      "dimension": "system",
+      "profile": "design",
+      "strictBodySchema": "DesignBody",
+      "bodyRequiredAtPublish": [
+        "purpose",
+        "responsibility",
+        "nonResponsibility",
+        "inputs",
+        "outputs",
+        "processing",
+        "dataEffects",
+        "errors",
+        "constraintRefs"
+      ]
+    },
+    {
+      "kind": "Component",
+      "schemaVersion": "1.0",
+      "dimension": "system",
+      "profile": "design",
+      "strictBodySchema": "DesignBody",
+      "bodyRequiredAtPublish": [
+        "purpose",
+        "responsibility",
+        "nonResponsibility",
+        "inputs",
+        "outputs",
+        "processing",
+        "dataEffects",
+        "errors",
+        "constraintRefs"
+      ]
+    },
+    {
+      "kind": "Api",
+      "schemaVersion": "1.0",
+      "dimension": "system",
+      "profile": "design",
+      "strictBodySchema": "DesignBody",
+      "bodyRequiredAtPublish": [
+        "purpose",
+        "responsibility",
+        "nonResponsibility",
+        "inputs",
+        "outputs",
+        "processing",
+        "dataEffects",
+        "errors",
+        "constraintRefs"
+      ]
+    },
+    {
+      "kind": "Implementation",
+      "schemaVersion": "1.0",
+      "dimension": "system",
+      "profile": "design",
+      "strictBodySchema": "DesignBody",
+      "bodyRequiredAtPublish": [
+        "purpose",
+        "responsibility",
+        "nonResponsibility",
+        "inputs",
+        "outputs",
+        "processing",
+        "dataEffects",
+        "errors",
+        "constraintRefs"
+      ]
+    },
+    {
+      "kind": "Observation",
+      "schemaVersion": "1.0",
+      "dimension": "business",
+      "profile": "observation",
+      "strictBodySchema": "ObservationBody",
+      "bodyRequiredAtPublish": [
+        "subject",
+        "buildDigest",
+        "environment",
+        "method",
+        "input",
+        "actual",
+        "observedAt",
+        "evidenceRefs",
+        "limitations"
+      ]
+    },
+    {
+      "kind": "BusinessCase",
+      "schemaVersion": "1.0",
+      "dimension": "business",
+      "profile": "case",
+      "strictBodySchema": "CaseBody",
+      "bodyRequiredAtPublish": [
+        "target",
+        "input",
+        "expected",
+        "caseKind",
+        "context",
+        "expectedExplanation"
+      ]
+    },
+    {
+      "kind": "Source",
+      "schemaVersion": "1.0",
+      "dimension": "knowledge",
+      "profile": "source",
+      "strictBodySchema": "SourceBody",
+      "bodyRequiredAtPublish": [
+        "sourceKind",
+        "locator",
+        "provenance"
+      ]
+    },
+    {
+      "kind": "DataField",
+      "schemaVersion": "1.0",
+      "dimension": "system",
+      "profile": "data",
+      "strictBodySchema": "DataBody",
+      "bodyRequiredAtPublish": [
+        "businessMeaning",
+        "valueType",
+        "missingNullSemantics",
+        "origin",
+        "constraints",
+        "mappingRefs"
+      ]
+    },
+    {
+      "kind": "TypeDefinition",
+      "schemaVersion": "1.0",
+      "dimension": "knowledge",
+      "profile": "registry",
+      "strictBodySchema": "SchemaDefinitionBody",
+      "bodyRequiredAtPublish": [
+        "typeKey",
+        "version",
+        "profile",
+        "schema",
+        "category"
+      ]
+    },
+    {
+      "kind": "PredicateDefinition",
+      "schemaVersion": "1.0",
+      "dimension": "knowledge",
+      "profile": "registry",
+      "strictBodySchema": "PredicateDefinitionBody",
+      "bodyRequiredAtPublish": [
+        "predicate",
+        "fromKinds",
+        "toKinds",
+        "meaning",
+        "impactDirections"
+      ]
+    },
+    {
+      "kind": "ContentProfile",
+      "schemaVersion": "1.0",
+      "dimension": "knowledge",
+      "profile": "registry",
+      "strictBodySchema": "SchemaDefinitionBody",
+      "bodyRequiredAtPublish": [
+        "typeKey",
+        "version",
+        "profile",
+        "schema",
+        "category"
+      ]
+    },
+    {
+      "kind": "Domain",
+      "schemaVersion": "1.0",
+      "dimension": "project",
+      "profile": "standard",
+      "strictBodySchema": "GenericBody",
+      "bodyRequiredAtPublish": []
+    },
+    {
+      "kind": "Capability",
+      "schemaVersion": "1.0",
+      "dimension": "project",
+      "profile": "standard",
+      "strictBodySchema": "GenericBody",
+      "bodyRequiredAtPublish": []
+    },
+    {
+      "kind": "Feature",
+      "schemaVersion": "1.0",
+      "dimension": "business",
+      "profile": "feature",
+      "strictBodySchema": "FeatureBody",
+      "bodyRequiredAtPublish": [
+        "purpose",
+        "actors",
+        "requirementRefs",
+        "ruleRefs",
+        "behaviorRefs",
+        "designRefs",
+        "nonScope"
+      ]
+    },
+    {
+      "kind": "Actor",
+      "schemaVersion": "1.0",
+      "dimension": "business",
+      "profile": "standard",
+      "strictBodySchema": "GenericBody",
+      "bodyRequiredAtPublish": []
+    },
+    {
+      "kind": "Action",
+      "schemaVersion": "1.0",
+      "dimension": "business",
+      "profile": "behavior",
+      "strictBodySchema": "ActionBody",
+      "bodyRequiredAtPublish": [
+        "purpose",
+        "actorRefs",
+        "objectRefs",
+        "preconditions",
+        "ruleRefs",
+        "effects",
+        "exceptions"
+      ]
+    },
+    {
+      "kind": "Event",
+      "schemaVersion": "1.0",
+      "dimension": "business",
+      "profile": "event",
+      "strictBodySchema": "EventBody",
+      "bodyRequiredAtPublish": [
+        "meaning",
+        "trigger",
+        "subjectRefs",
+        "effects",
+        "ruleRefs"
+      ]
+    },
+    {
+      "kind": "Behavior",
+      "schemaVersion": "1.0",
+      "dimension": "business",
+      "profile": "behavior",
+      "strictBodySchema": "ActionBody",
+      "bodyRequiredAtPublish": [
+        "purpose",
+        "actorRefs",
+        "objectRefs",
+        "preconditions",
+        "ruleRefs",
+        "effects",
+        "exceptions"
+      ]
+    },
+    {
+      "kind": "State",
+      "schemaVersion": "1.0",
+      "dimension": "business",
+      "profile": "state",
+      "strictBodySchema": "StateBody",
+      "bodyRequiredAtPublish": [
+        "objectRef",
+        "meaning",
+        "invariants",
+        "terminal"
+      ]
+    },
+    {
+      "kind": "Constraint",
+      "schemaVersion": "1.0",
+      "dimension": "business",
+      "profile": "constraint",
+      "strictBodySchema": "ConstraintBody",
+      "bodyRequiredAtPublish": [
+        "statement",
+        "scope",
+        "violationEffect",
+        "verificationMethod",
+        "subjectRefs"
+      ]
+    },
+    {
+      "kind": "Decision",
+      "schemaVersion": "1.0",
+      "dimension": "governance",
+      "profile": "decision",
+      "strictBodySchema": "DecisionBody",
+      "bodyRequiredAtPublish": [
+        "question",
+        "alternatives",
+        "recommendation",
+        "rationale",
+        "effects",
+        "preserveRefs"
+      ]
+    },
+    {
+      "kind": "System",
+      "schemaVersion": "1.0",
+      "dimension": "system",
+      "profile": "design",
+      "strictBodySchema": "DesignBody",
+      "bodyRequiredAtPublish": [
+        "purpose",
+        "responsibility",
+        "nonResponsibility",
+        "inputs",
+        "outputs",
+        "processing",
+        "dataEffects",
+        "errors",
+        "constraintRefs"
+      ]
+    },
+    {
+      "kind": "Module",
+      "schemaVersion": "1.0",
+      "dimension": "system",
+      "profile": "design",
+      "strictBodySchema": "DesignBody",
+      "bodyRequiredAtPublish": [
+        "purpose",
+        "responsibility",
+        "nonResponsibility",
+        "inputs",
+        "outputs",
+        "processing",
+        "dataEffects",
+        "errors",
+        "constraintRefs"
+      ]
+    },
+    {
+      "kind": "DataEntity",
+      "schemaVersion": "1.0",
+      "dimension": "system",
+      "profile": "data",
+      "strictBodySchema": "DataEntityBody",
+      "bodyRequiredAtPublish": [
+        "meaning",
+        "identitySemantics",
+        "attributeRefs",
+        "fieldRefs",
+        "constraints",
+        "lifecycle"
+      ]
+    },
+    {
+      "kind": "Operation",
+      "schemaVersion": "1.0",
+      "dimension": "system",
+      "profile": "design",
+      "strictBodySchema": "DesignBody",
+      "bodyRequiredAtPublish": [
+        "purpose",
+        "responsibility",
+        "nonResponsibility",
+        "inputs",
+        "outputs",
+        "processing",
+        "dataEffects",
+        "errors",
+        "constraintRefs"
+      ]
+    },
+    {
+      "kind": "Environment",
+      "schemaVersion": "1.0",
+      "dimension": "system",
+      "profile": "standard",
+      "strictBodySchema": "GenericBody",
+      "bodyRequiredAtPublish": []
+    },
+    {
+      "kind": "Deployment",
+      "schemaVersion": "1.0",
+      "dimension": "system",
+      "profile": "standard",
+      "strictBodySchema": "GenericBody",
+      "bodyRequiredAtPublish": []
+    },
+    {
+      "kind": "Test",
+      "schemaVersion": "1.0",
+      "dimension": "system",
+      "profile": "test",
+      "strictBodySchema": "TestBody",
+      "bodyRequiredAtPublish": [
+        "purpose",
+        "targetRefs",
+        "preconditions",
+        "steps",
+        "expected"
+      ]
+    },
+    {
+      "kind": "OperationalKnowledge",
+      "schemaVersion": "1.0",
+      "dimension": "system",
+      "profile": "standard",
+      "strictBodySchema": "GenericBody",
+      "bodyRequiredAtPublish": []
+    },
+    {
+      "kind": "EngineeringStandard",
+      "schemaVersion": "1.0",
+      "dimension": "system",
+      "profile": "constraint",
+      "strictBodySchema": "ConstraintBody",
+      "bodyRequiredAtPublish": [
+        "statement",
+        "scope",
+        "violationEffect",
+        "verificationMethod",
+        "subjectRefs"
+      ]
+    },
+    {
+      "kind": "QualityRequirement",
+      "schemaVersion": "1.0",
+      "dimension": "system",
+      "profile": "constraint",
+      "strictBodySchema": "ConstraintBody",
+      "bodyRequiredAtPublish": [
+        "statement",
+        "scope",
+        "violationEffect",
+        "verificationMethod",
+        "subjectRefs"
+      ]
+    },
+    {
+      "kind": "Document",
+      "schemaVersion": "1.0",
+      "dimension": "knowledge",
+      "profile": "standard",
+      "strictBodySchema": "GenericBody",
+      "bodyRequiredAtPublish": []
+    },
+    {
+      "kind": "Metric",
+      "schemaVersion": "1.0",
+      "dimension": "project",
+      "profile": "standard",
+      "strictBodySchema": "GenericBody",
+      "bodyRequiredAtPublish": []
+    },
+    {
+      "kind": "Milestone",
+      "schemaVersion": "1.0",
+      "dimension": "project",
+      "profile": "standard",
+      "strictBodySchema": "GenericBody",
+      "bodyRequiredAtPublish": []
+    },
+    {
+      "kind": "Permission",
+      "schemaVersion": "1.0",
+      "dimension": "governance",
+      "profile": "standard",
+      "strictBodySchema": "GenericBody",
+      "bodyRequiredAtPublish": []
+    },
+    {
+      "kind": "Risk",
+      "schemaVersion": "1.0",
+      "dimension": "project",
+      "profile": "standard",
+      "strictBodySchema": "GenericBody",
+      "bodyRequiredAtPublish": []
+    },
+    {
+      "kind": "TechnicalDebt",
+      "schemaVersion": "1.0",
+      "dimension": "governance",
+      "profile": "standard",
+      "strictBodySchema": "GenericBody",
+      "bodyRequiredAtPublish": []
+    },
+    {
+      "kind": "Configuration",
+      "schemaVersion": "1.0",
+      "dimension": "system",
+      "profile": "standard",
+      "strictBodySchema": "GenericBody",
+      "bodyRequiredAtPublish": []
+    },
+    {
+      "kind": "Exception",
+      "schemaVersion": "1.0",
+      "dimension": "business",
+      "profile": "standard",
+      "strictBodySchema": "GenericBody",
+      "bodyRequiredAtPublish": []
+    },
+    {
+      "kind": "Compensation",
+      "schemaVersion": "1.0",
+      "dimension": "business",
+      "profile": "standard",
+      "strictBodySchema": "GenericBody",
+      "bodyRequiredAtPublish": []
+    },
+    {
+      "kind": "Scenario",
+      "schemaVersion": "1.0",
+      "dimension": "business",
+      "profile": "scenario",
+      "strictBodySchema": "ScenarioBody",
+      "bodyRequiredAtPublish": [
+        "purpose",
+        "context",
+        "trigger",
+        "participants",
+        "preconditions",
+        "steps",
+        "ruleRefs",
+        "flowRefs",
+        "outcomes",
+        "exceptions"
+      ]
+    }
+  ],
+  "predicates": [
+    {
+      "key": "contains",
+      "fromKinds": [
+        "Domain",
+        "Capability",
+        "System",
+        "Module",
+        "Feature",
+        "ProjectProfile"
+      ],
+      "toKinds": [
+        "*"
+      ],
+      "impactDirections": [
+        "scope_only"
+      ],
+      "meaning": "归属，不是执行"
+    },
+    {
+      "key": "defines",
+      "fromKinds": [
+        "DomainTerm",
+        "DomainConcept"
+      ],
+      "toKinds": [
+        "DomainConcept",
+        "BusinessAttribute",
+        "BusinessObject"
+      ],
+      "impactDirections": [
+        "forward",
+        "reverse"
+      ],
+      "meaning": "定义"
+    },
+    {
+      "key": "specializes",
+      "fromKinds": [
+        "DomainConcept",
+        "BusinessRule"
+      ],
+      "toKinds": [
+        "DomainConcept",
+        "BusinessRule"
+      ],
+      "impactDirections": [
+        "forward",
+        "reverse"
+      ],
+      "meaning": "细化"
+    },
+    {
+      "key": "refines",
+      "fromKinds": [
+        "Requirement",
+        "BusinessRule",
+        "QualityRequirement"
+      ],
+      "toKinds": [
+        "Requirement",
+        "QualityRequirement"
+      ],
+      "impactDirections": [
+        "forward",
+        "reverse"
+      ],
+      "meaning": "细化需求"
+    },
+    {
+      "key": "usesFact",
+      "fromKinds": [
+        "BusinessRule"
+      ],
+      "toKinds": [
+        "BusinessAttribute",
+        "DomainConcept",
+        "Assertion",
+        "BusinessObject"
+      ],
+      "impactDirections": [
+        "reverse",
+        "forward"
+      ],
+      "meaning": "业务判断依据"
+    },
+    {
+      "key": "constrains",
+      "fromKinds": [
+        "BusinessRule",
+        "Constraint",
+        "QualityRequirement"
+      ],
+      "toKinds": [
+        "Behavior",
+        "Action",
+        "BusinessObject",
+        "State",
+        "Flow",
+        "Component",
+        "Api"
+      ],
+      "impactDirections": [
+        "forward",
+        "reverse"
+      ],
+      "meaning": "约束，不是执行"
+    },
+    {
+      "key": "performs",
+      "fromKinds": [
+        "Actor",
+        "Component",
+        "System"
+      ],
+      "toKinds": [
+        "Action",
+        "Operation",
+        "Behavior"
+      ],
+      "impactDirections": [
+        "forward",
+        "reverse"
+      ],
+      "meaning": "履责"
+    },
+    {
+      "key": "triggers",
+      "fromKinds": [
+        "Event",
+        "Action"
+      ],
+      "toKinds": [
+        "Action",
+        "Event",
+        "Behavior"
+      ],
+      "impactDirections": [
+        "forward",
+        "reverse"
+      ],
+      "meaning": "明确触发"
+    },
+    {
+      "key": "followsWhen",
+      "fromKinds": [
+        "Action",
+        "Event",
+        "Behavior"
+      ],
+      "toKinds": [
+        "Action",
+        "Event",
+        "Behavior"
+      ],
+      "impactDirections": [
+        "forward",
+        "reverse"
+      ],
+      "meaning": "明确条件执行"
+    },
+    {
+      "key": "changesState",
+      "fromKinds": [
+        "Action",
+        "Transition",
+        "Behavior"
+      ],
+      "toKinds": [
+        "State",
+        "BusinessObject"
+      ],
+      "impactDirections": [
+        "forward",
+        "reverse"
+      ],
+      "meaning": "状态变化"
+    },
+    {
+      "key": "satisfies",
+      "fromKinds": [
+        "Behavior",
+        "Action",
+        "Capability",
+        "Feature"
+      ],
+      "toKinds": [
+        "Requirement",
+        "QualityRequirement"
+      ],
+      "impactDirections": [
+        "forward",
+        "reverse"
+      ],
+      "meaning": "目标满足，非验收"
+    },
+    {
+      "key": "implements",
+      "fromKinds": [
+        "Api",
+        "Component",
+        "Implementation",
+        "Operation",
+        "Module"
+      ],
+      "toKinds": [
+        "BusinessRule",
+        "Behavior",
+        "Action",
+        "Design",
+        "Requirement"
+      ],
+      "impactDirections": [
+        "forward",
+        "reverse"
+      ],
+      "meaning": "实现映射"
+    },
+    {
+      "key": "mapsTo",
+      "fromKinds": [
+        "BusinessAttribute",
+        "DomainConcept",
+        "BusinessObject"
+      ],
+      "toKinds": [
+        "DataField",
+        "DataEntity",
+        "Api",
+        "Operation",
+        "Implementation"
+      ],
+      "impactDirections": [
+        "reverse",
+        "forward"
+      ],
+      "meaning": "业务到实现语义映射"
+    },
+    {
+      "key": "calls",
+      "fromKinds": [
+        "Api",
+        "Component",
+        "Operation",
+        "Implementation"
+      ],
+      "toKinds": [
+        "Api",
+        "Component",
+        "Operation",
+        "Implementation"
+      ],
+      "impactDirections": [
+        "forward",
+        "reverse"
+      ],
+      "meaning": "真实技术调用"
+    },
+    {
+      "key": "reads",
+      "fromKinds": [
+        "Action",
+        "Operation",
+        "Api",
+        "Implementation"
+      ],
+      "toKinds": [
+        "BusinessAttribute",
+        "DataField",
+        "DataEntity"
+      ],
+      "impactDirections": [
+        "reverse",
+        "forward"
+      ],
+      "meaning": "数据读取"
+    },
+    {
+      "key": "writes",
+      "fromKinds": [
+        "Action",
+        "Operation",
+        "Api",
+        "Implementation"
+      ],
+      "toKinds": [
+        "BusinessAttribute",
+        "DataField",
+        "DataEntity"
+      ],
+      "impactDirections": [
+        "reverse",
+        "forward"
+      ],
+      "meaning": "数据写入"
+    },
+    {
+      "key": "dependsOn",
+      "fromKinds": [
+        "*"
+      ],
+      "toKinds": [
+        "*"
+      ],
+      "impactDirections": [
+        "scope_only"
+      ],
+      "meaning": "一般依赖，须调查"
+    },
+    {
+      "key": "governedBy",
+      "fromKinds": [
+        "*"
+      ],
+      "toKinds": [
+        "Constraint",
+        "Decision",
+        "Design",
+        "BusinessRule"
+      ],
+      "impactDirections": [
+        "reverse",
+        "forward"
+      ],
+      "meaning": "既定职责约束"
+    },
+    {
+      "key": "validates",
+      "fromKinds": [
+        "BusinessCase",
+        "Test"
+      ],
+      "toKinds": [
+        "BusinessRule",
+        "Requirement",
+        "QualityRequirement",
+        "Constraint"
+      ],
+      "impactDirections": [
+        "reverse",
+        "forward"
+      ],
+      "meaning": "验证目标，不代表通过"
+    },
+    {
+      "key": "observedAt",
+      "fromKinds": [
+        "Observation"
+      ],
+      "toKinds": [
+        "Implementation",
+        "Deployment",
+        "Environment",
+        "Source"
+      ],
+      "impactDirections": [
+        "forward",
+        "reverse"
+      ],
+      "meaning": "观察版本环境"
+    },
+    {
+      "key": "evidencedBy",
+      "fromKinds": [
+        "*"
+      ],
+      "toKinds": [
+        "Source",
+        "Observation"
+      ],
+      "impactDirections": [
+        "reverse",
+        "forward"
+      ],
+      "meaning": "证据支持"
+    },
+    {
+      "key": "supersedes",
+      "fromKinds": [
+        "*"
+      ],
+      "toKinds": [
+        "*"
+      ],
+      "impactDirections": [
+        "forward",
+        "reverse"
+      ],
+      "meaning": "替代，禁止循环"
+    },
+    {
+      "key": "conflictsWith",
+      "fromKinds": [
+        "*"
+      ],
+      "toKinds": [
+        "*"
+      ],
+      "impactDirections": [
+        "forward",
+        "reverse"
+      ],
+      "meaning": "冲突待决"
+    }
+  ],
+  "aliases": {
+    "Rule": "BusinessRule",
+    "Scenario": "Scenario",
+    "Entity": "legacy-type-resolve",
+    "belongsTo": "contains:reverse",
+    "Feature": "Feature"
+  },
+  "note": "legacy Scenario maps to Scenario; create and link Flow only when actual nodes/edges exist, and keep source; no inference of approval. GenericBody is a base; P1.0 profile-specific semantics still necessary."
+}

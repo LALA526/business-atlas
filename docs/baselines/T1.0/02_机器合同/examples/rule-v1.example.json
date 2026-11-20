@@ -1,0 +1,59 @@
+{
+  "purpose": "EX: 匹配业务属性名称决定是否应用（合成示例）",
+  "evaluationMode": "structured",
+  "inputs": [
+    {
+      "attribute": {
+        "unitId": "00000000-0000-4000-8000-000000000001"
+      },
+      "label": "参数名称",
+      "valueType": "string",
+      "missingSemantics": "缺键表示未知，不自动等同空值",
+      "nullSemantics": "null为未提供名称，只有已确认分支可使用"
+    }
+  ],
+  "priorityPolicy": "unique",
+  "rows": [
+    {
+      "rowId": "EX-R1",
+      "situation": "有名称且名称为A",
+      "comparisonExplanation": "按区分大小写的精确字符串A匹配",
+      "when": {
+        "op": "all",
+        "args": [
+          {
+            "op": "exists",
+            "operand": {
+              "kind": "field",
+              "attributeId": "00000000-0000-4000-8000-000000000001"
+            }
+          },
+          {
+            "op": "eq",
+            "left": {
+              "kind": "field",
+              "attributeId": "00000000-0000-4000-8000-000000000001"
+            },
+            "right": {
+              "kind": "literal",
+              "valueType": "string",
+              "value": "A"
+            },
+            "comparison": "ordinal"
+          }
+        ]
+      },
+      "outcome": {
+        "kind": "perform",
+        "description": "应用参数"
+      },
+      "evidenceRefs": []
+    }
+  ],
+  "defaultOutcome": {
+    "kind": "skip",
+    "description": "已知但不匹配的参数不应用"
+  },
+  "exceptionExplanation": "缺失事实不得推断默认行为；本例非真实CPQ规范。",
+  "caseRefs": []
+}

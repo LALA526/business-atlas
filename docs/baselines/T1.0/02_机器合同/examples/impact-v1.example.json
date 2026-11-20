@@ -1,0 +1,23 @@
+{
+  "taskId": "00000000-0000-4000-8000-000000000011",
+  "target": {
+    "unitId": "00000000-0000-4000-8000-000000000013",
+    "revisionId": "00000000-0000-4000-8000-000000000014"
+  },
+  "path": [
+    {
+      "edge": {
+        "unitId": "00000000-0000-4000-8000-000000000021",
+        "revisionId": "00000000-0000-4000-8000-000000000022"
+      },
+      "predicate": "usesFact",
+      "direction": "reverse"
+    }
+  ],
+  "disposition": "potential",
+  "inspectionState": "candidate",
+  "reason": "EX: 属性映射可能影响规则，尚未调查实际代码",
+  "risk": "high",
+  "evidence": [],
+  "closeState": "open"
+}

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "atlas-leader": {
+      "description": "按T1.0任务依赖协调、审查方案和完整性，不实现功能",
+      "mode": "primary",
+      "model": "kimi-code-plan-cn/k3.1-pro",
+      "prompt": "先读AGENTS.md和T1.0 Leader指令。持有154需求、14不变量、44任务的整体责任。按实际DAG认领、派工、验收，保留任务状态与证据。不得兼任全部功能开发，不得以局部编译成功代替业务验收。技术细节自主决定并留ADR，未知业务事实显式保留。当前若任务要求只是方案或环境准备，禁止启动完整产品开发。"
+    },
+    "atlas-builder": {
+      "description": "在独立任务分支中按冻结合同实现完整行为",
+      "mode": "primary",
+      "prompt": "先读AGENTS.md、指定T-ID与关联合同。由调用方用-m显式选择已经验证可用的Kimi或RoutinAI模型。分析完整数据流和调用方后实施，覆盖成功、拒绝、并发和失败恢复。不得自行批准自己的实现，不得改写共享合同或其他任务迁移。交付实际diff、测试日志、需求追溯和知识候选。遇到402停止当前provider，不无限重试。",
+      "model": "kimi-code-plan-cn/kimi-for-coding"
+    },
+    "atlas-reviewer": {
+      "description": "独立检查需求、全量影响和实现差异",
+      "mode": "primary",
+      "model": "kimi-code-plan-cn/k3.1-pro",
+      "tools": {
+        "edit": false,
+        "write": false,
+        "bash": false
+      },
+      "prompt": "从基线和验收条件独立判断，不把开发者总结当证据。读取真实diff和相关调用路径，检查产品语义、越权、版本并发、旧路径及维护成本。只报告可定位的问题和证据。给出pass或needs_changes及未验证项，不修改代码，不冒充业务Owner签署。"
+    },
+    "atlas-qa": {
+      "description": "独立验收工作树中执行领域、集成、安全和浏览器验证",
+      "mode": "primary",
+      "prompt": "使用独立QA工作树和隔离测试数据库。从已确认目标和Golden Case设计独立预期，运行实际测试。禁止通过改动产品源代码使测试变绿。失败返回可复现条件和真实日志；通过也列未覆盖项。保存commit、contract digest、环境、结果及证据路径。",
+      "model": "kimi-code-plan-cn/kimi-for-coding"
+    }
+  },
+  "model": "kimi-code-plan-cn/k3.1-pro",
+  "small_model": "kimi-code-plan-cn/kimi-for-coding",
+  "autoupdate": false,
+  "permission": {
+    "external_directory": {
+      "*": "deny",
+      "/Users/fox/Workspace/projects/business-atlas-preflight/env.sh": "allow",
+      "/Users/fox/Workspace/projects/business-atlas-preflight/evidence/*": "allow",
+      "/Users/fox/Workspace/projects/business-atlas-preflight/runner-state/*": "allow"
+    },
+    "read": {
+      "*": "allow",
+      "*.env": "deny",
+      "*/.env": "deny",
+      "**/secrets/*": "deny",
+      "**/azure-pat": "deny"
+    }
+  }
+}

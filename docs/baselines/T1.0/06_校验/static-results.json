@@ -1,0 +1,17 @@
+{
+  "schemas": 17,
+  "examples": 14,
+  "openapi_operations": 114,
+  "unique_operation_owners": 114,
+  "paths": 95,
+  "mcp_tools": 35,
+  "types": 52,
+  "predicates": 23,
+  "sql_tables": 50,
+  "sql_rls_tables": 49,
+  "tasks": 44,
+  "trace_rows": 154,
+  "legacy_rows": 116,
+  "new_rows": 38,
+  "status": "static_checks_passed"
+}

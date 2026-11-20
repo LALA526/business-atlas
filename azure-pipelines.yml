@@ -1,0 +1,46 @@
+trigger:
+  branches:
+    include: [main]
+
+stages:
+  - stage: VerifyPreparation
+    jobs:
+      - job: BuildPreparationArm64
+        pool:
+          name: Atlas-Build
+          demands:
+            - Agent.Name -equals atlas-mac16-build
+        timeoutInMinutes: 45
+        steps:
+          - checkout: self
+            clean: true
+            persistCredentials: false
+          - bash: |
+              set -euo pipefail
+              source /Users/fox/Workspace/projects/business-atlas-preflight/env.sh
+              /Users/fox/Workspace/projects/business-atlas-preflight/.venv/bin/python scripts/preflight/verify.py
+              IMAGE=$(python3.13 -c 'import json; print(json.load(open("preparation/policy.json"))["image"])')
+              python3.13 scripts/preflight/package.py --out "$BUILD_ARTIFACTSTAGINGDIRECTORY/release" --release-id "prep-$BUILD_BUILDID" --image "$IMAGE"
+            displayName: Validate baseline, UI and runner; package preparation container
+          - publish: $(Build.ArtifactStagingDirectory)/release
+            artifact: atlas-preparation-release
+
+  - stage: DeployPreparationMac8
+    dependsOn: VerifyPreparation
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), ne(variables['Build.Reason'], 'PullRequest'))
+    jobs:
+      - job: DeployPreparationContainer
+        pool:
+          name: Default
+          demands:
+            - Agent.Name -equals mac-mini-m1-deploy
+        timeoutInMinutes: 20
+        steps:
+          - checkout: none
+          - download: current
+            artifact: atlas-preparation-release
+          - bash: |
+              set -euo pipefail
+              export ATLAS_EXPECTED_COMMIT="$BUILD_SOURCEVERSION"
+              /Users/mac/atlas-deploy/bin/deploy-verified-release "$PIPELINE_WORKSPACE/atlas-preparation-release"
+            displayName: Verify artifact, deploy isolated container and check health
