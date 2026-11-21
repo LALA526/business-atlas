@@ -8,6 +8,7 @@
   <ItemGroup>
     <ProjectReference Include="../../src/BuildingBlocks/BuildingBlocks.csproj" />
     <ProjectReference Include="../../src/Modules/AccessApplicability/AccessApplicability.csproj" />
+    <ProjectReference Include="../../src/Modules/Governance/Governance.csproj" />
     <ProjectReference Include="../../src/Modules/ImportEvidence/ImportEvidence.csproj" />
     <ProjectReference Include="../../src/Modules/KnowledgeCore/KnowledgeCore.csproj" />
     <ProjectReference Include="../../src/Modules/PlatformOps/PlatformOps.csproj" />

@@ -47,6 +47,7 @@ public sealed record RevisionView(
 
 public sealed record RevisionViewPage(IReadOnlyList<RevisionView> Items, string? NextCursor);
 public sealed record RevisionMutation(RevisionView Revision, long ProjectVersion);
+public sealed record ProposalBatchResult(Guid ChangeSetId, long ProjectVersion, IReadOnlyList<RevisionView> Revisions);
 public sealed record RuleEvaluationRequest(ReadContextRequest ReadContext, JsonElement Facts);
 public sealed record RuleCondition(string RowId, string Value, string Reason);
 public sealed record RuleResult(string Status, IReadOnlyList<JsonElement> Outcomes,

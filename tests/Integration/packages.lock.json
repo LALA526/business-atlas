@@ -520,6 +520,7 @@
         "dependencies": {
           "AccessApplicability": "[1.0.0, )",
           "BuildingBlocks": "[1.0.0, )",
+          "Governance": "[1.0.0, )",
           "ImportEvidence": "[1.0.0, )",
           "KnowledgeCore": "[1.0.0, )",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "[10.0.15, )",
@@ -533,6 +534,14 @@
         "type": "Project",
         "dependencies": {
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.0, )"
+        }
+      },
+      "governance": {
+        "type": "Project",
+        "dependencies": {
+          "AccessApplicability": "[1.0.0, )",
+          "KnowledgeCore": "[1.0.0, )",
+          "ProjectIdentity": "[1.0.0, )"
         }
       },
       "importevidence": {

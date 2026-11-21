@@ -181,6 +181,114 @@ public sealed class PostgresKnowledgeStore(string connectionString, PostgresAcce
         }
     }
 
+    public async Task<ProposalBatchResult> CreateProposalBatchAsync(AtlasPrincipal actor, Guid projectId, Guid baseBaselineId, string title, Guid? taskId,
+        IReadOnlyList<RevisionInput> inputs, IReadOnlyList<Guid> impactIds, string key, string requestId, string? traceId, CancellationToken ct)
+    {
+        if (actor.Kind == PrincipalKind.Service) throw ProjectIdentityException.Forbidden();
+        if (key.Length is < 8 or > 128 || inputs.Count == 0) throw ProjectIdentityException.Invalid("A proposal requires an idempotency key and at least one revision.");
+        foreach (var input in inputs) Validate(input, input.UnitId, key);
+        if (inputs.Where(input => input.UnitId.HasValue).Select(input => input.UnitId).Distinct().Count() != inputs.Count(input => input.UnitId.HasValue))
+            throw ProjectIdentityException.Invalid("A proposal can revise each stable unit only once.");
+        var digest = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(CanonicalJson.Serialize(JsonSerializer.SerializeToElement(new { projectId, baseBaselineId, title, taskId, inputs, impactIds }, Json))))).ToLowerInvariant();
+        await using var connection = await OpenAsync(ct);
+        await using var tx = await connection.BeginTransactionAsync(ct);
+        await SetContextAsync(tx, projectId, actor.PrincipalId, ct);
+        var projectVersion = await RequireProposerAsync(tx, projectId, actor.PrincipalId, ct);
+        var replay = await FindProposalIdempotencyAsync(tx, projectId, actor.PrincipalId, key, digest, ct);
+        if (replay is not null) { await tx.CommitAsync(ct); return replay; }
+        await RequireCurrentBaseAsync(tx, projectId, baseBaselineId, ct);
+        if (taskId.HasValue && !await TaskMatchesBaseAsync(tx, projectId, taskId.Value, baseBaselineId, ct)) throw ProjectIdentityException.Invalid("taskId must identify a task based on the proposal base.");
+        foreach (var impact in impactIds) await RequireResolvedImpactAsync(tx, projectId, impact, ct);
+
+        var changeSetId = Guid.NewGuid();
+        await using (var create = tx.CreateCommand())
+        {
+            create.CommandText = "INSERT INTO gov.change_set(project_id,change_set_id,base_baseline_id,title,state,created_by) VALUES(@project,@id,@base,@title,'draft',@actor);";
+            create.Parameters.AddWithValue("project", projectId); create.Parameters.AddWithValue("id", changeSetId); create.Parameters.AddWithValue("base", baseBaselineId);
+            create.Parameters.AddWithValue("title", title.Trim()); create.Parameters.AddWithValue("actor", actor.PrincipalId);
+            await create.ExecuteNonQueryAsync(ct);
+        }
+        var revisions = new List<RevisionView>();
+        foreach (var input in inputs) revisions.Add(await InsertProposalRevisionAsync(tx, actor, projectId, changeSetId, input, ct));
+        var result = new ProposalBatchResult(changeSetId, checked(projectVersion + 1), revisions);
+        await using (var write = tx.CreateCommand())
+        {
+            write.CommandText = """
+                UPDATE identity.project SET version=version+1 WHERE project_id=@project;
+                INSERT INTO ops.idempotency(project_id,principal_id,operation_id,idempotency_key,request_sha256,result_ref)
+                VALUES(@project,@actor,'submitProposal',@key,@digest,@result::jsonb);
+                INSERT INTO ops.audit_event(project_id,actor_id,action,resource_ref,result_code,request_id,trace_id)
+                VALUES(@project,@actor,'submitProposal',@resource::jsonb,'OK',@request,@trace);
+                INSERT INTO ops.outbox(project_id,event_id,event_type,aggregate_id,aggregate_revision,schema_version,payload,state)
+                VALUES(@project,@event,'KnowledgeProposalCreated.v1',@id,1,'1.0',@payload::jsonb,'queued');
+                """;
+            write.Parameters.AddWithValue("project", projectId); write.Parameters.AddWithValue("actor", actor.PrincipalId); write.Parameters.AddWithValue("key", key); write.Parameters.AddWithValue("digest", digest);
+            write.Parameters.Add(new NpgsqlParameter("result", NpgsqlDbType.Jsonb) { Value = JsonSerializer.Serialize(result, Json) });
+            write.Parameters.Add(new NpgsqlParameter("resource", NpgsqlDbType.Jsonb) { Value = JsonSerializer.Serialize(new { changeSetId, taskId, revisionIds = revisions.Select(item => item.RevisionId) }, Json) });
+            write.Parameters.AddWithValue("request", requestId); write.Parameters.AddWithValue("trace", NpgsqlDbType.Text, (object?)traceId ?? DBNull.Value);
+            write.Parameters.AddWithValue("event", Guid.NewGuid()); write.Parameters.AddWithValue("id", changeSetId);
+            write.Parameters.Add(new NpgsqlParameter("payload", NpgsqlDbType.Jsonb) { Value = JsonSerializer.Serialize(new { projectId, changeSetId, taskId }, Json) });
+            await write.ExecuteNonQueryAsync(ct);
+        }
+        await tx.CommitAsync(ct); return result;
+    }
+
+    private async Task<RevisionView> InsertProposalRevisionAsync(NpgsqlTransaction tx, AtlasPrincipal actor, Guid projectId, Guid changeSetId, RevisionInput input, CancellationToken ct)
+    {
+        var unitId = input.UnitId ?? Guid.NewGuid(); Guid? parent = null; long revNo = 1;
+        if (input.UnitId.HasValue)
+        {
+            var previous = await LatestRevisionAsync(tx, projectId, unitId, ct) ?? throw ProjectIdentityException.NotFound();
+            if (previous.Kind != input.Kind) throw ProjectIdentityException.Invalid("A unit kind cannot change across revisions.");
+            input = VocabularySemantics.RetainFormerNameAsAlias(input, previous);
+            parent = previous.RevisionId; revNo = checked(previous.RevNo + 1);
+            await EnsureExternalIdentityStableAsync(tx, projectId, unitId, input.ExternalId, ct);
+            if (await ChangeItemExistsAsync(tx, projectId, changeSetId, unitId, ct)) throw ProjectIdentityException.Invalid("A unit can occur only once in a proposal.");
+            await using var exactBase = tx.CreateCommand();
+            exactBase.CommandText = "SELECT EXISTS(SELECT 1 FROM gov.change_set cs JOIN gov.baseline_entry be ON be.project_id=cs.project_id AND be.baseline_id=cs.base_baseline_id AND be.unit_id=@unit AND be.revision_id=@parent WHERE cs.project_id=@project AND cs.change_set_id=@changeSet);";
+            exactBase.Parameters.AddWithValue("project", projectId); exactBase.Parameters.AddWithValue("changeSet", changeSetId); exactBase.Parameters.AddWithValue("unit", unitId); exactBase.Parameters.AddWithValue("parent", parent);
+            if (await exactBase.ExecuteScalarAsync(ct) is not true) throw ProjectIdentityException.Conflict("A revision must be based on the exact revision in the proposal base.");
+        }
+        else await InsertUnitAsync(tx, projectId, unitId, input.Kind, actor.PrincipalId, ct);
+
+        var revisionId = Guid.NewGuid(); var createdAt = DateTimeOffset.UtcNow;
+        var revision = new RevisionView(unitId, revisionId, revNo, input.Title, input.Kind, input.SchemaVersion, input.FactKind,
+            input.Verification, input.Applicability.Clone(), input.Body.Clone(), input.Blocks.Clone(), input.Evidence.Clone(), input.Unknowns.Clone(),
+            ContentHash(input), createdAt, actor.PrincipalId, Strings(input.CategoryKeys)) { ParentRevisionId = parent };
+        await InsertRevisionAsync(tx, projectId, revision, input.SchemaDefinitionRevisionId, ct);
+        await ValidateRuleReferencesAsync(tx, projectId, revision, ct);
+        await InsertReferencesAsync(tx, projectId, revision, ct); await InsertEvidenceAsync(tx, projectId, revision, actor.PrincipalId, ct);
+        if (!input.UnitId.HasValue && input.ExternalId is not null) await InsertExternalIdentityAsync(tx, projectId, unitId, input.ExternalId, ct);
+        if (RelationSemantics.IsRelation(input.Kind)) await InsertRelationAsync(tx, projectId, revision, ct);
+        await using var item = tx.CreateCommand();
+        item.CommandText = """
+            INSERT INTO gov.change_item(project_id,item_id,change_set_id,unit_id,base_revision_id,proposed_revision_id,action,dependency_group,reason)
+            VALUES(@project,@item,@changeSet,@unit,@parent,@revision,@action,'proposal','Atomic structured proposal');
+            """;
+        item.Parameters.AddWithValue("project", projectId); item.Parameters.AddWithValue("item", Guid.NewGuid()); item.Parameters.AddWithValue("changeSet", changeSetId);
+        item.Parameters.AddWithValue("unit", unitId); item.Parameters.AddWithValue("parent", NpgsqlDbType.Uuid, (object?)parent ?? DBNull.Value); item.Parameters.AddWithValue("revision", revisionId); item.Parameters.AddWithValue("action", parent.HasValue ? "revise" : "add");
+        await item.ExecuteNonQueryAsync(ct); return revision;
+    }
+
+    private static async Task RequireCurrentBaseAsync(NpgsqlTransaction tx, Guid projectId, Guid baseline, CancellationToken ct)
+    {
+        await using var command = tx.CreateCommand(); command.CommandText = "SELECT EXISTS(SELECT 1 FROM identity.project p JOIN gov.baseline b ON b.project_id=p.project_id AND b.baseline_id=p.current_baseline_id AND b.sealed WHERE p.project_id=@project AND p.current_baseline_id=@baseline);";
+        command.Parameters.AddWithValue("project", projectId); command.Parameters.AddWithValue("baseline", baseline);
+        if (await command.ExecuteScalarAsync(ct) is not true) throw ProjectIdentityException.Conflict("The proposal base must be the current sealed baseline.");
+    }
+    private static async Task<bool> TaskMatchesBaseAsync(NpgsqlTransaction tx, Guid projectId, Guid task, Guid baseline, CancellationToken ct)
+    { await using var command = tx.CreateCommand(); command.CommandText = "SELECT EXISTS(SELECT 1 FROM collab.task WHERE project_id=@project AND task_id=@task AND base_baseline_id=@baseline);"; command.Parameters.AddWithValue("project", projectId); command.Parameters.AddWithValue("task", task); command.Parameters.AddWithValue("baseline", baseline); return await command.ExecuteScalarAsync(ct) is true; }
+    private static async Task RequireResolvedImpactAsync(NpgsqlTransaction tx, Guid projectId, Guid impact, CancellationToken ct)
+    { await using var command = tx.CreateCommand(); command.CommandText = "SELECT EXISTS(SELECT 1 FROM collab.impact WHERE project_id=@project AND impact_id=@impact AND close_state IN ('closed','accepted'));"; command.Parameters.AddWithValue("project", projectId); command.Parameters.AddWithValue("impact", impact); if (await command.ExecuteScalarAsync(ct) is not true) throw ProjectIdentityException.Invalid("Every impactId must identify a resolved impact in this project."); }
+    private static async Task<ProposalBatchResult?> FindProposalIdempotencyAsync(NpgsqlTransaction tx, Guid projectId, Guid actor, string key, string digest, CancellationToken ct)
+    {
+        await using var command = tx.CreateCommand(); command.CommandText = "SELECT request_sha256,result_ref FROM ops.idempotency WHERE project_id=@project AND principal_id=@actor AND operation_id='submitProposal' AND idempotency_key=@key;";
+        command.Parameters.AddWithValue("project", projectId); command.Parameters.AddWithValue("actor", actor); command.Parameters.AddWithValue("key", key);
+        await using var reader = await command.ExecuteReaderAsync(ct); if (!await reader.ReadAsync(ct)) return null;
+        if (!CryptographicOperations.FixedTimeEquals(Encoding.ASCII.GetBytes(reader.GetString(0)), Encoding.ASCII.GetBytes(digest))) throw ProjectIdentityException.Conflict("The idempotency key was already used with a different request.");
+        return JsonSerializer.Deserialize<ProposalBatchResult>(reader.GetString(1), Json);
+    }
+
     public async Task<RuleResult> EvaluateRuleAsync(ResolvedReadContext context, Guid unitId, JsonElement facts, CancellationToken ct)
     {
         var revision = await GetUnitAsync(context, unitId, ct);
