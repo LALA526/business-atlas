@@ -225,6 +225,13 @@
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.0, )"
         }
       },
+      "knowledgecore": {
+        "type": "Project",
+        "dependencies": {
+          "AccessApplicability": "[1.0.0, )",
+          "ProjectIdentity": "[1.0.0, )"
+        }
+      },
       "projectidentity": {
         "type": "Project",
         "dependencies": {

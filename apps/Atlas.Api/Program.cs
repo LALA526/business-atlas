@@ -13,6 +13,8 @@ using ProjectIdentity.Infrastructure;
 using Atlas.Api.Auth;
 using Atlas.Api.Platform;
 using Atlas.Api.SchemaCatalog;
+using Atlas.Api.KnowledgeCore;
+using KnowledgeCore.Infrastructure;
 using SchemaCatalog.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +23,7 @@ builder.Services.AddPlatformOps(builder.Configuration.GetConnectionString("Atlas
 builder.Services.AddSingleton(new PostgresProjectIdentityStore(builder.Configuration.GetConnectionString("Atlas") ?? string.Empty));
 builder.Services.AddSingleton(new PostgresAccessApplicabilityStore(builder.Configuration.GetConnectionString("Atlas") ?? string.Empty));
 builder.Services.AddSingleton<PostgresSchemaCatalogStore>();
+builder.Services.AddSingleton(services => new PostgresKnowledgeStore(builder.Configuration.GetConnectionString("Atlas") ?? string.Empty, services.GetRequiredService<PostgresAccessApplicabilityStore>()));
 builder.Services.AddSingleton<PolicyService>();
 builder.Services.AddSingleton<IPolicyService>(services => services.GetRequiredService<PolicyService>());
 builder.Services.AddSingleton<IReadContextFactory>(services => services.GetRequiredService<PolicyService>());
@@ -43,6 +46,7 @@ app.MapIdentityEndpoints();
 app.MapAccessEndpoints();
 app.MapPlatformEndpoints();
 app.MapSchemaCatalogEndpoints();
+app.MapKnowledgeEndpoints();
 
 app.MapGet("/health/live", (HttpContext context) => HealthResponse(context, "ok"));
 app.MapGet("/health/ready", async (HttpContext context, HealthState state, AtlasDbContext database, CancellationToken ct) =>
