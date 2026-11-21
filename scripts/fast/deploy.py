@@ -40,7 +40,7 @@ def report_and_restore(error_type,error,trace):
  except Exception as recovery_error:print('Recovery error:',type(recovery_error).__name__,flush=True)
  sys.__excepthook__(error_type,error,trace)
 sys.excepthook=report_and_restore
-docker('load','-i',str(release/'runtime-images.tar'))
+if (release/'runtime-images.tar').exists():docker('load','-i',str(release/'runtime-images.tar'))
 docker('compose','-p','atlas-product','up','-d','postgres','identity')
 for attempt in range(60):
  ready=subprocess.run(['/opt/homebrew/bin/docker','compose','-p','atlas-product','exec','-T','postgres','pg_isready','-U','atlas','-d','atlas'],cwd=release,env=env,capture_output=True)

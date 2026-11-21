@@ -27,11 +27,6 @@ stages:
         cp -R dist "$OUT/web"
         cd ../..
         cp scripts/fast/* "$OUT/"
-        docker pull mcr.microsoft.com/dotnet/aspnet:10.0
-        docker pull caddy:2-alpine
-        docker pull postgres:17
-        docker pull quay.io/keycloak/keycloak:26.4
-        docker save -o "$OUT/runtime-images.tar" mcr.microsoft.com/dotnet/aspnet:10.0 caddy:2-alpine postgres:17 quay.io/keycloak/keycloak:26.4
       displayName: Build API, worker and web
     - publish: $(Build.ArtifactStagingDirectory)/atlas-release
       artifact: atlas-release

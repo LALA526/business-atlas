@@ -91,7 +91,7 @@ public static class AtlasAuthentication
             {
                 if (context.Principal?.Identity is ClaimsIdentity identity)
                 {
-                    identity.RemoveClaim(identity.FindFirst(CsrfClaim));
+                    foreach (var claim in identity.FindAll(CsrfClaim).ToArray()) identity.TryRemoveClaim(claim);
                     identity.AddClaim(new Claim(CsrfClaim, Convert.ToBase64String(RandomNumberGenerator.GetBytes(32))));
                 }
                 return Task.CompletedTask;
