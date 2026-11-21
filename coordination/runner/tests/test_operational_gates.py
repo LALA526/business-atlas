@@ -49,6 +49,7 @@ class AzureOperationalGateTests(unittest.TestCase):
         self.config = {'project': 'Business Atlas', 'projectId': 'p', 'repositoryId': 'r',
             'pipelineId': 4, 'buildPoolId': 2, 'timeoutSeconds': 2, 'pollSeconds': 0}
         self.sha, self.merge = 'a' * 40, 'b' * 40
+        self.target = 'c' * 40
 
     def test_deployment_requires_exact_sha_and_successful_stage(self):
         def api(path, *args):
@@ -90,8 +91,8 @@ class AzureOperationalGateTests(unittest.TestCase):
             if 'searchCriteria' in path:
                 return {'value': [{'pullRequestId': 3, 'lastMergeSourceCommit': {'commitId': self.sha}}]}
             if '/policy/evaluations?' in path:
-                return {'value': [{'status': 'rejected', 'configuration': {'isEnabled': True, 'isBlocking': True, 'settings': {'buildDefinitionId': 4}}}]}
-            return {'pullRequestId': 3, 'status': 'active', 'lastMergeSourceCommit': {'commitId': self.sha}}
+                return {'value': [{'evaluationId':'E','context':{'buildId':9,'lastMergeSourceCommitId':self.sha,'lastMergeTargetCommitId':self.target},'status': 'rejected', 'configuration': {'isEnabled': True, 'isBlocking': True, 'settings': {'buildDefinitionId': 4}}}]}
+            return {'pullRequestId': 3, 'status': 'active', 'lastMergeSourceCommit': {'commitId': self.sha},'lastMergeTargetCommit':{'commitId':self.target}}
         result = AzureGateBackend(self.config, self.tmp.name, api).integrate({'taskId': 'T01', 'plannedBranch': 'task/T01'}, self.sha, self.tmp.name)
         self.assertEqual(result.status, 'failed')
         self.assertNotIn('PATCH', calls)
@@ -105,7 +106,7 @@ class AzureOperationalGateTests(unittest.TestCase):
             if 'searchCriteria' in path:
                 return {'value': [{'pullRequestId': 3, 'lastMergeSourceCommit': {'commitId': self.sha}}]}
             if '/policy/evaluations?' in path:
-                return {'value': [{'status': 'approved', 'configuration': {'isEnabled': True, 'isBlocking': True, 'settings': {'buildDefinitionId': 4}}}]}
+                return {'value': [{'evaluationId':'E','context':{'buildId':9,'lastMergeSourceCommitId':self.sha,'lastMergeTargetCommitId':self.target},'status': 'approved', 'configuration': {'isEnabled': True, 'isBlocking': True, 'settings': {'buildDefinitionId': 4}}}]}
             if method == 'PATCH':
                 self.assertEqual(body['lastMergeSourceCommit']['commitId'], self.sha)
                 merged = True
@@ -114,7 +115,7 @@ class AzureOperationalGateTests(unittest.TestCase):
                 return {'records': [{'type': 'Stage', 'identifier': 'DeployPreparationMac8', 'result': 'succeeded'}]}
             if '/build/builds?' in path:
                 return {'value': [{'id': 9, 'sourceVersion': self.merge, 'status': 'completed', 'result': 'succeeded'}]}
-            return {'pullRequestId': 3, 'status': 'completed' if merged else 'active', 'lastMergeSourceCommit': {'commitId': self.sha}, 'lastMergeCommit': {'commitId': self.merge}}
+            return {'pullRequestId': 3, 'status': 'completed' if merged else 'active', 'lastMergeTargetCommit':{'commitId':self.target},'lastMergeSourceCommit': {'commitId': self.sha}, 'lastMergeCommit': {'commitId': self.merge}}
         result = AzureGateBackend(self.config, self.tmp.name, api).integrate({'taskId': 'T01', 'plannedBranch': 'task/T01'}, self.sha, self.tmp.name)
         self.assertEqual(result.status, 'merged')
         self.assertEqual(result.merge_sha, self.merge)

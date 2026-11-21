@@ -94,6 +94,12 @@ class AzureGateBackend:
             subprocess.run(['git','push','origin','HEAD:refs/heads/'+branch],cwd=worktree,check=True,capture_output=True)
         return pr_id
 
+    def current_build_policy(self,evaluation,pr,candidate_sha):
+        if evaluation.get('configuration',{}).get('settings',{}).get('buildDefinitionId')!=self.config['pipelineId']:return True
+        context=evaluation.get('context',{})
+        target=pr.get('lastMergeTargetCommit',{}).get('commitId')
+        return bool(target and context.get('buildId') and context.get('lastMergeSourceCommitId')==candidate_sha and context.get('lastMergeTargetCommitId')==target and not context.get('isExpired',False) and not context.get('buildIsNotCurrent',False))
+
     def integrate(self, task, candidate_sha, evidence_dir):
         try:
             return self._integrate(task, candidate_sha, evidence_dir)
@@ -121,6 +127,7 @@ class AzureGateBackend:
                 'description': 'Scoped T1.0 requirement delivery. Task: ' + task['taskId'] + '\nRequirement IDs: ' + ', '.join(task.get('requirementIds', [])) + '\nAcceptance: ' + task.get('acceptance', '') + '\nIndependent implementation, review and QA evidence is bound to source ' + candidate_sha})
         pr_id = str(pr['pullRequestId'])
         deadline = time.monotonic() + self.config.get('timeoutSeconds', 1800)
+        requeued=set()
         while time.monotonic() < deadline:
             pr = self.api(self.pr_path('/' + pr_id + '?api-version=7.1'))
             if pr.get('lastMergeSourceCommit', {}).get('commitId') != candidate_sha:
@@ -128,17 +135,32 @@ class AzureGateBackend:
             if pr.get('status') == 'abandoned':
                 return IntegrationResult('failed', candidate_sha, pr_id=pr_id, detail='PR abandoned')
             if pr.get('status') == 'active':
+                if pr.get('mergeStatus')=='conflicts':
+                    return IntegrationResult('failed',candidate_sha,pr_id=pr_id,detail='Merge approved origin/main into the task branch and resolve Git conflicts')
                 if pr.get('isDraft'):
                     self.api(self.pr_path('/' + pr_id + '?api-version=7.1'), 'PATCH', {'isDraft': False})
                 evaluations = self.policies(pr_id)
                 required = [e for e in evaluations if e.get('configuration', {}).get('isEnabled') and e.get('configuration', {}).get('isBlocking')]
                 own_build = any(e.get('configuration', {}).get('settings', {}).get('buildDefinitionId') == self.config['pipelineId'] for e in required)
-                if own_build and all(e.get('status') == 'approved' for e in required):
+                # Draft/source changes can leave a prior generation's rejected or
+                # approved evaluation visible. Neither is evidence for this SHA.
+                for evaluation in required:
+                    own=evaluation.get('configuration',{}).get('settings',{}).get('buildDefinitionId')==self.config['pipelineId']
+                    if own and not self.current_build_policy(evaluation,pr,candidate_sha):
+                        key=(evaluation.get('evaluationId'),candidate_sha,pr.get('lastMergeTargetCommit',{}).get('commitId'))
+                        if key[0] and key not in requeued and evaluation.get('status') not in ('queued','running'):
+                            self.api(self.path('/_apis/policy/evaluations/'+key[0]+'?api-version=7.1-preview.1'),'PATCH',{'status':'queued'})
+                            requeued.add(key)
+                all_current=all(self.current_build_policy(e,pr,candidate_sha) for e in required)
+                if own_build and all_current and all(e.get('status') == 'approved' for e in required):
                     self.api(self.pr_path('/' + pr_id + '?api-version=7.1'), 'PATCH', {
                         'status': 'completed', 'lastMergeSourceCommit': {'commitId': candidate_sha},
                         'completionOptions': {'deleteSourceBranch': False, 'mergeStrategy': 'squash', 'transitionWorkItems': False}})
-                elif any(e.get('status') in ('rejected', 'broken') for e in required):
-                    return IntegrationResult('failed', candidate_sha, pr_id=pr_id, detail='Azure required policy failed')
+                elif any(e.get('status') in ('rejected','broken') and self.current_build_policy(e,pr,candidate_sha) for e in required):
+                    evidence_dir.mkdir(parents=True,exist_ok=True)
+                    failure=evidence_dir/'azure-policy-failure.json'
+                    failure.write_text(json.dumps([{'status':e.get('status'),'context':e.get('context',{})} for e in required],indent=2))
+                    return IntegrationResult('failed',candidate_sha,pr_id=pr_id,detail='Current candidate Azure policy failed; inspect '+str(failure))
             elif pr.get('status') == 'completed':
                 merge_sha = pr.get('lastMergeCommit', {}).get('commitId', '')
                 if not merge_sha:
