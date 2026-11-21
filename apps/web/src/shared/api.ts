@@ -5,9 +5,14 @@ export type Schema<K extends keyof components['schemas']> = components['schemas'
 export type Project = Schema<'ProjectSummary'>;
 export type ProjectPage = Schema<'ProjectSummaryPage'>;
 export type ReadingView = Schema<'ReadingView'>;
+export type ReadingPurpose = 'understand' | 'implement' | 'change' | 'verify';
 export type CatalogNode = Schema<'CatalogNode'>;
 export type Revision = Schema<'RevisionView'>;
 export type RevisionPage = Schema<'RevisionViewPage'>;
+export type RevisionInput = Schema<'RevisionInput'>;
+export type RuleResult = Schema<'RuleResult'>;
+export type ChangeSet = Schema<'ChangeSet'>;
+export type BaselinePage = Schema<'BaselinePage'>;
 export type SearchPage = Schema<'SearchHitPage'>;
 export type ImportBatch = Schema<'ImportBatch'>;
 export type Session = { principalId: string; displayName: string; expiresAt: string; csrfToken: string };
@@ -59,7 +64,14 @@ export const atlasApi = {
   catalog: (projectId: string) => unwrap<CatalogNode[]>(client.GET('/api/v1/projects/{projectId}/catalog', { params: { path: { projectId }, query: { mode: 'published', purpose: 'understand' } } })),
   units: (projectId: string, query: { kind?: string; categoryKey?: string; cursor?: string } = {}) => unwrap<RevisionPage>(client.GET('/api/v1/projects/{projectId}/units', { params: { path: { projectId }, query: { ...query, limit: 100, mode: 'published', purpose: 'understand' } } })),
   search: (projectId: string, q: string, kind?: string, cursor?: string) => unwrap<SearchPage>(client.GET('/api/v1/projects/{projectId}/search', { params: { path: { projectId }, query: { q, kind, cursor, limit: 50, mode: 'published', purpose: 'understand' } } })),
-  reading: (projectId: string, rootUnitId: string) => unwrap<ReadingView>(client.POST('/api/v1/projects/{projectId}/reading-plans', { params: { path: { projectId } }, body: { rootUnitId, readContext: { mode: 'published', purpose: 'understand' } } })),
+  reading: (projectId: string, rootUnitId: string, options: { purpose?: ReadingPurpose; baselineId?: string } = {}) => unwrap<ReadingView>(client.POST('/api/v1/projects/{projectId}/reading-plans', { params: { path: { projectId } }, body: { rootUnitId, readContext: { mode: options.baselineId ? 'historical' : 'published', baselineId: options.baselineId, purpose: options.purpose ?? 'understand' } } })),
+  unit: (projectId: string, unitId: string, baselineId?: string) => unwrap<Revision>(client.GET('/api/v1/projects/{projectId}/units/{unitId}', { params: { path: { projectId, unitId }, query: { mode: baselineId ? 'historical' : 'published', baselineId, purpose: 'understand' } } })),
+  baselines: (projectId: string) => unwrap<BaselinePage>(client.GET('/api/v1/projects/{projectId}/baselines', { params: { path: { projectId }, query: { limit: 50 } } })),
+  evaluateRule: (projectId: string, unitId: string, facts: Record<string, unknown>, baselineId?: string) => unwrap<RuleResult>(client.POST('/api/v1/projects/{projectId}/rules/{unitId}/evaluate', { params: { path: { projectId, unitId } }, body: { facts, readContext: { mode: baselineId ? 'historical' : 'published', baselineId, purpose: 'understand' } } })),
+  createChangeSet: (projectId: string, title: string, baseBaselineId: string, key: string) => unwrap<ChangeSet>(client.POST('/api/v1/projects/{projectId}/change-sets', { params: { path: { projectId }, header: { 'Idempotency-Key': key } }, body: { title, baseBaselineId } })),
+  reviseUnitDraft: (projectId: string, changeSetId: string, unitId: string, revision: RevisionInput, key: string, ifMatch: string) => unwrap<Revision>(client.POST('/api/v1/projects/{projectId}/change-sets/{changeSetId}/units/{unitId}/revisions', { params: { path: { projectId, changeSetId, unitId }, header: { 'Idempotency-Key': key, 'If-Match': `"${ifMatch.replaceAll('"', '')}"` } }, body: revision })),
+  changeSet: (projectId: string, changeSetId: string) => unwrap<ChangeSet>(client.GET('/api/v1/projects/{projectId}/change-sets/{changeSetId}', { params: { path: { projectId, changeSetId } } })),
+  submitChangeSet: (projectId: string, changeSetId: string, version: number, summary: Schema<'ContentBlock'>[], key: string) => unwrap<ChangeSet>(client.POST('/api/v1/projects/{projectId}/change-sets/{changeSetId}/submit', { params: { path: { projectId, changeSetId }, header: { 'Idempotency-Key': key, 'If-Match': `"${version}"` } }, body: { summary, impactIds: [] } })),
 };
 
 export async function apiRequest<T>(url: string, init: RequestInit = {}): Promise<T> {
