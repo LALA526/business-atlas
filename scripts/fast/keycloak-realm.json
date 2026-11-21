@@ -1,0 +1,49 @@
+{
+  "realm": "atlas",
+  "enabled": true,
+  "displayName": "Business Atlas",
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "clients": [
+    {
+      "clientId": "atlas-web",
+      "name": "Business Atlas web",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "__ATLAS_OIDC_CLIENT_SECRET__",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": [
+        "http://192.168.10.10:15809/signin-oidc",
+        "http://192.168.10.10:15809/signout-callback-oidc",
+        "http://127.0.0.1:15809/signin-oidc",
+        "http://127.0.0.1:15809/signout-callback-oidc"
+      ],
+      "webOrigins": ["http://192.168.10.10:15809", "http://127.0.0.1:15809"],
+      "defaultClientScopes": ["openid", "profile", "email", "atlas.read", "atlas.admin"],
+      "protocolMappers": [
+        {
+          "name": "business-atlas-api-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {"included.client.audience": "business-atlas-api", "id.token.claim": "false", "access.token.claim": "true"}
+        }
+      ]
+    }
+  ],
+  "clientScopes": [
+    {"name": "atlas.read", "protocol": "openid-connect", "attributes": {"include.in.token.scope": "true"}},
+    {"name": "atlas.admin", "protocol": "openid-connect", "attributes": {"include.in.token.scope": "true"}}
+  ],
+  "users": [
+    {
+      "username": "atlas-admin",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Atlas",
+      "lastName": "Administrator",
+      "credentials": [{"type": "password", "value": "__ATLAS_USER_PASSWORD__", "temporary": false}]
+    }
+  ]
+}

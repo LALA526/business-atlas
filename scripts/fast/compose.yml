@@ -1,4 +1,49 @@
 services:
+  postgres:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: atlas
+      POSTGRES_USER: atlas
+      POSTGRES_PASSWORD: ${ATLAS_DB_PASSWORD}
+    volumes:
+      - atlas-postgres:/var/lib/postgresql/data
+      - ./db-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U atlas -d atlas]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    mem_limit: 384m
+  identity:
+    image: quay.io/keycloak/keycloak:26.4
+    restart: unless-stopped
+    command:
+      - start-dev
+      - --proxy-headers=xforwarded
+      - --hostname=http://192.168.10.10:15809/auth
+      - --hostname-strict=false
+      - --import-realm
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: atlas
+      KC_DB_PASSWORD: ${ATLAS_DB_PASSWORD}
+      KEYCLOAK_ADMIN: atlas-keycloak-admin
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+    volumes: [./keycloak:/opt/keycloak/data/import:ro]
+    depends_on:
+      postgres: {condition: service_healthy}
+    mem_limit: 768m
+  migrate:
+    image: mcr.microsoft.com/dotnet/aspnet:10.0
+    profiles: [tools]
+    working_dir: /app
+    command: [dotnet, Atlas.Api.dll, --migrate-only]
+    environment:
+      ConnectionStrings__Atlas: Host=postgres;Port=5432;Database=atlas;Username=atlas;Password=${ATLAS_DB_PASSWORD}
+    volumes: [./api:/app:ro]
+    mem_limit: 512m
   api:
     image: mcr.microsoft.com/dotnet/aspnet:10.0
     restart: unless-stopped
@@ -7,7 +52,22 @@ services:
     environment:
       ASPNETCORE_URLS: http://+:8080
       ASPNETCORE_ENVIRONMENT: Production
-    volumes: [./api:/app:ro]
+      ConnectionStrings__Atlas: Host=postgres;Port=5432;Database=atlas;Username=atlas_runtime;Password=${ATLAS_RUNTIME_PASSWORD}
+      Authentication__DataProtectionKeyPath: /var/lib/atlas/keys
+      Authentication__AllowInsecureLanPreview: "true"
+      Authentication__Oidc__Authority: http://192.168.10.10:15809/auth/realms/atlas
+      Authentication__Oidc__MetadataAddress: http://identity:8080/realms/atlas/.well-known/openid-configuration
+      Authentication__Oidc__ClientId: atlas-web
+      Authentication__Oidc__ClientSecret: ${ATLAS_OIDC_CLIENT_SECRET}
+      Authentication__Bearer__Authority: http://192.168.10.10:15809/auth/realms/atlas
+      Authentication__Bearer__MetadataAddress: http://identity:8080/realms/atlas/.well-known/openid-configuration
+      Authentication__Bearer__Audience: business-atlas-api
+    volumes:
+      - ./api:/app:ro
+      - atlas-keys:/var/lib/atlas/keys
+    depends_on:
+      postgres: {condition: service_healthy}
+      identity: {condition: service_started}
     mem_limit: 512m
   worker:
     image: mcr.microsoft.com/dotnet/aspnet:10.0
@@ -16,11 +76,19 @@ services:
     command: [dotnet, Atlas.Worker.dll]
     environment:
       DOTNET_ENVIRONMENT: Production
+      ConnectionStrings__Atlas: Host=postgres;Port=5432;Database=atlas;Username=atlas_background;Password=${ATLAS_WORKER_PASSWORD}
     volumes: [./worker:/app:ro]
+    depends_on:
+      postgres: {condition: service_healthy}
     mem_limit: 256m
   web:
     image: caddy:2-alpine
     restart: unless-stopped
+    # Explicit isolated LAN preview. Public/production deployments must terminate HTTPS.
     ports: [127.0.0.1:15809:8080]
     volumes: [./web:/srv:ro, ./Caddyfile:/etc/caddy/Caddyfile:ro]
+    depends_on: [api, identity]
     mem_limit: 128m
+volumes:
+  atlas-postgres:
+  atlas-keys:

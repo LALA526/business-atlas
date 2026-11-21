@@ -23,11 +23,8 @@ public sealed partial class PostgresProjectIdentityStore(string connectionString
         await using var connection = await OpenAsync(cancellationToken);
         await using var command = connection.CreateCommand();
         command.CommandText = """
-            INSERT INTO identity.principal (issuer, subject, kind)
-            VALUES (@issuer, @subject, @kind)
-            ON CONFLICT (issuer, subject) DO NOTHING;
-            SELECT principal_id, issuer, subject, kind, active
-            FROM identity.principal WHERE issuer = @issuer AND subject = @subject;
+            SELECT out_principal_id, out_issuer, out_subject, out_kind, out_active
+            FROM identity.resolve_principal(@issuer, @subject, @kind);
             """;
         command.Parameters.AddWithValue("issuer", issuer);
         command.Parameters.AddWithValue("subject", subject);

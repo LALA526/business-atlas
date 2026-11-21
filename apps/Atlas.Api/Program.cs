@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using BuildingBlocks;
+using BuildingBlocks.Persistence;
+using Microsoft.EntityFrameworkCore;
 using PlatformOps;
 using ProjectIdentity.Infrastructure;
 using Atlas.Api.Auth;
@@ -11,6 +13,13 @@ builder.Services.AddSingleton(new PostgresProjectIdentityStore(builder.Configura
 builder.Services.AddAtlasAuthentication(builder.Configuration, builder.Environment);
 
 var app = builder.Build();
+if (args.Contains("--migrate-only", StringComparer.Ordinal))
+{
+    await using var scope = app.Services.CreateAsyncScope();
+    await scope.ServiceProvider.GetRequiredService<AtlasDbContext>().Database.MigrateAsync();
+    return;
+}
+
 app.Lifetime.ApplicationStopping.Register(app.Services.GetRequiredService<HealthState>().BeginShutdown);
 app.UseAuthentication();
 app.UseAtlasCsrfProtection();
@@ -22,6 +31,7 @@ app.MapGet("/health/ready", (HttpContext context, HealthState state) =>
     state.IsReady
         ? Results.Ok(HealthBody(context, "ok"))
         : Results.Json(ErrorBody(context, "DEPENDENCY_UNAVAILABLE", "Service is shutting down"), statusCode: 503));
+
 
 app.Run();
 

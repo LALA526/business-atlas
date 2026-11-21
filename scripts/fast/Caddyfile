@@ -8,6 +8,24 @@
   handle /v1/* {
     reverse_proxy api:8080
   }
+  handle /auth/login* {
+    reverse_proxy api:8080
+  }
+  handle /auth/session* {
+    reverse_proxy api:8080
+  }
+  handle /auth/logout* {
+    reverse_proxy api:8080
+  }
+  handle /signin-oidc* {
+    reverse_proxy api:8080
+  }
+  handle /signout-callback-oidc* {
+    reverse_proxy api:8080
+  }
+  handle_path /auth/* {
+    reverse_proxy identity:8080
+  }
   handle {
     root * /srv
     try_files {path} /index.html

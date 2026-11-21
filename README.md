@@ -26,3 +26,20 @@ Unknown inputs block their affected tasks without fabricating completion.
 
 Never commit model credentials, Azure PATs, private keys or database passwords.
 The coordinator uses private host configuration; product source does not store it.
+
+## Self-contained Mac8 LAN preview
+
+`azure-pipelines.yml` publishes and deploys PostgreSQL, Keycloak, the API, worker,
+and web application. `scripts/fast/deploy.py` generates strong secrets once in
+`~/atlas-deploy/product/secrets.json` and writes the initial application and
+Keycloak administrator credentials to the host-only, mode-0600 file
+`~/atlas-deploy/product/initial-login.json`. PostgreSQL and API data-protection
+keys use persistent Docker volumes. The API applies its EF Core migrations on
+startup against the deployed Atlas database.
+
+This deployment is explicitly an HTTP LAN preview at
+`http://192.168.10.10:15809`; only that deployment sets
+`Authentication__AllowInsecureLanPreview=true`. The application otherwise keeps
+secure cookies and HTTPS OIDC metadata requirements. A public/production release
+must use HTTPS, external production identity configuration, and must not enable
+the LAN preview switch.

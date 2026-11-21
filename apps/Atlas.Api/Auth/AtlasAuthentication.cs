@@ -25,6 +25,10 @@ public static class AtlasAuthentication
         var dataProtection = services.AddDataProtection().SetApplicationName("BusinessAtlas");
         var keyPath = configuration["Authentication:DataProtectionKeyPath"];
         if (!string.IsNullOrWhiteSpace(keyPath)) dataProtection.PersistKeysToFileSystem(new DirectoryInfo(keyPath));
+        // Production remains HTTPS-only. The isolated LAN preview explicitly opts into HTTP cookies.
+        var cookieSecurePolicy = configuration.GetValue("Authentication:AllowInsecureLanPreview", false)
+            ? CookieSecurePolicy.SameAsRequest
+            : CookieSecurePolicy.Always;
 
         services.AddAuthentication(options =>
         {
@@ -41,7 +45,7 @@ public static class AtlasAuthentication
         {
             options.Cookie.Name = "atlas.session";
             options.Cookie.HttpOnly = true;
-            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            options.Cookie.SecurePolicy = cookieSecurePolicy;
             options.Cookie.SameSite = SameSiteMode.Lax;
             options.ExpireTimeSpan = TimeSpan.FromHours(8);
             options.SlidingExpiration = false;
@@ -59,14 +63,18 @@ public static class AtlasAuthentication
         .AddOpenIdConnect(OidcScheme, options =>
         {
             options.Authority = configuration["Authentication:Oidc:Authority"];
+            options.MetadataAddress = configuration["Authentication:Oidc:MetadataAddress"];
             options.ClientId = configuration["Authentication:Oidc:ClientId"];
             options.ClientSecret = configuration["Authentication:Oidc:ClientSecret"];
             options.CallbackPath = "/signin-oidc";
+            options.SignedOutCallbackPath = "/signout-callback-oidc";
+            options.CorrelationCookie.SecurePolicy = cookieSecurePolicy;
+            options.NonceCookie.SecurePolicy = cookieSecurePolicy;
             options.ResponseType = "code";
             options.UsePkce = true;
             options.SaveTokens = false;
             options.GetClaimsFromUserInfoEndpoint = configuration.GetValue("Authentication:Oidc:UseUserInfo", false);
-            options.RequireHttpsMetadata = !environment.IsDevelopment();
+            options.RequireHttpsMetadata = !configuration.GetValue("Authentication:AllowInsecureLanPreview", false) && !environment.IsDevelopment();
             options.MapInboundClaims = false;
             options.TokenValidationParameters.NameClaimType = "name";
             options.Scope.Clear();
@@ -84,8 +92,10 @@ public static class AtlasAuthentication
         .AddJwtBearer(BearerScheme, options =>
         {
             options.Authority = configuration["Authentication:Bearer:Authority"];
+            if (configuration["Authentication:Bearer:MetadataAddress"] is { Length: > 0 } bearerMetadataAddress)
+                options.MetadataAddress = bearerMetadataAddress;
             options.Audience = configuration["Authentication:Bearer:Audience"];
-            options.RequireHttpsMetadata = !environment.IsDevelopment();
+            options.RequireHttpsMetadata = !configuration.GetValue("Authentication:AllowInsecureLanPreview", false) && !environment.IsDevelopment();
             options.MapInboundClaims = false;
             options.TokenValidationParameters = new TokenValidationParameters
             {
@@ -117,9 +127,11 @@ public static class AtlasAuthentication
         if (string.IsNullOrWhiteSpace(issuer) || string.IsNullOrWhiteSpace(subject))
             throw new UnauthorizedAccessException("The authenticated subject is missing iss or sub.");
         var isBearer = user.Identity?.AuthenticationType == BearerScheme;
-        var kind = isBearer && user.HasClaim("client_id", user.FindFirst("sub")?.Value ?? string.Empty)
-            ? PrincipalKind.Service
-            : PrincipalKind.Human;
+        var kind = PrincipalKind.Human;
+        if (isBearer && string.Equals(user.FindFirst("atlas_principal_kind")?.Value, "agent", StringComparison.Ordinal))
+            kind = PrincipalKind.Agent;
+        else if (isBearer && (user.HasClaim("client_id", subject) || user.HasClaim("azp", subject)))
+            kind = PrincipalKind.Service;
         return await context.RequestServices.GetRequiredService<PostgresProjectIdentityStore>()
             .ResolvePrincipalAsync(issuer, subject, kind, cancellationToken);
     }
@@ -132,9 +144,7 @@ public static class AtlasAuthentication
         if (unsafeRequest && browserSession)
         {
             var origin = context.Request.Headers.Origin;
-            if (!string.IsNullOrEmpty(origin) && (!Uri.TryCreate(origin, UriKind.Absolute, out var uri) ||
-                !string.Equals(uri.Host, context.Request.Host.Host, StringComparison.OrdinalIgnoreCase) ||
-                (uri.IsDefaultPort ? -1 : uri.Port) != (context.Request.Host.Port ?? (context.Request.IsHttps ? 443 : 80))))
+            if (!string.IsNullOrEmpty(origin) && !IsSameOrigin(context, origin.ToString()))
             {
                 context.Response.StatusCode = StatusCodes.Status403Forbidden;
                 return;
@@ -151,6 +161,17 @@ public static class AtlasAuthentication
         }
         await next();
     });
+
+    private static bool IsSameOrigin(HttpContext context, string origin)
+    {
+        if (!Uri.TryCreate(origin, UriKind.Absolute, out var uri) ||
+            !string.Equals(uri.Scheme, context.Request.Scheme, StringComparison.OrdinalIgnoreCase) ||
+            !string.Equals(uri.Host, context.Request.Host.Host, StringComparison.OrdinalIgnoreCase))
+            return false;
+        var originPort = uri.IsDefaultPort ? (uri.Scheme == Uri.UriSchemeHttps ? 443 : 80) : uri.Port;
+        var requestPort = context.Request.Host.Port ?? (context.Request.IsHttps ? 443 : 80);
+        return originPort == requestPort;
+    }
 
     private static bool HasScope(ClaimsPrincipal user, string required, string browserScheme)
     {

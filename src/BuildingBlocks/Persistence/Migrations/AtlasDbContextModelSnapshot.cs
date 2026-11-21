@@ -1830,6 +1830,27 @@ namespace BuildingBlocks.Persistence.Migrations
                     b.ToTable("project", "identity");
                 });
 
+            modelBuilder.Entity("identity.project_profile", b =>
+                {
+                    b.Property<Guid>("project_id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("created_at")
+                        .HasColumnType("timestamptz");
+
+                    b.Property<string>("policy_version")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("profile_kind")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("project_id");
+
+                    b.ToTable("project_profile", "identity");
+                });
+
             modelBuilder.Entity("intake.blob", b =>
                 {
                     b.Property<Guid>("project_id")
@@ -3376,6 +3397,15 @@ namespace BuildingBlocks.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("project_id", "current_baseline_id")
                         .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("identity.project_profile", b =>
+                {
+                    b.HasOne("identity.project", null)
+                        .WithMany()
+                        .HasForeignKey("project_id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("intake.blob", b =>

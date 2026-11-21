@@ -66,7 +66,7 @@ public sealed class DatabaseMigrationTests
         await connection.OpenAsync();
         var history = await ScalarAsync<string>(connection,
             "SELECT string_agg(\"MigrationId\", ',' ORDER BY \"MigrationId\") FROM public.\"__EFMigrationsHistory\"");
-        Assert.Equal("20261122000000_InitialAtlas,20261122000001_RuntimeRoles", history);
+        Assert.Equal("20261122000000_InitialAtlas,20261122000001_RuntimeRoles,20261122000002_ProjectIdentity", history);
 
         var unprotected = await ScalarAsync<long>(connection, """
             SELECT count(*) FROM pg_class c
