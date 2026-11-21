@@ -6,4 +6,17 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" PrivateAssets="all" />
+    <PackageReference Include="System.Security.Cryptography.Xml" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="../../docs/baselines/T1.0/02_机器合同/database.sql" Link="db/migrations/sql/0001_initial.sql" LogicalName="BusinessAtlas.db.migrations.sql.0001_initial.sql" />
+  </ItemGroup>
+
 </Project>
