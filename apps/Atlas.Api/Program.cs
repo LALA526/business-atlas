@@ -11,12 +11,15 @@ using Microsoft.EntityFrameworkCore;
 using PlatformOps;
 using ProjectIdentity.Infrastructure;
 using Atlas.Api.Auth;
+using Atlas.Api.SchemaCatalog;
+using SchemaCatalog.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<HealthState>();
 builder.Services.AddPlatformOps(builder.Configuration.GetConnectionString("Atlas"));
 builder.Services.AddSingleton(new PostgresProjectIdentityStore(builder.Configuration.GetConnectionString("Atlas") ?? string.Empty));
 builder.Services.AddSingleton(new PostgresAccessApplicabilityStore(builder.Configuration.GetConnectionString("Atlas") ?? string.Empty));
+builder.Services.AddSingleton<PostgresSchemaCatalogStore>();
 builder.Services.AddSingleton<PolicyService>();
 builder.Services.AddSingleton<IPolicyService>(services => services.GetRequiredService<PolicyService>());
 builder.Services.AddSingleton<IReadContextFactory>(services => services.GetRequiredService<PolicyService>());
@@ -37,6 +40,7 @@ app.UseAtlasCsrfProtection();
 app.UseAuthorization();
 app.MapIdentityEndpoints();
 app.MapAccessEndpoints();
+app.MapSchemaCatalogEndpoints();
 
 app.MapGet("/health/live", (HttpContext context) => HealthResponse(context, "ok"));
 app.MapGet("/health/ready", (HttpContext context, HealthState state) =>

@@ -10,6 +10,7 @@
     <ProjectReference Include="../../src/Modules/AccessApplicability/AccessApplicability.csproj" />
     <ProjectReference Include="../../src/Modules/PlatformOps/PlatformOps.csproj" />
     <ProjectReference Include="../../src/Modules/ProjectIdentity/ProjectIdentity.csproj" />
+    <ProjectReference Include="../../src/Modules/SchemaCatalog/SchemaCatalog.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

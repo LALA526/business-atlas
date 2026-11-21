@@ -87,7 +87,7 @@ public static class AtlasAuthentication
             options.TokenValidationParameters.AuthenticationType = CookieScheme;
             options.TokenValidationParameters.NameClaimType = "name";
             options.Scope.Clear();
-            foreach (var scope in new[] { "openid", "profile", "atlas.read", "atlas.admin" }) options.Scope.Add(scope);
+            foreach (var scope in new[] { "openid", "profile", "atlas.read", "atlas.propose", "atlas.admin" }) options.Scope.Add(scope);
             options.Events.OnTokenValidated = context =>
             {
                 if (context.Principal?.Identity is ClaimsIdentity identity)
@@ -121,6 +121,7 @@ public static class AtlasAuthentication
 
         services.AddAuthorizationBuilder()
             .AddPolicy("AtlasRead", policy => policy.RequireAuthenticatedUser().RequireAssertion(context => HasScope(context.User, "atlas.read", CookieScheme)))
+            .AddPolicy("AtlasPropose", policy => policy.RequireAuthenticatedUser().RequireAssertion(context => HasScope(context.User, "atlas.propose", CookieScheme)))
             .AddPolicy("AtlasAdmin", policy => policy.RequireAuthenticatedUser().RequireAssertion(context => HasScope(context.User, "atlas.admin", CookieScheme)));
         return services;
     }

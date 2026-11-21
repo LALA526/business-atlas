@@ -508,14 +508,23 @@
           "xunit.extensibility.core": "[2.9.3]"
         }
       },
+      "accessapplicability": {
+        "type": "Project",
+        "dependencies": {
+          "BuildingBlocks": "[1.0.0, )",
+          "ProjectIdentity": "[1.0.0, )"
+        }
+      },
       "atlas.api": {
         "type": "Project",
         "dependencies": {
+          "AccessApplicability": "[1.0.0, )",
           "BuildingBlocks": "[1.0.0, )",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "[10.0.15, )",
           "Microsoft.AspNetCore.Authentication.OpenIdConnect": "[10.0.15, )",
           "PlatformOps": "[1.0.0, )",
-          "ProjectIdentity": "[1.0.0, )"
+          "ProjectIdentity": "[1.0.0, )",
+          "SchemaCatalog": "[1.0.0, )"
         }
       },
       "buildingblocks": {
@@ -534,6 +543,13 @@
         "type": "Project",
         "dependencies": {
           "BuildingBlocks": "[1.0.0, )"
+        }
+      },
+      "schemacatalog": {
+        "type": "Project",
+        "dependencies": {
+          "AccessApplicability": "[1.0.0, )",
+          "ProjectIdentity": "[1.0.0, )"
         }
       },
       "Microsoft.AspNetCore.Authentication.JwtBearer": {

@@ -231,6 +231,13 @@
           "BuildingBlocks": "[1.0.0, )"
         }
       },
+      "schemacatalog": {
+        "type": "Project",
+        "dependencies": {
+          "AccessApplicability": "[1.0.0, )",
+          "ProjectIdentity": "[1.0.0, )"
+        }
+      },
       "Npgsql.EntityFrameworkCore.PostgreSQL": {
         "type": "CentralTransitive",
         "requested": "[10.0.0, )",

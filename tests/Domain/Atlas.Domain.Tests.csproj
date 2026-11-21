@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="../../src/BuildingBlocks/BuildingBlocks.csproj" />
     <ProjectReference Include="../../src/Modules/AccessApplicability/AccessApplicability.csproj" />
+    <ProjectReference Include="../../src/Modules/SchemaCatalog/SchemaCatalog.csproj" />
   </ItemGroup>
 
   <ItemGroup>

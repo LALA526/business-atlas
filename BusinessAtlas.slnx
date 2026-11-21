@@ -7,6 +7,7 @@
     <Project Path="src/BuildingBlocks/BuildingBlocks.csproj" />
     <Project Path="src/Modules/PlatformOps/PlatformOps.csproj" />
     <Project Path="src/Modules/ProjectIdentity/ProjectIdentity.csproj" />
+    <Project Path="src/Modules/SchemaCatalog/SchemaCatalog.csproj" />
   </Folder>
   <Folder Name="/tests/" />
   <Folder Name="/tests/Contract/">
