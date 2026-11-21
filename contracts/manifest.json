@@ -1,13 +1,18 @@
 {
   "schemaVersion": "1.0.0",
   "algorithm": "sha256(path UTF-8 || NUL || lowercase-content-sha256 || LF), sorted by relative POSIX path; manifest excluded",
-  "fileCount": 37,
-  "treeSha256": "cd5ff0e65914de567a048a0f41a49ac022936f92aacdc0ffcc7c98b5376cfa97",
+  "fileCount": 38,
+  "treeSha256": "9cfef8a3c201cb92e6b6b272f46b8fe8f8517dda66fbf3a38f5f036e9a332008",
   "files": [
     {
       "path": "README.md",
       "sha256": "e050e149fec5a0c03990b0f0733389f37b44627f00aab51944ddd7fbce630018",
       "bytes": 5118
+    },
+    {
+      "path": "akp/atlas-proposal-v1.0.schema.json",
+      "sha256": "16f141d97548806a9a3be3ef75f976c7880f93f2a990161cb50d16c2bf769b24",
+      "bytes": 1856
     },
     {
       "path": "api-catalog.csv",

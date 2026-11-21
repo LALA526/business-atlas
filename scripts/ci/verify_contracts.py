@@ -265,7 +265,13 @@ def verify(root: Path = ROOT) -> None:
     validate_manifest(contracts)
     source_files = {p.relative_to(source).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in source.rglob("*") if p.is_file()}
     contract_files = {entry["path"]: entry["sha256"] for entry in manifest_entries(contracts)}
-    require(source_files == contract_files, "frozen contracts differ from read-only baseline bytes")
+    baseline_contract_files = {path: digest for path, digest in contract_files.items() if not path.startswith("akp/")}
+    require(source_files == baseline_contract_files, "frozen contracts differ from read-only baseline bytes")
+    # Versioned package adapters are additive and must never rewrite AKP/0.1 bytes.
+    for additive in sorted((contracts / "akp").glob("*.schema.json")):
+        schema = load_json(additive)
+        jsonschema.Draft202012Validator.check_schema(schema)
+        validate_refs(schema, additive)
     openapi = load_yaml(contracts / "openapi.yaml")
     require(isinstance(openapi, dict), "OpenAPI root must be object")
     validate_openapi(openapi)

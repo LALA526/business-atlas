@@ -29,8 +29,6 @@ public sealed class PostgresImportEvidenceStore(string connectionString, IPrivat
         await using (var authTx = await auth.BeginTransactionAsync(ct))
         {
         await SetContextAsync(authTx, projectId, actor.PrincipalId, ct); await RequireProposerAsync(authTx, projectId, actor.PrincipalId, ct);
-        var prior = await FindIdempotencyAsync(authTx, projectId, actor.PrincipalId, "uploadSource", key, Hash(key + ":" + expectedHash), ct);
-        if (prior is not null) { await authTx.CommitAsync(ct); return prior.Value.Deserialize<UploadView>(Json)!; }
         }
         var stored = await blobs.StoreAsync(projectId, file, 100 * 1024 * 1024, ct);
         var digest = Hash(key + ":" + (expectedHash ?? stored.Sha256));
@@ -103,16 +101,13 @@ public sealed class PostgresImportEvidenceStore(string connectionString, IPrivat
         Guid baseBaselineId, Stream file, string key, string requestId, string? traceId, CancellationToken ct)
     {
         ValidateKey(key); ValidateFile(fileName, contentType, "package", 100 * 1024 * 1024);
-        var digest = Hash(key + ":" + baseBaselineId);
         await using (var auth = await OpenAsync(ct))
         await using (var authTx = await auth.BeginTransactionAsync(ct))
         {
-        await SetContextAsync(authTx, projectId, actor.PrincipalId, ct); await RequireProposerAsync(authTx, projectId, actor.PrincipalId, ct);
-        var replay = await FindIdempotencyAsync(authTx, projectId, actor.PrincipalId, "uploadAkp", key, digest, ct);
-        if (replay is not null) { await authTx.CommitAsync(ct); return replay.Value.Deserialize<ImportBatchView>(Json)!; }
+            await SetContextAsync(authTx, projectId, actor.PrincipalId, ct); await RequireProposerAsync(authTx, projectId, actor.PrincipalId, ct);
         }
         var stored = await blobs.StoreAsync(projectId, file, 100 * 1024 * 1024, ct);
-        digest = Hash(key + ":" + baseBaselineId + ":" + stored.Sha256);
+        var digest = Hash(key + ":" + baseBaselineId + ":" + stored.Sha256);
         await using (var content = await blobs.OpenReadAsync(projectId, stored.StorageKey, ct))
         { var scan = await scanner.ScanAsync(content, fileName, ct); if (scan.Status == ScanStatus.Unavailable) throw new ProjectIdentityException("DEPENDENCY_UNAVAILABLE", scan.Reason!, 503); if (scan.Status == ScanStatus.Rejected) throw ProjectIdentityException.Invalid(scan.Reason!); }
         NormalizedPackage package; await using (var content = await blobs.OpenReadAsync(projectId, stored.StorageKey, ct)) package = await AkpPackageReader.ReadAsync(content, fileName, ct);
@@ -123,13 +118,13 @@ public sealed class PostgresImportEvidenceStore(string connectionString, IPrivat
         Guid? existingImport = null;
         await using (var check = tx.CreateCommand())
         {
-            check.CommandText = "SELECT package_sha256,import_id FROM intake.import_batch WHERE project_id=@project AND source_namespace=@namespace AND package_id=@package"; Add(check, "project", projectId); Add(check, "namespace", package.Namespace); Add(check, "package", package.PackageId);
+            check.CommandText = "SELECT package_sha256,import_id FROM intake.import_batch WHERE project_id=@project AND package_id=@package"; Add(check, "project", projectId); Add(check, "package", package.PackageId);
             await using var reader = await check.ExecuteReaderAsync(ct); if (await reader.ReadAsync(ct)) { if (reader.GetString(0) != stored.Sha256) throw ProjectIdentityException.Conflict("packageId already exists with different content."); existingImport = reader.GetGuid(1); }
         }
         if (existingImport.HasValue) { var existing = await ReadBatchAsync(tx, projectId, existingImport.Value, ct); await tx.CommitAsync(ct); return existing; }
         var importId = Guid.NewGuid(); var blobId = await InsertBlobAsync(tx, projectId, Guid.NewGuid(), stored, "clean", actor.PrincipalId, ct);
         var batch = new ImportBatchView(importId, package.PackageId, baseBaselineId, "preview_ready", 1, [], null, package.Unknowns);
-        await using var insert = tx.CreateCommand(); insert.CommandText = "INSERT INTO intake.import_batch(project_id,import_id,package_id,format_version,package_sha256,source_namespace,blob_id,base_baseline_id,state,summary,created_by) VALUES(@project,@import,@package,@format,@hash,@namespace,@blob,@baseline,'preview_ready',@summary::jsonb,@actor)"; Add(insert, "project", projectId); Add(insert, "import", importId); Add(insert, "package", package.PackageId); Add(insert, "format", package.FormatVersion); Add(insert, "hash", stored.Sha256); Add(insert, "namespace", package.Namespace); Add(insert, "blob", blobId); Add(insert, "baseline", baseBaselineId); Add(insert, "summary", JsonSerializer.Serialize(new { unknowns = package.Unknowns }, Json), NpgsqlDbType.Jsonb); Add(insert, "actor", actor.PrincipalId); await insert.ExecuteNonQueryAsync(ct);
+        await using var insert = tx.CreateCommand(); insert.CommandText = "INSERT INTO intake.import_batch(project_id,import_id,package_id,format_version,package_sha256,source_namespace,blob_id,base_baseline_id,state,summary,created_by) VALUES(@project,@import,@package,@format,@hash,@namespace,@blob,@baseline,'preview_ready',@summary::jsonb,@actor)"; Add(insert, "project", projectId); Add(insert, "import", importId); Add(insert, "package", package.PackageId); Add(insert, "format", package.FormatVersion); Add(insert, "hash", stored.Sha256); Add(insert, "namespace", package.Namespace); Add(insert, "blob", blobId); Add(insert, "baseline", baseBaselineId); Add(insert, "summary", JsonSerializer.Serialize(new { unknowns = package.Unknowns, originalName = Path.GetFileName(fileName), contentType }, Json), NpgsqlDbType.Jsonb); Add(insert, "actor", actor.PrincipalId); await insert.ExecuteNonQueryAsync(ct);
         foreach (var entry in package.Entries) await InsertEntryAsync(tx, projectId, importId, entry, await DiffAsync(tx, projectId, baseBaselineId, package.Namespace, entry, ct), ct);
         batch = await ReadBatchAsync(tx, projectId, importId, ct);
         await RecordIdempotencyAsync(tx, projectId, actor.PrincipalId, "uploadAkp", key, digest, batch, requestId, traceId, ct); await tx.CommitAsync(ct); return batch;
@@ -139,7 +134,7 @@ public sealed class PostgresImportEvidenceStore(string connectionString, IPrivat
     {
         var after = Decode(cursor); var items = new List<ImportBatchView>();
         await using var connection = await OpenAsync(ct); await using var tx = await connection.BeginTransactionAsync(ct); await SetContextAsync(tx, projectId, principalId, ct); await RequireProposerAsync(tx, projectId, principalId, ct);
-        await using var command = tx.CreateCommand(); command.CommandText = "SELECT import_id FROM intake.import_batch WHERE project_id=@project ORDER BY created_at,import_id LIMIT 1000"; Add(command, "project", projectId); var ids = new List<Guid>(); await using (var reader = await command.ExecuteReaderAsync(ct)) while (await reader.ReadAsync(ct)) ids.Add(reader.GetGuid(0));
+        await using var command = tx.CreateCommand(); command.CommandText = "SELECT import_id FROM intake.import_batch WHERE project_id=@project ORDER BY import_id LIMIT 1000"; Add(command, "project", projectId); var ids = new List<Guid>(); await using (var reader = await command.ExecuteReaderAsync(ct)) while (await reader.ReadAsync(ct)) ids.Add(reader.GetGuid(0));
         foreach (var id in ids.Where(id => !after.HasValue || id.CompareTo(after.Value) > 0).Take(limit + 1)) items.Add(await ReadBatchAsync(tx, projectId, id, ct));
         string? next = null; if (items.Count > limit) { next = Encode(items[limit - 1].ImportId); items.RemoveAt(limit); } return new(items, next);
     }
@@ -168,9 +163,14 @@ public sealed class PostgresImportEvidenceStore(string connectionString, IPrivat
         await using var connection = await OpenAsync(ct); await using var tx = await connection.BeginTransactionAsync(ct); await SetContextAsync(tx, projectId, actor.PrincipalId, ct); await RequireProposerAsync(tx, projectId, actor.PrincipalId, ct);
         var replay = await FindIdempotencyAsync(tx, projectId, actor.PrincipalId, "decideImport", key, digest, ct); if (replay is not null) { await tx.CommitAsync(ct); return replay.Value.Deserialize<ImportBatchView>(Json)!; }
         var state = await LoadBatchStateAsync(tx, projectId, importId, true, ct); if (state.Version != expected) throw ProjectIdentityException.CasMismatch(); if (state.CurrentBaseline != state.BaseBaseline) throw ProjectIdentityException.Conflict("The baseline changed; regenerate the preview before decisions."); if (state.State is not ("preview_ready" or "decided")) throw ProjectIdentityException.Conflict("This import cannot accept decisions.");
+        var currentEntries = await ReadStoredEntriesAsync(tx, projectId, importId, ct);
         foreach (var decision in request.Decisions)
         {
             if (decision.Decision is not ("reuse_existing" or "new_version" or "new_identity" or "reject" or "needs_evidence") || string.IsNullOrWhiteSpace(decision.Reason)) throw ProjectIdentityException.Invalid("A valid decision and reason are required for every entry.");
+            var current = currentEntries.SingleOrDefault(e => e.EntryId == decision.EntryId) ?? throw ProjectIdentityException.Invalid("A decision entry does not belong to this import.");
+            var status = current.Diff.GetProperty("status").GetString();
+            if (decision.Decision == "reuse_existing" && status is "new" or "invalid" || decision.Decision == "new_version" && status is "new" or "duplicate")
+                throw ProjectIdentityException.Invalid($"Decision '{decision.Decision}' is not valid for a {status} entry.");
             await using var command = tx.CreateCommand(); command.CommandText = "UPDATE intake.import_entry SET decision=@decision,reason=@reason,decided_by=@actor,unit_id=COALESCE(@unit,unit_id),version=version+1 WHERE project_id=@project AND import_id=@import AND entry_id=@entry"; Add(command, "decision", decision.Decision); Add(command, "reason", decision.Reason); Add(command, "actor", actor.PrincipalId); Add(command, "unit", (object?)decision.UnitId ?? DBNull.Value); Add(command, "project", projectId); Add(command, "import", importId); Add(command, "entry", decision.EntryId); if (await command.ExecuteNonQueryAsync(ct) != 1) throw ProjectIdentityException.Invalid("A decision entry does not belong to this import.");
         }
         await using var batchUpdate = tx.CreateCommand(); batchUpdate.CommandText = "UPDATE intake.import_batch SET state='decided',version=version+1 WHERE project_id=@project AND import_id=@import"; Add(batchUpdate, "project", projectId); Add(batchUpdate, "import", importId); await batchUpdate.ExecuteNonQueryAsync(ct);
@@ -193,6 +193,8 @@ public sealed class PostgresImportEvidenceStore(string connectionString, IPrivat
             var entry = package.Entries.Single(e => e.ExternalType == stored.ExternalType && e.ExternalId == stored.ExternalId); var status = stored.Diff.GetProperty("status").GetString(); var decision = stored.Decision;
             if (decision == "reject") continue;
             if (decision == "needs_evidence") throw ProjectIdentityException.Conflict("Unresolved evidence decisions block staging.");
+            if (entry.Kind == "Issue" && entry.Body.TryGetProperty("issueKind", out var issueKind) && issueKind.GetString() == "conflict" && decision is null)
+                throw ProjectIdentityException.Conflict("Imported conflict issues need an explicit human decision before staging.");
             if (status == "conflict" && decision is null) throw ProjectIdentityException.Conflict("All conflicts need a decision before staging.");
             if (status == "duplicate" || decision == "reuse_existing") { if (stored.UnitId is null) throw ProjectIdentityException.Conflict("Cannot reuse an entry without an existing unit."); continue; }
             Guid unit = decision == "new_identity" ? Guid.NewGuid() : stored.UnitId ?? Guid.NewGuid();
@@ -220,7 +222,7 @@ public sealed class PostgresImportEvidenceStore(string connectionString, IPrivat
             await InsertReferencesAsync(tx, projectId, revision, body, ct);
             var evidence = EvidenceFor(value.Entry, package.Entries, revisions, storedEntries); await InsertEvidenceAsync(tx, projectId, revision, evidence, actor.PrincipalId, ct);
         }
-        await using var finish = tx.CreateCommand(); finish.CommandText = "UPDATE intake.import_batch SET state='staged',change_set_id=@changeSet,version=version+1 WHERE project_id=@project AND import_id=@import; UPDATE identity.project SET version=version+1 WHERE project_id=@project;"; Add(finish, "changeSet", changeSetId); Add(finish, "project", projectId); Add(finish, "import", importId); await finish.ExecuteNonQueryAsync(ct);
+        await using var finish = tx.CreateCommand(); finish.CommandText = "UPDATE intake.import_batch SET state='staged',change_set_id=@changeSet,version=version+1 WHERE project_id=@project AND import_id=@import; UPDATE identity.project SET version=version+1 WHERE project_id=@project; INSERT INTO ops.outbox(project_id,event_id,event_type,aggregate_id,aggregate_revision,schema_version,payload,state) VALUES(@project,@event,'import.staged',@changeSet,1,'1.0',@eventPayload::jsonb,'queued');"; Add(finish, "changeSet", changeSetId); Add(finish, "project", projectId); Add(finish, "import", importId); Add(finish, "event", Guid.NewGuid()); Add(finish, "eventPayload", JsonSerializer.Serialize(new { importId, changeSetId, packageId = package.PackageId, candidateCount = selected.Count }, Json), NpgsqlDbType.Jsonb); await finish.ExecuteNonQueryAsync(ct);
         var result = new ChangeSetView(changeSetId, state.BaseBaseline, $"Import: {package.PackageId}", "draft", 1); await RecordIdempotencyAsync(tx, projectId, actor.PrincipalId, "stageImport", key, digest, result, requestId, traceId, ct); await tx.CommitAsync(ct); return result;
     }
 
@@ -243,7 +245,7 @@ public sealed class PostgresImportEvidenceStore(string connectionString, IPrivat
         return JsonSerializer.Serialize(new { status, summary = status switch { "duplicate" => "Content-equivalent existing revision", "updated" => "Candidate revision of an existing identity", _ => "Existing identity has a conflicting kind" }, unitId = unit, baseRevisionId = revision, normalized = entry }, Json);
     }
     private async Task<NormalizedPackage> ReadPackageAsync(NpgsqlTransaction tx, Guid project, Guid blobId, CancellationToken ct)
-    { await using var command = tx.CreateCommand(); command.CommandText = "SELECT b.storage_key,u.original_name FROM intake.blob b LEFT JOIN intake.upload u ON u.project_id=b.project_id AND u.blob_id=b.blob_id WHERE b.project_id=@project AND b.blob_id=@blob AND b.scan_status='clean'"; Add(command, "project", project); Add(command, "blob", blobId); string key; string name; await using (var reader = await command.ExecuteReaderAsync(ct)) { if (!await reader.ReadAsync(ct)) throw ProjectIdentityException.NotFound(); key = reader.GetString(0); name = reader.IsDBNull(1) ? "akp.json" : reader.GetString(1); } await using var stream = await blobs.OpenReadAsync(project, key, ct); return await AkpPackageReader.ReadAsync(stream, name, ct); }
+    { await using var command = tx.CreateCommand(); command.CommandText = "SELECT b.storage_key,COALESCE(i.summary->>'originalName','akp.json') FROM intake.blob b JOIN intake.import_batch i ON i.project_id=b.project_id AND i.blob_id=b.blob_id WHERE b.project_id=@project AND b.blob_id=@blob AND b.scan_status='clean'"; Add(command, "project", project); Add(command, "blob", blobId); string key; string name; await using (var reader = await command.ExecuteReaderAsync(ct)) { if (!await reader.ReadAsync(ct)) throw ProjectIdentityException.NotFound(); key = reader.GetString(0); name = reader.GetString(1); } await using var stream = await blobs.OpenReadAsync(project, key, ct); return await AkpPackageReader.ReadAsync(stream, name, ct); }
     private async Task InsertEntryAsync(NpgsqlTransaction tx, Guid project, Guid import, NormalizedEntry entry, string diff, CancellationToken ct)
     { await using var command = tx.CreateCommand(); command.CommandText = "INSERT INTO intake.import_entry(project_id,entry_id,import_id,external_type,external_id,unit_id,diff) VALUES(@project,@entry,@import,@type,@external,@unit,@diff::jsonb)"; Add(command, "project", project); Add(command, "entry", Guid.NewGuid()); Add(command, "import", import); Add(command, "type", entry.ExternalType); Add(command, "external", entry.ExternalId); Add(command, "unit", (object?)FindUnit(diff) ?? DBNull.Value); Add(command, "diff", diff, NpgsqlDbType.Jsonb); await command.ExecuteNonQueryAsync(ct); }
     private async Task<ImportBatchView> ReadBatchAsync(NpgsqlTransaction tx, Guid project, Guid import, CancellationToken ct)
@@ -269,7 +271,23 @@ public sealed class PostgresImportEvidenceStore(string connectionString, IPrivat
         using var doc = JsonDocument.Parse(body.GetRawText()); var root = (Dictionary<string, object?>)ToObject(doc.RootElement)!;
         if (root.TryGetValue("subjectExternalId", out var subject)) root["subject"] = ResolveRef("AssertionSubject", subject?.ToString(), revisions, stored);
         if (root.TryGetValue("objectExternalId", out var obj) && obj is not null) root["object"] = ResolveRef("AssertionObject", obj.ToString(), revisions, stored);
+        ResolveStructureReferences(root, revisions, stored);
         return JsonSerializer.SerializeToElement(root);
+    }
+    private static void ResolveStructureReferences(Dictionary<string, object?> value, Dictionary<string, (Guid RevisionId, Guid Unit)> revisions, List<StoredEntry> stored)
+    {
+        foreach (var key in value.Keys.ToArray())
+        {
+            if (value[key] is Dictionary<string, object?> child) ResolveStructureReferences(child, revisions, stored);
+            else if (value[key] is object?[] items) foreach (var item in items) if (item is Dictionary<string, object?> nested) ResolveStructureReferences(nested, revisions, stored);
+            if (value[key] is string external && key is "scenarioId" or "actionId" or "ruleId" or "eventId" or "objectId" or "actionRef")
+            {
+                var targetKey = key.EndsWith("Id", StringComparison.Ordinal) ? key[..^2] : key[..^3];
+                value[targetKey + "Ref"] = ResolveRef(key, external, revisions, stored);
+            }
+            if (key == "relatedExternalIds" && value[key] is object?[] related)
+                value["related"] = related.Select(item => ResolveRef(key, item?.ToString(), revisions, stored)).ToArray();
+        }
     }
     private static object ResolveRef(string type, string? id, Dictionary<string, (Guid RevisionId, Guid Unit)> revisions, List<StoredEntry> stored)
     { var match = revisions.FirstOrDefault(p => p.Value.Unit != Guid.Empty && p.Key.EndsWith(":" + id, StringComparison.Ordinal) && !p.Key.StartsWith("Source:", StringComparison.Ordinal)); if (match.Key is not null) return new { unitId = match.Value.Unit, revisionId = match.Value.RevisionId }; var existing = stored.FirstOrDefault(e => e.ExternalId == id && e.ExternalType != "Source"); if (existing?.UnitId is not null) return new { unitId = existing.UnitId, revisionId = ReadGuid(existing.Diff, "baseRevisionId") }; throw ProjectIdentityException.Conflict($"Unresolved imported reference '{id}'."); }

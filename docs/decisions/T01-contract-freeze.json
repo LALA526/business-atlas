@@ -8,8 +8,8 @@
   "inputContractDigestAlgorithm": "coordinator contract_digest: canonical public T01 task JSON, then sorted contractRef path, NUL and original bytes",
   "machineContractFreeze": {
     "manifest": "contracts/manifest.json",
-    "fileCount": 37,
-    "treeSha256": "cd5ff0e65914de567a048a0f41a49ac022936f92aacdc0ffcc7c98b5376cfa97"
+    "fileCount": 38,
+    "treeSha256": "9cfef8a3c201cb92e6b6b272f46b8fe8f8517dda66fbf3a38f5f036e9a332008"
   },
   "baselineCounts": {
     "tasks": 44,
@@ -79,6 +79,7 @@
     "taskDag": "v1",
     "knowledgeChangeProposal": "v1.3",
     "knowledgeDeliveryManifest": "v1.3",
+    "nativeKnowledgePackage": "AtlasProposal/1.0",
     "legacyCompatibilityOnly": ["akp-v0.1", "agent-run-events-v0.1", "v1.2 schemas"]
   },
   "browserAuthenticationControlPlane": {

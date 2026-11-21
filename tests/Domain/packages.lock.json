@@ -225,6 +225,14 @@
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.0, )"
         }
       },
+      "importevidence": {
+        "type": "Project",
+        "dependencies": {
+          "AccessApplicability": "[1.0.0, )",
+          "KnowledgeCore": "[1.0.0, )",
+          "ProjectIdentity": "[1.0.0, )"
+        }
+      },
       "knowledgecore": {
         "type": "Project",
         "dependencies": {
