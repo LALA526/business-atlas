@@ -28,6 +28,7 @@ public static class RuleEvaluator
         if (policy == "collect" && String(body, "collectOperator") is not ("set_union" or "ordered_list"))
             return NotExecutable(conditions, unknowns, "Collect requires an approved set_union or ordered_list operator.");
 
+        var inputTypes = ReadInputTypes(body);
         var evaluated = new List<(JsonElement Row, Truth Truth)>();
         var rowIds = new HashSet<string>(StringComparer.Ordinal);
         var nodeCount = 0;
@@ -36,13 +37,11 @@ public static class RuleEvaluator
             var rowId = String(row, "rowId");
             if (rowId is null || !rowIds.Add(rowId) || !row.TryGetProperty("outcome", out var outcome) || !Object(outcome))
                 return NotExecutable(conditions, unknowns, "Every decision row requires a unique rowId and structured outcome.");
-            if (rowId is null || !row.TryGetProperty("when", out var expression))
-            {
-                evaluated.Add((row, Truth.Unknown));
-                conditions.Add(new(rowId ?? "unknown", "unknown", "The row has no stable rowId or executable condition."));
-                continue;
-            }
-            var result = EvaluateExpression(expression, facts, 1, ref nodeCount);
+            if (!row.TryGetProperty("when", out var expression))
+                return NotExecutable(conditions, unknowns, "Every structured decision row requires an executable condition.");
+            if (ValidateExpression(expression, 1, ref nodeCount) is { } validationError)
+                return NotExecutable(conditions, unknowns, validationError);
+            var result = EvaluateExpression(expression, facts, inputTypes);
             evaluated.Add((row, result.Value));
             conditions.Add(new(rowId, Name(result.Value), result.Reason));
             if (result.Value == Truth.Unknown) unknowns.Add(Unknown(rowId, result.Reason));
@@ -105,15 +104,46 @@ public static class RuleEvaluator
     private static RuleEvaluation NotExecutable(List<RuleCondition> conditions, List<JsonElement> unknowns, string reason) =>
         new("not_executable", [], conditions, unknowns, [], [reason]);
 
-    private static (Truth Value, string Reason) EvaluateExpression(JsonElement expression, JsonElement facts, int depth, ref int nodes)
+    private static string? ValidateExpression(JsonElement expression, int depth, ref int nodes)
     {
-        if (++nodes > MaxNodes || depth > MaxDepth) return (Truth.Unknown, "The expression exceeds AST v1 resource limits.");
-        if (!Object(expression) || String(expression, "op") is not { } op || !Operators.Contains(op)) return (Truth.Unknown, "The expression operator is missing or unsupported.");
+        if (++nodes > MaxNodes || depth > MaxDepth) return "The expression exceeds AST v1 resource limits.";
+        if (!Object(expression) || String(expression, "op") is not { } op || !Operators.Contains(op)) return "The expression operator is missing or unsupported.";
+        if (op is "all" or "any")
+        {
+            if (Array(expression, "args") is not { } args || args.GetArrayLength() == 0) return $"{op} requires at least one argument.";
+            foreach (var arg in args.EnumerateArray())
+                if (ValidateExpression(arg, depth + 1, ref nodes) is { } error) return error;
+            return null;
+        }
+        if (op == "not")
+            return !expression.TryGetProperty("arg", out var arg) ? "not requires an argument." : ValidateExpression(arg, depth + 1, ref nodes);
+        if (op is "exists" or "missing" or "isNull")
+            return !expression.TryGetProperty("operand", out var operand) ? $"{op} requires an operand." : ValidateOperand(operand);
+        if (!expression.TryGetProperty("left", out var left) || !expression.TryGetProperty("right", out var right)) return "A comparison requires left and right operands.";
+        if (String(expression, "comparison") is { } comparison && comparison is not ("ordinal" or "ordinalIgnoreCase" or "typed")) return "The comparison policy is unsupported.";
+        return ValidateOperand(left) ?? ValidateOperand(right);
+    }
+
+    private static string? ValidateOperand(JsonElement operand)
+    {
+        if (!Object(operand)) return "The operand is not an object.";
+        if (String(operand, "kind") == "literal")
+        {
+            if (String(operand, "valueType") is not ("string" or "decimal" or "integer" or "boolean" or "date" or "datetime" or "enum" or "null" or "list") || !operand.TryGetProperty("value", out _))
+                return "A literal operand requires a supported valueType and value.";
+            return null;
+        }
+        return String(operand, "kind") == "field" && Guid.TryParse(String(operand, "attributeId"), out _)
+            ? null : "A field operand requires a valid attributeId.";
+    }
+
+    private static (Truth Value, string Reason) EvaluateExpression(JsonElement expression, JsonElement facts, IReadOnlyDictionary<Guid, string> inputTypes)
+    {
+        var op = expression.GetProperty("op").GetString()!;
         if (op == "all" || op == "any")
         {
-            if (Array(expression, "args") is not { } args || args.GetArrayLength() == 0) return (Truth.Unknown, $"{op} requires at least one argument.");
             var values = new List<(Truth Value, string Reason)>();
-            foreach (var item in args.EnumerateArray()) values.Add(EvaluateExpression(item, facts, depth + 1, ref nodes));
+            foreach (var item in expression.GetProperty("args").EnumerateArray()) values.Add(EvaluateExpression(item, facts, inputTypes));
             if (values.Any(item => item.Value == Truth.Conflict)) return (Truth.Conflict, "An argument contains a conflict.");
             if (op == "all" && values.Any(item => item.Value == Truth.False)) return (Truth.False, "At least one all argument is false.");
             if (op == "any" && values.Any(item => item.Value == Truth.True)) return (Truth.True, "At least one any argument is true.");
@@ -123,23 +153,31 @@ public static class RuleEvaluator
         if (op == "not")
         {
             if (!expression.TryGetProperty("arg", out var arg)) return (Truth.Unknown, "not requires an argument.");
-            var value = EvaluateExpression(arg, facts, depth + 1, ref nodes);
+            var value = EvaluateExpression(arg, facts, inputTypes);
             return value.Value switch { Truth.True => (Truth.False, "The argument is true."), Truth.False => (Truth.True, "The argument is false."), _ => value };
         }
         if (op is "exists" or "missing" or "isNull")
         {
             if (!expression.TryGetProperty("operand", out var operand)) return (Truth.Unknown, $"{op} requires an operand.");
-            var value = ReadOperand(operand, facts);
+            var value = ReadOperand(operand, facts, inputTypes);
             if (value.Error is not null) return (Truth.Unknown, value.Error);
             var result = op == "exists" ? value.Present : op == "missing" ? !value.Present : value.Present && value.Value.ValueKind == JsonValueKind.Null;
             return (result ? Truth.True : Truth.False, $"{op} evaluated deterministically.");
         }
 
         if (!expression.TryGetProperty("left", out var leftNode) || !expression.TryGetProperty("right", out var rightNode)) return (Truth.Unknown, "A comparison requires left and right operands.");
-        var left = ReadOperand(leftNode, facts); var right = ReadOperand(rightNode, facts);
+        var left = ReadOperand(leftNode, facts, inputTypes); var right = ReadOperand(rightNode, facts, inputTypes);
         if (left.Error is not null || right.Error is not null) return (Truth.Unknown, left.Error ?? right.Error!);
         if (!left.Present || !right.Present) return (Truth.Unknown, "A required fact is missing.");
-        if (left.Value.ValueKind == JsonValueKind.Null || right.Value.ValueKind == JsonValueKind.Null) return (Truth.Unknown, "Null is not an implicit comparison value.");
+        if (left.Value.ValueKind == JsonValueKind.Null || right.Value.ValueKind == JsonValueKind.Null)
+        {
+            if (op is not ("eq" or "ne")) return (Truth.Unknown, "Null only supports explicit equality or isNull comparisons.");
+            var bothNull = left.Value.ValueKind == JsonValueKind.Null && right.Value.ValueKind == JsonValueKind.Null;
+            var nullAnswer = op == "eq" ? bothNull : !bothNull;
+            return (nullAnswer ? Truth.True : Truth.False, "Null equality was evaluated explicitly.");
+        }
+        if (op != "in" && (left.Value.ValueKind == JsonValueKind.Array || right.Value.ValueKind == JsonValueKind.Array))
+            return (Truth.Unknown, "Only the in operator accepts a list operand.");
         var comparison = String(expression, "comparison") ?? "typed";
         var compared = Compare(left, right, comparison);
         if (compared.Error is not null) return (Truth.Unknown, compared.Error);
@@ -168,11 +206,20 @@ public static class RuleEvaluator
         var other = right.Value;
         if (type == "list" || op.ValueKind == JsonValueKind.Array || other.ValueKind == JsonValueKind.Array)
         {
-            if (op.ValueKind != JsonValueKind.Array && other.ValueKind == JsonValueKind.Array)
-                return other.EnumerateArray().Any(item => CanonicalJson.Serialize(item) == CanonicalJson.Serialize(op)) ? (0, null) : (1, null);
-            return (1, "List comparisons require a scalar left operand and a list right operand.");
+            if (op.ValueKind == JsonValueKind.Array || other.ValueKind != JsonValueKind.Array)
+                return (1, "List comparisons require a scalar left operand and a list right operand.");
+            var elementType = left.Type == "list" ? null : left.Type;
+            foreach (var item in other.EnumerateArray())
+            {
+                var membership = Compare(left with { Type = elementType }, new(true, item, elementType, null), comparison);
+                if (membership.Error is not null) return membership;
+                if (membership.Order == 0) return (0, null);
+            }
+            return (1, null);
         }
-        if (type is "decimal" or "integer" || op.ValueKind == JsonValueKind.Number || other.ValueKind == JsonValueKind.Number)
+        if (type is "string" or "date" or "datetime" or "enum" && (op.ValueKind != JsonValueKind.String || other.ValueKind != JsonValueKind.String))
+            return (1, "String, enum, and temporal operands must use JSON strings.");
+        if (type is "decimal" or "integer")
         {
             if (!Decimal(op, out var a) || !Decimal(other, out var b)) return (1, "A decimal operand is invalid; locale-formatted numbers are not accepted.");
             if (type == "integer" && (a != decimal.Truncate(a) || b != decimal.Truncate(b))) return (1, "An integer operand has a fractional value.");
@@ -186,20 +233,61 @@ public static class RuleEvaluator
         if (op.ValueKind != JsonValueKind.String || other.ValueKind != JsonValueKind.String) return (1, "Comparison operands have incompatible types.");
         var x = op.GetString()!; var y = other.GetString()!;
         if (x.Length > 65536 || y.Length > 65536) return (1, "A string operand exceeds the 64KiB limit.");
-        if (type == "date" && (!DateOnly.TryParseExact(x, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dx) || !DateOnly.TryParseExact(y, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dy))) return (1, "Dates must use ISO yyyy-MM-dd.");
-        if (type == "datetime" && (!DateTimeOffset.TryParse(x, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var dtx) || !DateTimeOffset.TryParse(y, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var dty))) return (1, "Datetimes must be ISO 8601 values with an explicit offset.");
+        if (type == "date")
+        {
+            if (!DateOnly.TryParseExact(x, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dx) || !DateOnly.TryParseExact(y, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dy)) return (1, "Dates must use ISO yyyy-MM-dd.");
+            return (dx.CompareTo(dy), null);
+        }
+        if (type == "datetime")
+        {
+            if (!ExplicitOffset(x) || !ExplicitOffset(y) || !DateTimeOffset.TryParse(x, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var dtx) || !DateTimeOffset.TryParse(y, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var dty)) return (1, "Datetimes must be ISO 8601 values with an explicit offset.");
+            return (dtx.CompareTo(dty), null);
+        }
         var stringComparison = comparison == "ordinalIgnoreCase" ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
         return (string.Compare(x, y, stringComparison), null);
     }
 
-    private static OperandValue ReadOperand(JsonElement node, JsonElement facts)
+    private static Dictionary<Guid, string> ReadInputTypes(JsonElement body)
+    {
+        var result = new Dictionary<Guid, string>();
+        if (Array(body, "inputs") is not { } inputs) return result;
+        foreach (var input in inputs.EnumerateArray())
+        {
+            if (!input.TryGetProperty("attribute", out var attribute) || !Guid.TryParse(String(attribute, "unitId"), out var id)) continue;
+            if (String(input, "valueType") is { } type) result[id] = type;
+        }
+        return result;
+    }
+
+    private static OperandValue ReadOperand(JsonElement node, JsonElement facts, IReadOnlyDictionary<Guid, string> inputTypes)
     {
         if (!Object(node)) return new(false, default, null, "The operand is not an object.");
-        if (String(node, "kind") == "literal") return new(true, node.TryGetProperty("value", out var value) ? value.Clone() : default, String(node, "valueType"), null);
+        if (String(node, "kind") == "literal")
+        {
+            var type = String(node, "valueType");
+            var value = node.GetProperty("value");
+            return LiteralTypeMatches(type, value)
+                ? new(true, value.Clone(), type, null)
+                : new(true, value.Clone(), type, "The literal value does not match its declared valueType.");
+        }
         if (String(node, "kind") != "field" || !Guid.TryParse(String(node, "attributeId"), out var id)) return new(false, default, null, "A field operand requires a valid attributeId.");
-        if (!facts.TryGetProperty(id.ToString(), out var fact) && !facts.TryGetProperty(id.ToString("D"), out fact)) return new(false, default, null, null);
-        return new(true, fact.Clone(), null, null);
+        if (!facts.TryGetProperty(id.ToString(), out var fact)) return new(false, default, null, null);
+        return new(true, fact.Clone(), inputTypes.TryGetValue(id, out var inputType) ? inputType : null, null);
     }
+
+    private static bool LiteralTypeMatches(string? type, JsonElement value) => type switch
+    {
+        "string" or "date" or "datetime" or "enum" => value.ValueKind == JsonValueKind.String,
+        "decimal" => value.ValueKind == JsonValueKind.Number || value.ValueKind == JsonValueKind.String,
+        "integer" => value.ValueKind == JsonValueKind.Number || value.ValueKind == JsonValueKind.String,
+        "boolean" => value.ValueKind is JsonValueKind.True or JsonValueKind.False,
+        "null" => value.ValueKind == JsonValueKind.Null,
+        "list" => value.ValueKind == JsonValueKind.Array,
+        _ => false
+    };
+
+    private static bool ExplicitOffset(string value) => value.EndsWith('Z') || value.EndsWith('z') ||
+        value.Length >= 6 && (value[^6] is '+' or '-') && value[^3] == ':';
 
     private static bool Decimal(JsonElement value, out decimal result) => value.ValueKind switch
     {
