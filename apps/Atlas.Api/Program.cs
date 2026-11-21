@@ -1,13 +1,21 @@
 using System.Diagnostics;
 using BuildingBlocks;
 using PlatformOps;
+using ProjectIdentity.Infrastructure;
+using Atlas.Api.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<HealthState>();
 builder.Services.AddPlatformOps(builder.Configuration.GetConnectionString("Atlas"));
+builder.Services.AddSingleton(new PostgresProjectIdentityStore(builder.Configuration.GetConnectionString("Atlas") ?? string.Empty));
+builder.Services.AddAtlasAuthentication(builder.Configuration, builder.Environment);
 
 var app = builder.Build();
 app.Lifetime.ApplicationStopping.Register(app.Services.GetRequiredService<HealthState>().BeginShutdown);
+app.UseAuthentication();
+app.UseAtlasCsrfProtection();
+app.UseAuthorization();
+app.MapIdentityEndpoints();
 
 app.MapGet("/health/live", (HttpContext context) => HealthResponse(context, "ok"));
 app.MapGet("/health/ready", (HttpContext context, HealthState state) =>

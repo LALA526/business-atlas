@@ -1,8 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="../../src/BuildingBlocks/BuildingBlocks.csproj" />
     <ProjectReference Include="../../src/Modules/PlatformOps/PlatformOps.csproj" />
+    <ProjectReference Include="../../src/Modules/ProjectIdentity/ProjectIdentity.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
