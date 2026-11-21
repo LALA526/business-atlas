@@ -78,7 +78,7 @@ public sealed class PostgresOutboxStore(AtlasDbContext database)
 
         if (claimed is not null)
         {
-            await transaction.AppendAuditAsync(OutboxAudit("outbox.claim", claimed.EventId, claimed.Fence), cancellationToken);
+            await AppendWorkerAudit(transaction, "outbox.claim", claimed.EventId, claimed.Fence, cancellationToken);
         }
 
         await transaction.CommitAsync(cancellationToken);
@@ -107,6 +107,18 @@ public sealed class PostgresOutboxStore(AtlasDbContext database)
         }
 
         return FinishAsync(projectId, workerPrincipalId, eventId, fence, delay, cancellationToken);
+    }
+
+    public async Task<bool> FailAsync(Guid projectId, Guid eventId, long fence, CancellationToken cancellationToken = default)
+    {
+        await using var transaction = await PostgresCommandTransaction.BeginAsync(database,
+            WorkerContext(projectId, Guid.NewGuid(), "outbox.fail"), cancellationToken);
+        await using var command = CreateCommand(transaction,
+            "UPDATE ops.outbox SET state='failed',lease_until=NULL WHERE project_id=@project AND event_id=@event AND fence=@fence AND state='running'");
+        AddParameter(command, "project", projectId); AddParameter(command, "event", eventId); AddParameter(command, "fence", fence);
+        var updated = await command.ExecuteNonQueryAsync(cancellationToken) == 1;
+        await transaction.CommitAsync(cancellationToken);
+        return updated;
     }
 
     private async Task<bool> FinishAsync(
@@ -138,7 +150,7 @@ public sealed class PostgresOutboxStore(AtlasDbContext database)
         var updated = await command.ExecuteNonQueryAsync(cancellationToken) == 1;
         if (updated)
         {
-            await transaction.AppendAuditAsync(OutboxAudit(action, eventId, fence), cancellationToken);
+            await AppendWorkerAudit(transaction, action, eventId, fence, cancellationToken);
         }
 
         await transaction.CommitAsync(cancellationToken);
@@ -148,12 +160,16 @@ public sealed class PostgresOutboxStore(AtlasDbContext database)
     private static CommandContext WorkerContext(Guid projectId, Guid principalId, string operation) =>
         new(projectId, principalId, operation, $"worker-{Guid.NewGuid():N}", Guid.NewGuid().ToString("N"));
 
-    private static AuditEntryInput OutboxAudit(string action, Guid eventId, long fence) =>
-        new(
-            action,
-            JsonSerializer.SerializeToElement(new { eventId }),
-            "OK",
-            JsonSerializer.SerializeToElement(new { fence }));
+    private static async Task AppendWorkerAudit(PostgresCommandTransaction transaction, string action, Guid eventId, long fence, CancellationToken cancellationToken)
+    {
+        await using var command = CreateCommand(transaction,
+            "INSERT INTO ops.audit_event(project_id,actor_id,action,resource_ref,result_code,request_id,trace_id,safe_metadata) VALUES (@project,NULL,@action,@resource::jsonb,'OK',@request,@trace,@metadata::jsonb)");
+        AddParameter(command, "project", transaction.CommandContext.ProjectId); AddParameter(command, "action", action);
+        PostgresCommandTransaction.AddParameter(command, "resource", JsonSerializer.Serialize(new { eventId }), NpgsqlTypes.NpgsqlDbType.Jsonb);
+        AddParameter(command, "request", transaction.CommandContext.RequestId); AddParameter(command, "trace", transaction.CommandContext.TraceId);
+        PostgresCommandTransaction.AddParameter(command, "metadata", JsonSerializer.Serialize(new { fence }), NpgsqlTypes.NpgsqlDbType.Jsonb);
+        await command.ExecuteNonQueryAsync(cancellationToken);
+    }
 
     private static DbCommand CreateCommand(PostgresCommandTransaction transaction, string sql) =>
         transaction.CreateCommand(sql);

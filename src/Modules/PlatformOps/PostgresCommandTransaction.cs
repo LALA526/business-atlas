@@ -140,10 +140,10 @@ public sealed class PostgresCommandTransaction : ICommandTransaction
         await using var command = CreateCommand(
             """
             INSERT INTO ops.outbox
-              (project_id, event_id, event_type, aggregate_id, aggregate_revision,
-               schema_version, payload, occurred_at)
-            VALUES
-              (@project, @event, @type, @aggregate, @revision, @schema, @payload::jsonb, @occurred)
+               (project_id, event_id, event_type, aggregate_id, aggregate_revision,
+                schema_version, payload, occurred_at, state)
+             VALUES
+               (@project, @event, @type, @aggregate, @revision, @schema, @payload::jsonb, @occurred, 'queued')
             """);
         AddParameter(command, "project", message.ProjectId);
         AddParameter(command, "event", message.EventId);

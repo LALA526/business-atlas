@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using PlatformOps;
 using ProjectIdentity.Infrastructure;
 using Atlas.Api.Auth;
+using Atlas.Api.Platform;
 using Atlas.Api.SchemaCatalog;
 using SchemaCatalog.Infrastructure;
 
@@ -40,13 +41,26 @@ app.UseAtlasCsrfProtection();
 app.UseAuthorization();
 app.MapIdentityEndpoints();
 app.MapAccessEndpoints();
+app.MapPlatformEndpoints();
 app.MapSchemaCatalogEndpoints();
 
 app.MapGet("/health/live", (HttpContext context) => HealthResponse(context, "ok"));
-app.MapGet("/health/ready", (HttpContext context, HealthState state) =>
-    state.IsReady
-        ? Results.Ok(HealthBody(context, "ok"))
-        : Results.Json(ErrorBody(context, "DEPENDENCY_UNAVAILABLE", "Service is shutting down"), statusCode: 503));
+app.MapGet("/health/ready", async (HttpContext context, HealthState state, AtlasDbContext database, CancellationToken ct) =>
+{
+    if (!state.IsReady) return Results.Json(ErrorBody(context, "DEPENDENCY_UNAVAILABLE", "Service is shutting down"), statusCode: 503);
+    try
+    {
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        timeout.CancelAfter(TimeSpan.FromSeconds(3));
+        return await database.Database.CanConnectAsync(timeout.Token)
+            ? Results.Ok(HealthBody(context, "ok"))
+            : Results.Json(ErrorBody(context, "DEPENDENCY_UNAVAILABLE", "Database is unavailable"), statusCode: 503);
+    }
+    catch
+    {
+        return Results.Json(ErrorBody(context, "DEPENDENCY_UNAVAILABLE", "Database is unavailable"), statusCode: 503);
+    }
+});
 
 
 app.Run();

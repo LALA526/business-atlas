@@ -2,6 +2,7 @@ using BuildingBlocks.Commands;
 using BuildingBlocks.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PlatformOps.Jobs;
 
 namespace PlatformOps;
 
@@ -15,6 +16,9 @@ public static class PlatformOpsServiceCollectionExtensions
         services.AddSingleton<CommandPipeline>();
         services.AddScoped<AuditQueryService>();
         services.AddScoped<PostgresOutboxStore>();
+        services.AddScoped<PostgresJobStore>();
+        services.AddScoped<IJobQueue>(provider => provider.GetRequiredService<PostgresJobStore>());
+        services.AddScoped<PostgresErrorPatternStore>();
         return services;
     }
 }
