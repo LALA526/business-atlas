@@ -71,6 +71,10 @@ def serve():
         signal.signal(signum, runner.request_stop)
     try:
         with ar.ProcessLock(STATE / 'runner.lock'):
+            if runner.controls.get('fastDelivery'):
+                # Only this process owns the coordinator lock. Native jobs survive a host crash;
+                # reattach their journals now instead of waiting an hour for abandoned leases.
+                runner.ledger.connection.execute("UPDATE tasks SET lease_expires_at=0 WHERE lease_owner IS NOT NULL AND phase!='done'")
             if hasattr(getattr(runner, 'adapter', None), 'health'):
                 from provider_recovery import normalize_legacy_quota_waits
                 normalize_legacy_quota_waits(runner, runner.adapter.health)
