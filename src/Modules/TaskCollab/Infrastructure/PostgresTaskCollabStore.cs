@@ -10,6 +10,8 @@ using ProjectIdentity.Application;
 using ProjectIdentity.Contracts;
 using TaskCollab.Contracts;
 using TaskCollab.Impact;
+using TaskCollab.ChangePlanner;
+using TaskCollab.Investigation;
 
 namespace TaskCollab.Infrastructure;
 
@@ -21,7 +23,6 @@ public sealed class PostgresTaskCollabStore(string connectionString, PostgresAcc
     private static readonly HashSet<string> InspectionStates = ["candidate", "inspected", "verified", "stale"];
     private static readonly HashSet<string> CloseStates = ["open", "resolved", "deferred"];
     private static readonly HashSet<string> Risks = ["low", "medium", "high", "critical"];
-    private static readonly HashSet<string> CaptureKinds = ["rawCaptured", "verifiedScript", "reconstructed", "proposed", "humanAttestation"];
 
     public async Task<TaskPage> ListTasksAsync(Guid principal, Guid project, string? cursor, int limit, CancellationToken ct)
     {
@@ -224,20 +225,35 @@ public sealed class PostgresTaskCollabStore(string connectionString, PostgresAcc
 
     public async Task<InvestigationInput> SubmitInvestigationAsync(AtlasPrincipal actor, Guid project, Guid task, InvestigationInput request, long expected, string key, string requestId, string? trace, CancellationToken ct)
     {
-        if (request.TaskId != task || request.BaselineId == Guid.Empty || string.IsNullOrWhiteSpace(request.Coverage) || request.Methods.Count == 0 || request.Methods.Any(string.IsNullOrWhiteSpace) || !CaptureKinds.Contains(request.CaptureKind)) throw ProjectIdentityException.Invalid("Investigation task, baseline, methods, coverage and captureKind are required.");
-        if (request.CommitSha is not null && (request.CommitSha.Length is < 40 or > 64 || request.CommitSha.Any(c => !Uri.IsHexDigit(c) || char.IsUpper(c)))) throw ProjectIdentityException.Invalid("commitSha must be lowercase hexadecimal.");
-        if (request.SearchedPaths.Any(string.IsNullOrWhiteSpace) || request.Exclusions.Any(string.IsNullOrWhiteSpace)) throw ProjectIdentityException.Invalid("Investigation paths and exclusions cannot be blank.");
+        InvestigationEvidence.Validate(actor, request);
+        if (request.TaskId != task) throw ProjectIdentityException.Invalid("The investigation task must match the route task.");
         await using var connection = await OpenAsync(ct); await using var tx = await connection.BeginTransactionAsync(ct); await Context(tx, project, actor.PrincipalId, ct); await RequireMember(tx, project, actor.PrincipalId, true, ct);
         var digest = Digest(new { task, request }); if (await Replay<InvestigationInput>(tx, project, actor.PrincipalId, "submitInvestigation", key, digest, ct) is { } replay) { await tx.CommitAsync(ct); return replay; }
-        var row = await ReadTask(tx, project, task, true, ct); if (row.Version != expected) throw ProjectIdentityException.CasMismatch(); if (request.BaselineId != row.BaseBaselineId) throw ProjectIdentityException.Conflict("Investigation must use the task base baseline.");
+        var row = await ReadTaskRow(tx, project, task, ct); if (row.Version != expected) throw ProjectIdentityException.CasMismatch(); if (request.BaselineId != row.BaseBaseline) throw ProjectIdentityException.Conflict("Investigation must use the task base baseline.");
+        foreach (var evidence in request.Evidence)
+        {
+            var source = evidence.GetProperty("source");
+            var reference = new RevisionRef(source.GetProperty("unitId").GetGuid(), source.GetProperty("revisionId").GetGuid());
+            await AuthorizeExact(tx, actor.PrincipalId, project, reference, ct);
+            if (await BaselineRevision(tx, project, row.BaseBaseline, reference.UnitId, ct) != reference.RevisionId) throw ProjectIdentityException.Invalid("Evidence sources must be exact revisions in the task base baseline.");
+        }
+        if (request.RunId.HasValue && !await ControlledRunCaptured(tx, project, task, actor.PrincipalId, request.RunId.Value, request.CaptureKind, ct))
+            throw new ProjectIdentityException("FORBIDDEN", "Executed evidence requires a succeeded controlled run owned by the submitter with matching captured events.", 403);
         var id = request.InvestigationId ?? Guid.NewGuid(); if (request.InvestigationId.HasValue) throw ProjectIdentityException.Invalid("investigationId is assigned by the server.");
         var scope = new { request.Repo, request.CommitSha, request.SearchedPaths, request.Methods, request.RunId };
         await Execute(tx, "INSERT INTO collab.investigation(project_id,investigation_id,task_id,base_baseline_id,scope,evidence_refs,coverage,capture_kind,created_by) VALUES(@project,@id,@task,@baseline,@scope::jsonb,@evidence::jsonb,@coverage::jsonb,@capture,@actor)", ct,
             ("project", project), ("id", id), ("task", task), ("baseline", request.BaselineId), ("scope", JsonSerializer.Serialize(scope, Json)), ("evidence", JsonSerializer.Serialize(request.Evidence, Json)),
             ("coverage", JsonSerializer.Serialize(new { request.Coverage, request.Exclusions }, Json)), ("capture", request.CaptureKind), ("actor", actor.PrincipalId));
-        var inspected = request.Evidence.Count > 0 && request.CaptureKind is not ("proposed" or "reconstructed");
-        await Execute(tx, "UPDATE collab.impact SET investigation_id=@investigation,inspection_state=CASE WHEN @inspected THEN 'inspected' ELSE inspection_state END,evidence_refs=@evidence::jsonb,version=version+1 WHERE project_id=@project AND task_id=@task AND close_state='open'; UPDATE collab.task SET version=version+1 WHERE project_id=@project AND task_id=@task", ct,
+        var inspected = request.Evidence.Count > 0 && InvestigationEvidence.IsExecuted(request.CaptureKind);
+        await Execute(tx, "UPDATE collab.impact SET investigation_id=@investigation,inspection_state=CASE WHEN @inspected THEN 'inspected' ELSE inspection_state END,evidence_refs=@evidence::jsonb,version=version+1 WHERE project_id=@project AND task_id=@task AND close_state='open'", ct,
             ("project", project), ("task", task), ("investigation", id), ("inspected", inspected), ("evidence", JsonSerializer.Serialize(request.Evidence, Json)));
+        var summary = Summary(row.Summary); summary.Unknowns = summary.Unknowns.Where(item => item.Field != "investigationCoverage").ToArray();
+        if (!inspected || request.Exclusions.Count > 0)
+            summary.Unknowns = [.. summary.Unknowns, new Unknown("investigationCoverage", "Supply executed evidence for the declared exclusions and any uninspected scope.", request.Exclusions.Count > 0 ? string.Join("; ", request.Exclusions) : "A proposal or reconstruction is not executed inspection evidence.")];
+        if (inspected && request.Exclusions.Count == 0) summary.Unknowns = summary.Unknowns.Where(item => item.Field != "impactCoverage").ToArray();
+        summary.NextAction = summary.Unknowns.Any(item => item.Field == "investigationCoverage") ? "Complete the explicitly uninvestigated scope" : "Decide each inspected impact and build the coordinated change plan";
+        await Execute(tx, "UPDATE collab.task SET target_summary=@summary::jsonb,version=version+1 WHERE project_id=@project AND task_id=@task", ct,
+            ("project", project), ("task", task), ("summary", JsonSerializer.Serialize(summary, Json)));
         var result = request with { InvestigationId = id }; await Save(tx, project, actor.PrincipalId, "submitInvestigation", key, digest, result, requestId, trace, ct); await tx.CommitAsync(ct); return result;
     }
 
@@ -248,8 +264,21 @@ public sealed class PostgresTaskCollabStore(string connectionString, PostgresAcc
         if (await Replay<ImpactView>(tx, project, actor.PrincipalId, "decideImpact", key, digest, ct) is { } replay) { await tx.CommitAsync(ct); return replay; }
         var existing = await ReadImpactForUpdate(tx, project, task, impact, ct); if (existing.Version != expected) throw ProjectIdentityException.CasMismatch();
         if (request.InvestigationId.HasValue && !await InvestigationBelongs(tx, project, task, request.InvestigationId.Value, ct)) throw ProjectIdentityException.Invalid("The investigation must belong to this task.");
-        if (request.AssignedTaskId.HasValue) _ = await ReadTask(tx, project, request.AssignedTaskId.Value, false, ct);
-        if (request.Disposition == "no_change" && (!request.InvestigationId.HasValue || request.Evidence.Count == 0 || request.InspectionState is not ("inspected" or "verified"))) throw ProjectIdentityException.Invalid("no_change requires an actual investigation, evidence, and inspected or verified state.");
+        if (request.AssignedTaskId.HasValue)
+        {
+            if (request.AssignedTaskId == task) throw ProjectIdentityException.Invalid("A deferred impact must be assigned to a different task.");
+            await AuthorizeTask(tx, actor.PrincipalId, project, request.AssignedTaskId.Value, ct);
+            var assigned = await ReadTask(tx, project, request.AssignedTaskId.Value, false, ct);
+            if (assigned.State is "completed" or "cancelled") throw ProjectIdentityException.Invalid("A deferred impact must be assigned to an active task.");
+        }
+        if (request.Disposition is "no_change" or "required")
+        {
+            if (!request.InvestigationId.HasValue || request.Evidence.Count == 0 || request.InspectionState is not ("inspected" or "verified"))
+                throw ProjectIdentityException.Invalid("required and no_change dispositions require an actual investigation, evidence, and inspected or verified state.");
+            var investigation = await ReadInvestigation(tx, project, task, request.InvestigationId.Value, ct);
+            if (!InvestigationEvidence.IsExecuted(investigation.CaptureKind) || !InvestigationEvidence.ContainsEvidence(investigation.Evidence, request.Evidence))
+                throw ProjectIdentityException.Invalid("Impact conclusions must reuse executed evidence recorded by the linked investigation; reconstructed or invented evidence is insufficient.");
+        }
         if (request.Disposition == "deferred" && !request.AssignedTaskId.HasValue) throw ProjectIdentityException.Invalid("A deferred impact requires an assigned task.");
         await Execute(tx, "UPDATE collab.impact SET disposition=@disposition,inspection_state=@inspection,investigation_id=@investigation,reason=@reason,risk=@risk,assigned_task_id=@assigned,evidence_refs=@evidence::jsonb,close_state=@close,version=version+1 WHERE project_id=@project AND impact_id=@impact", ct,
             ("project", project), ("impact", impact), ("disposition", request.Disposition), ("inspection", request.InspectionState), ("investigation", Db(request.InvestigationId)), ("reason", request.Reason.Trim()), ("risk", request.Risk), ("assigned", Db(request.AssignedTaskId)), ("evidence", JsonSerializer.Serialize(request.Evidence, Json)), ("close", request.CloseState));
@@ -259,14 +288,21 @@ public sealed class PostgresTaskCollabStore(string connectionString, PostgresAcc
     public Task<JobView> PlanChangeAsync(AtlasPrincipal actor, Guid project, Guid task, PlanChangeRequest request, long expected, string key, string requestId, string? trace, CancellationToken ct) =>
         MutateTask(actor, project, task, "planChange", expected, key, request, requestId, trace, async (tx, row) =>
         {
-            if (!await ContextBelongs(tx, project, task, request.ContextId, ct)) throw ProjectIdentityException.Invalid("contextId must belong to this task.");
+            if (!await ContextBelongs(tx, project, task, request.ContextId, ct)) throw ProjectIdentityException.Invalid("contextId must belong to this task and be executable and valid.");
+            if (request.InvestigationIds.Count == 0 || request.InvestigationIds.Distinct().Count() != request.InvestigationIds.Count) throw ProjectIdentityException.Invalid("A plan requires a distinct set of investigation IDs.");
             foreach (var investigation in request.InvestigationIds) if (!await InvestigationBelongs(tx, project, task, investigation, ct)) throw ProjectIdentityException.Invalid("Every investigation must belong to this task.");
-            var summary = Summary(row.Summary); var unresolved = await Scalar<long>(tx, "SELECT count(*) FROM collab.impact WHERE project_id=@project AND task_id=@task AND close_state='open'", ct, ("project", project), ("task", task));
-            var ready = summary.TargetChanges.Count > 0 && summary.Unknowns.Count == 0 && unresolved == 0;
-            summary.NextAction = ready ? "Build an executable context and begin implementation" : "Resolve target unknowns and open impacts before implementation";
+            var summary = Summary(row.Summary);
+            var unresolved = await Scalar<long>(tx, "SELECT count(*) FROM collab.impact WHERE project_id=@project AND task_id=@task AND (close_state='open' OR inspection_state='stale' OR (close_state='deferred' AND risk IN ('high','critical')))", ct, ("project", project), ("task", task));
+            var impacts = await ReadImpacts(tx, project, task, ct);
+            var investigations = await ReadInvestigationCoverage(tx, project, task, request.InvestigationIds, ct);
+            var coverageComplete = investigations.Count == request.InvestigationIds.Count && investigations.All(item => item.Executed && item.Exclusions.Count == 0);
+            var ready = summary.TargetChanges.Count > 0 && summary.Unknowns.Count == 0 && unresolved == 0 && coverageComplete;
+            var plan = ChangePlanBuilder.Build(task, row.Classification, summary.TargetChanges, summary.Preserve, impacts, investigations);
+            summary.ChangePlan = plan;
+            summary.NextAction = ready ? "Begin implementation under the approved executable context" : "Resolve target unknowns, blocking impacts, and investigation exclusions before implementation";
             var job = Guid.NewGuid(); var resultRef = $"task:{task}:plan:{row.Version + 1}";
-            await Execute(tx, "UPDATE collab.task SET state=CASE WHEN @ready AND state IN ('captured','investigating','needs_decision') THEN 'ready' ELSE state END,target_summary=@summary::jsonb,version=version+1 WHERE project_id=@project AND task_id=@task; INSERT INTO ops.job(project_id,job_id,kind,requester_id,context_id,state,input,result,attempt,max_attempt) VALUES(@project,@job,'change_plan',@actor,@context,'succeeded',@input::jsonb,@result::jsonb,0,1)", ct,
-                ("project", project), ("task", task), ("ready", ready), ("summary", JsonSerializer.Serialize(summary, Json)), ("job", job), ("actor", actor.PrincipalId), ("context", request.ContextId), ("input", JsonSerializer.Serialize(request, Json)), ("result", JsonSerializer.Serialize(new { resultRef, ready, unresolvedImpacts = unresolved, unknowns = summary.Unknowns }, Json)));
+            await Execute(tx, "UPDATE collab.task SET state=CASE WHEN @ready AND state IN ('captured','investigating','needs_decision') THEN 'ready' WHEN NOT @ready AND state='ready' THEN 'investigating' ELSE state END,target_summary=@summary::jsonb,version=version+1 WHERE project_id=@project AND task_id=@task; INSERT INTO ops.job(project_id,job_id,kind,requester_id,context_id,state,input,result,attempt,max_attempt) VALUES(@project,@job,'change_plan',@actor,@context,'succeeded',@input::jsonb,@result::jsonb,0,1)", ct,
+                ("project", project), ("task", task), ("ready", ready), ("summary", JsonSerializer.Serialize(summary, Json)), ("job", job), ("actor", actor.PrincipalId), ("context", request.ContextId), ("input", JsonSerializer.Serialize(request, Json)), ("result", JsonSerializer.Serialize(new { resultRef, ready, unresolvedImpacts = unresolved, coverageComplete, plan, unknowns = summary.Unknowns }, Json)));
             row.PendingJob = new(job, "change_plan", "succeeded", 1, 0, 1, resultRef, null, summary.Unknowns);
         }, ct);
 
@@ -462,6 +498,35 @@ public sealed class PostgresTaskCollabStore(string connectionString, PostgresAcc
     private static async Task<Guid?> BaselineRevision(NpgsqlTransaction tx, Guid project, Guid baseline, Guid unit, CancellationToken ct) { await using var command = Command(tx); command.CommandText = "SELECT revision_id FROM gov.baseline_entry WHERE project_id=@project AND baseline_id=@baseline AND unit_id=@unit"; Add(command, "project", project); Add(command, "baseline", baseline); Add(command, "unit", unit); return await command.ExecuteScalarAsync(ct) as Guid?; }
     private static async Task<string> UnitKind(NpgsqlTransaction tx, Guid project, Guid unit, CancellationToken ct) { await using var command = Command(tx); command.CommandText = "SELECT kind FROM core.unit WHERE project_id=@project AND unit_id=@unit"; Add(command, "project", project); Add(command, "unit", unit); return await command.ExecuteScalarAsync(ct) as string ?? throw ProjectIdentityException.NotFound(); }
     private static async Task<bool> InvestigationBelongs(NpgsqlTransaction tx, Guid project, Guid task, Guid id, CancellationToken ct) { await using var command = Command(tx); command.CommandText = "SELECT EXISTS(SELECT 1 FROM collab.investigation WHERE project_id=@project AND task_id=@task AND investigation_id=@id)"; Add(command, "project", project); Add(command, "task", task); Add(command, "id", id); return await command.ExecuteScalarAsync(ct) is true; }
+    private static async Task<bool> ControlledRunCaptured(NpgsqlTransaction tx, Guid project, Guid task, Guid actor, Guid run, string captureKind, CancellationToken ct)
+    {
+        await using var command = Command(tx); command.CommandText = "SELECT EXISTS(SELECT 1 FROM agent.run r WHERE r.project_id=@project AND r.task_id=@task AND r.run_id=@run AND r.executor_id=@actor AND r.state='succeeded' AND EXISTS(SELECT 1 FROM agent.run_event e WHERE e.project_id=r.project_id AND e.run_id=r.run_id AND e.capture_kind=@capture))";
+        Add(command, "project", project); Add(command, "task", task); Add(command, "run", run); Add(command, "actor", actor); Add(command, "capture", captureKind); return await command.ExecuteScalarAsync(ct) is true;
+    }
+    private static async Task<List<ImpactView>> ReadImpacts(NpgsqlTransaction tx, Guid project, Guid task, CancellationToken ct)
+    {
+        var items = new List<ImpactView>(); await using var command = Command(tx);
+        command.CommandText = "SELECT impact_id,task_id,target_unit_id,target_revision_id,locator,path,disposition,inspection_state,investigation_id,reason,risk,assigned_task_id,evidence_refs,close_state,version FROM collab.impact WHERE project_id=@project AND task_id=@task ORDER BY impact_id";
+        Add(command, "project", project); Add(command, "task", task); await using var reader = await command.ExecuteReaderAsync(ct); while (await reader.ReadAsync(ct)) items.Add(ReadImpact(reader)); return items;
+    }
+    private static async Task<InvestigationRecord> ReadInvestigation(NpgsqlTransaction tx, Guid project, Guid task, Guid id, CancellationToken ct)
+    {
+        await using var command = Command(tx); command.CommandText = "SELECT capture_kind,evidence_refs FROM collab.investigation WHERE project_id=@project AND task_id=@task AND investigation_id=@id";
+        Add(command, "project", project); Add(command, "task", task); Add(command, "id", id); await using var reader = await command.ExecuteReaderAsync(ct);
+        if (!await reader.ReadAsync(ct)) throw ProjectIdentityException.NotFound(); return new(reader.GetString(0), Elements(reader.GetString(1)));
+    }
+    private static async Task<List<InvestigationCoverage>> ReadInvestigationCoverage(NpgsqlTransaction tx, Guid project, Guid task, IReadOnlyList<Guid> ids, CancellationToken ct)
+    {
+        var items = new List<InvestigationCoverage>(); await using var command = Command(tx);
+        command.CommandText = "SELECT investigation_id,capture_kind,coverage FROM collab.investigation WHERE project_id=@project AND task_id=@task AND investigation_id=ANY(@ids) ORDER BY investigation_id";
+        Add(command, "project", project); Add(command, "task", task); Add(command, "ids", ids.ToArray()); await using var reader = await command.ExecuteReaderAsync(ct);
+        while (await reader.ReadAsync(ct))
+        {
+            using var coverage = JsonDocument.Parse(reader.GetString(2));
+            items.Add(InvestigationCoverage.From(reader.GetGuid(0), reader.GetString(1), coverage.RootElement.GetProperty("coverage").GetString() ?? "unknown", coverage.RootElement.GetProperty("exclusions").EnumerateArray().Select(item => item.GetString() ?? "unknown").ToArray()));
+        }
+        return items;
+    }
     private static async Task<bool> ContextBelongs(NpgsqlTransaction tx, Guid project, Guid task, Guid id, CancellationToken ct) { await using var command = Command(tx); command.CommandText = "SELECT EXISTS(SELECT 1 FROM delivery.task_context WHERE project_id=@project AND task_id=@task AND context_id=@id AND phase='executable' AND NOT EXISTS(SELECT 1 FROM delivery.context_invalidation i WHERE i.project_id=@project AND i.context_id=@id))"; Add(command, "project", project); Add(command, "task", task); Add(command, "id", id); return await command.ExecuteScalarAsync(ct) is true; }
     private static async Task<bool> ChangeSetBelongs(NpgsqlTransaction tx, Guid project, Guid id, CancellationToken ct) { await using var command = Command(tx); command.CommandText = "SELECT EXISTS(SELECT 1 FROM gov.change_set WHERE project_id=@project AND change_set_id=@id)"; Add(command, "project", project); Add(command, "id", id); return await command.ExecuteScalarAsync(ct) is true; }
 
@@ -505,11 +570,12 @@ public sealed class PostgresTaskCollabStore(string connectionString, PostgresAcc
             Unknowns = root.TryGetProperty("unknowns", out var unknown) ? unknown.Deserialize<List<Unknown>>(Json) ?? [] : [],
             SourceRefs = root.TryGetProperty("sourceRefs", out var refs) ? refs.Deserialize<List<RevisionRef>>(Json) ?? [] : [],
             NextAction = root.TryGetProperty("nextAction", out var next) ? next.GetString() : null,
-            ImpactCoverage = root.TryGetProperty("impactCoverage", out var coverage) ? coverage.Deserialize<ImpactCoverage>(Json) : null
+            ImpactCoverage = root.TryGetProperty("impactCoverage", out var coverage) ? coverage.Deserialize<ImpactCoverage>(Json) : null,
+            ChangePlan = root.TryGetProperty("changePlan", out var plan) ? plan.Deserialize<ChangePlan>(Json) : null
         };
     }
 
-    private sealed class TaskSummary { public IReadOnlyList<TargetChange> TargetChanges { get; set; } = []; public IReadOnlyList<RevisionRef> Preserve { get; set; } = []; public IReadOnlyList<Unknown> Unknowns { get; set; } = []; public IReadOnlyList<RevisionRef> SourceRefs { get; set; } = []; public string? NextAction { get; set; } public ImpactCoverage? ImpactCoverage { get; set; } }
+    private sealed class TaskSummary { public IReadOnlyList<TargetChange> TargetChanges { get; set; } = []; public IReadOnlyList<RevisionRef> Preserve { get; set; } = []; public IReadOnlyList<Unknown> Unknowns { get; set; } = []; public IReadOnlyList<RevisionRef> SourceRefs { get; set; } = []; public string? NextAction { get; set; } public ImpactCoverage? ImpactCoverage { get; set; } public ChangePlan? ChangePlan { get; set; } }
     private sealed class ImpactCoverage
     {
         public int candidateCount { get; set; } public int edgeCount { get; set; } public bool truncated { get; set; }
@@ -522,9 +588,10 @@ public sealed class PostgresTaskCollabStore(string connectionString, PostgresAcc
     private sealed record ImpactEdge(Guid Relation, string Predicate, Guid Neighbor, string Direction, Guid EdgeUnit);
     private sealed record ImpactCandidate(Guid Unit, Guid Revision, string Kind, List<JsonElement> Path, string Reason);
     private sealed record MembershipContext(Guid Baseline, string[] Roles);
+    private sealed record InvestigationRecord(string CaptureKind, IReadOnlyList<JsonElement> Evidence);
     private sealed class TaskRow
     {
-        public TaskRow(TaskView view, string summary) { TaskId = view.TaskId; Version = view.Version; State = view.State; Intent = view.Intent; BaseBaseline = view.BaseBaselineId; RootUnitId = view.RootUnitId; Summary = summary; }
-        public Guid TaskId { get; } public long Version { get; } public string State { get; } public string Intent { get; } public Guid BaseBaseline { get; } public Guid? RootUnitId { get; } public string Summary { get; } public JobView? PendingJob { get; set; }
+        public TaskRow(TaskView view, string summary) { TaskId = view.TaskId; Version = view.Version; State = view.State; Intent = view.Intent; BaseBaseline = view.BaseBaselineId; RootUnitId = view.RootUnitId; Classification = view.Classification; Summary = summary; }
+        public Guid TaskId { get; } public long Version { get; } public string State { get; } public string Intent { get; } public Guid BaseBaseline { get; } public Guid? RootUnitId { get; } public string Classification { get; } public string Summary { get; } public JobView? PendingJob { get; set; }
     }
 }

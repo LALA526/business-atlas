@@ -202,6 +202,117 @@ public sealed class TaskCollabTests
         }
     }
 
+    [PostgreSqlFact]
+    public async Task AT_T23_Executed_evidence_dispositions_and_coordinated_change_plan()
+    {
+        var administrator = new NpgsqlConnectionStringBuilder(Environment.GetEnvironmentVariable("ATLAS_TEST_CONNECTIONSTRING"));
+        var database = $"atlas_t23_{Guid.NewGuid():N}";
+        await using (var connection = new NpgsqlConnection(administrator.ConnectionString))
+        {
+            await connection.OpenAsync(); await using var command = connection.CreateCommand(); command.CommandText = $"CREATE DATABASE {database}"; await command.ExecuteNonQueryAsync();
+        }
+        administrator.Database = database;
+        try
+        {
+            var options = new DbContextOptionsBuilder<BuildingBlocks.Persistence.AtlasDbContext>().UseNpgsql(administrator.ConnectionString).Options;
+            await using (var context = new BuildingBlocks.Persistence.AtlasDbContext(options)) await context.Database.MigrateAsync();
+            var runtime = new NpgsqlConnectionStringBuilder(administrator.ConnectionString) { Options = "-c role=atlas_app" }.ConnectionString;
+            var projects = new PostgresProjectIdentityStore(runtime);
+            var collab = new PostgresTaskCollabStore(runtime, new PostgresAccessApplicabilityStore(runtime));
+            var author = await projects.ResolvePrincipalAsync($"https://identity.test/{Guid.NewGuid():N}", "t23-automated-test-actor", PrincipalKind.Human, CancellationToken.None);
+            var project = await projects.CreateProjectAsync(author, new("Investigation", $"investigation-{Guid.NewGuid():N}", "t23-project-0001"), "t23-r1", null, CancellationToken.None);
+            var field = await AddUnit(administrator.ConnectionString, project.ProjectId, author.PrincipalId, project.CurrentBaselineId, "DataField");
+            var attribute = await AddUnit(administrator.ConnectionString, project.ProjectId, author.PrincipalId, project.CurrentBaselineId, "BusinessAttribute");
+            var rule = await AddUnit(administrator.ConnectionString, project.ProjectId, author.PrincipalId, project.CurrentBaselineId, "BusinessRule");
+            var source = await AddUnit(administrator.ConnectionString, project.ProjectId, author.PrincipalId, project.CurrentBaselineId, "Source");
+            await AddRelation(administrator.ConnectionString, project.ProjectId, author.PrincipalId, project.CurrentBaselineId, "mapsTo", attribute, field);
+            await AddRelation(administrator.ConnectionString, project.ProjectId, author.PrincipalId, project.CurrentBaselineId, "usesFact", rule, attribute);
+
+            var task = await collab.CreateTaskAsync(author, project.ProjectId, new("Rename a field while preserving matching behavior", null, field, null, null), "t23-task-0001", "t23-r2", null, CancellationToken.None);
+            var sourceRevision = await RevisionId(administrator.ConnectionString, project.ProjectId, source);
+            var amended = await collab.AmendTaskAsync(author, project.ProjectId, task.TaskId,
+                new(null, [new("revise", "Update the physical mapping without changing matching semantics", "Implementation-only field rename", new(source, sourceRevision))], [new(source, sourceRevision)], null),
+                task.Version, "t23-amend-001", "t23-r3", null, CancellationToken.None);
+            await collab.FindImpactsAsync(author, project.ProjectId, task.TaskId, new([new(field, null)], "revise", new(ReadMode.Published, ReadPurpose.Change, null, null, null)), amended.Version, "t23-impact-001", "t23-r4", null, CancellationToken.None);
+            var current = await collab.GetTaskAsync(author.PrincipalId, project.ProjectId, task.TaskId, CancellationToken.None);
+            var impacts = (await collab.ListImpactsAsync(author.PrincipalId, project.ProjectId, task.TaskId, null, 100, CancellationToken.None)).Items;
+            Assert.Equal(2, impacts.Count);
+            foreach (var impact in impacts)
+            {
+                var denied = await Assert.ThrowsAsync<ProjectIdentityException>(() => collab.DecideImpactAsync(author, project.ProjectId, task.TaskId, impact.ImpactId,
+                    new("no_change", "candidate", null, "No search was performed", "medium", null, [], "resolved"), impact.Version, $"t23-deny-{impact.ImpactId:N}", "t23-r5", null, CancellationToken.None));
+                Assert.Equal(422, denied.StatusCode);
+            }
+
+            var run = await AddCapturedRun(administrator.ConnectionString, project.ProjectId, task.TaskId, author.PrincipalId);
+            var evidence = Json($$"""[{"source":{"unitId":"{{source}}","revisionId":"{{sourceRevision}}"},"locator":{"kind":"file","path":"src/Legacy/Handler.cs","repo":"business-atlas","commitSha":"{{new string('a', 40)}}","lineStart":10,"lineEnd":40},"support":"supports","captureKind":"rawCaptured"}]""");
+            var investigated = await collab.SubmitInvestigationAsync(author, project.ProjectId, task.TaskId,
+                new(null, task.TaskId, project.CurrentBaselineId, "business-atlas", new string('a', 40), ["src"], ["rg entrypoints and legacy route references"], "Inspected known entry, legacy path, arguments and compatibility branch in the declared source scope.", [], "rawCaptured", evidence.EnumerateArray().Select(item => item.Clone()).ToArray(), run),
+                current.Version, "t23-investigate-01", "t23-r6", null, CancellationToken.None);
+            Assert.NotNull(investigated.InvestigationId);
+            impacts = (await collab.ListImpactsAsync(author.PrincipalId, project.ProjectId, task.TaskId, null, 100, CancellationToken.None)).Items;
+            var evidenceItems = evidence.EnumerateArray().Select(item => item.Clone()).ToArray();
+            foreach (var impact in impacts)
+            {
+                var decided = await collab.DecideImpactAsync(author, project.ProjectId, task.TaskId, impact.ImpactId,
+                    new("no_change", "inspected", investigated.InvestigationId, "Existing entry and legacy route preserve the rule in the inspected scope", "medium", null, evidenceItems, "resolved"),
+                    impact.Version, $"t23-decide-{impact.ImpactId:N}", "t23-r7", null, CancellationToken.None);
+                Assert.Equal("resolved", decided.CloseState);
+            }
+            current = await collab.GetTaskAsync(author.PrincipalId, project.ProjectId, task.TaskId, CancellationToken.None);
+            Assert.Empty(current.Unknowns);
+            var taskContext = await AddExecutableContext(administrator.ConnectionString, project.ProjectId, task.TaskId, project.CurrentBaselineId, author.PrincipalId);
+            var planned = await collab.PlanChangeAsync(author, project.ProjectId, task.TaskId, new(taskContext, [investigated.InvestigationId.Value]), current.Version, "t23-plan-0001", "t23-r8", null, CancellationToken.None);
+            Assert.Equal("succeeded", planned.State);
+            Assert.Equal("ready", (await collab.GetTaskAsync(author.PrincipalId, project.ProjectId, task.TaskId, CancellationToken.None)).State);
+
+            await using var connection = new NpgsqlConnection(administrator.ConnectionString); await connection.OpenAsync();
+            await using var planCommand = connection.CreateCommand(); planCommand.CommandText = "SELECT result->'plan' FROM ops.job WHERE project_id=@project AND job_id=@job";
+            planCommand.Parameters.AddWithValue("project", project.ProjectId); planCommand.Parameters.AddWithValue("job", planned.JobId);
+            var plan = JsonDocument.Parse((string)(await planCommand.ExecuteScalarAsync())!).RootElement;
+            Assert.Single(plan.GetProperty("dependencyGroups").EnumerateArray());
+            Assert.Equal("atomic", plan.GetProperty("dependencyGroups")[0].GetProperty("coordination").GetString());
+            Assert.Single(plan.GetProperty("preserve").EnumerateArray());
+            Assert.Equal(2, plan.GetProperty("revalidations").GetArrayLength());
+            Assert.Single(plan.GetProperty("engineeringRecommendations").EnumerateArray());
+            Assert.True(plan.GetProperty("investigationCoverage")[0].GetProperty("executed").GetBoolean());
+        }
+        finally
+        {
+            NpgsqlConnection.ClearAllPools(); administrator.Database = "postgres";
+            await using var connection = new NpgsqlConnection(administrator.ConnectionString); await connection.OpenAsync();
+            await using var command = connection.CreateCommand(); command.CommandText = $"DROP DATABASE IF EXISTS {database} WITH (FORCE)"; await command.ExecuteNonQueryAsync();
+        }
+    }
+
+    private static async Task<Guid> RevisionId(string connection, Guid project, Guid unit)
+    {
+        await using var db = new NpgsqlConnection(connection); await db.OpenAsync(); await using var command = db.CreateCommand();
+        command.CommandText = "SELECT revision_id FROM core.revision WHERE project_id=@project AND unit_id=@unit"; command.Parameters.AddWithValue("project", project); command.Parameters.AddWithValue("unit", unit);
+        return (Guid)(await command.ExecuteScalarAsync())!;
+    }
+
+    private static async Task<Guid> AddCapturedRun(string connection, Guid project, Guid task, Guid actor)
+    {
+        var run = Guid.NewGuid(); await using var db = new NpgsqlConnection(connection); await db.OpenAsync(); await using var command = db.CreateCommand();
+        command.CommandText = """
+            SET session_replication_role=replica;
+            INSERT INTO agent.run(project_id,run_id,task_id,executor_id,state,created_by) VALUES(@project,@run,@task,@actor,'succeeded',@actor);
+            INSERT INTO agent.run_event(project_id,event_id,run_id,seq,external_event_id,capture_kind,event_type,event_data,occurred_at,created_by)
+              VALUES(@project,@event,@run,1,'t23-tool-call','rawCaptured','tool_result','{"command":"rg entrypoints and legacy paths","exitCode":0}',now(),@actor);
+            """;
+        command.Parameters.AddWithValue("project", project); command.Parameters.AddWithValue("run", run); command.Parameters.AddWithValue("task", task); command.Parameters.AddWithValue("actor", actor); command.Parameters.AddWithValue("event", Guid.NewGuid());
+        await command.ExecuteNonQueryAsync(); return run;
+    }
+
+    private static async Task<Guid> AddExecutableContext(string connection, Guid project, Guid task, Guid baseline, Guid actor)
+    {
+        var context = Guid.NewGuid(); await using var db = new NpgsqlConnection(connection); await db.OpenAsync(); await using var command = db.CreateCommand();
+        command.CommandText = "INSERT INTO delivery.task_context(project_id,context_id,task_id,baseline_id,policy_epoch,phase,contract_digest,body,created_by) VALUES(@project,@context,@task,@baseline,1,'executable',@digest,'{}',@actor)";
+        command.Parameters.AddWithValue("project", project); command.Parameters.AddWithValue("context", context); command.Parameters.AddWithValue("task", task); command.Parameters.AddWithValue("baseline", baseline); command.Parameters.AddWithValue("digest", new string('b', 64)); command.Parameters.AddWithValue("actor", actor);
+        await command.ExecuteNonQueryAsync(); return context;
+    }
+
     private static async Task<Guid> AddUnit(string connection, Guid project, Guid actor, Guid baseline, string kind, Guid? id = null)
     {
         var unit = id ?? Guid.NewGuid(); var revision = Guid.NewGuid();
