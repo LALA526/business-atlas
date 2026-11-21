@@ -4,6 +4,7 @@ using AccessApplicability.Contracts;
 using AccessApplicability.Infrastructure;
 using KnowledgeCore.Contracts;
 using KnowledgeCore.Infrastructure;
+using KnowledgeCore.Relations;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using ProjectIdentity.Application;
@@ -81,6 +82,107 @@ public sealed class KnowledgeCoreTests
             await using var command = connection.CreateCommand(); command.CommandText = $"DROP DATABASE IF EXISTS {database} WITH (FORCE)"; await command.ExecuteNonQueryAsync();
         }
     }
+
+    [PostgreSqlFact]
+    public async Task AT_T09_Field_rename_preserves_business_attribute_and_reverse_rule_lookup_without_leaks()
+    {
+        var administrator = new NpgsqlConnectionStringBuilder(Environment.GetEnvironmentVariable("ATLAS_TEST_CONNECTIONSTRING"));
+        var database = $"atlas_t09_{Guid.NewGuid():N}";
+        await using (var connection = new NpgsqlConnection(administrator.ConnectionString))
+        {
+            await connection.OpenAsync(); await using var command = connection.CreateCommand(); command.CommandText = $"CREATE DATABASE {database}"; await command.ExecuteNonQueryAsync();
+        }
+        administrator.Database = database;
+        try
+        {
+            await MigrateAsync(administrator.ConnectionString);
+            var runtime = new NpgsqlConnectionStringBuilder(administrator.ConnectionString) { Options = "-c role=atlas_app" }.ConnectionString;
+            var projects = new PostgresProjectIdentityStore(runtime);
+            var access = new PostgresAccessApplicabilityStore(runtime);
+            var policy = new PolicyService(access);
+            var store = new PostgresKnowledgeStore(runtime, access);
+            var owner = await projects.ResolvePrincipalAsync($"https://identity.test/{Guid.NewGuid():N}", "owner", PrincipalKind.Human, CancellationToken.None);
+            var project = await projects.CreateProjectAsync(owner, new("Semantic trace", "semantic-trace", "t09-project-0001"), "r1", null, CancellationToken.None);
+            var change = await ChangeSetAsync(administrator.ConnectionString, project);
+            var version = project.Version;
+
+            var source = await Add(Input("Semantic source", "Source", "source", null));
+            var attribute = await Add(VocabularyInput("Parameter amount", "BusinessAttribute", source.Revision));
+            var field = await Add(DataFieldInput("legacy_amount", source.Revision));
+            var firstRule = await Add(CanonicalRuleInput("First amount rule", attribute.Revision, source.Revision));
+            var secondRule = await Add(CanonicalRuleInput("Second amount rule", attribute.Revision, source.Revision));
+            var mapping = await Add(RelationInput("Amount field mapping", "mapsTo", attribute.Revision, field.Revision, source.Revision));
+            _ = await Add(RelationInput("First rule input", "usesFact", firstRule.Revision, attribute.Revision, source.Revision));
+            var secondUse = await Add(RelationInput("Second rule input", "usesFact", secondRule.Revision, attribute.Revision, source.Revision));
+
+            var read = await policy.CreateReadContextAsync(owner.PrincipalId, project.ProjectId, new(ReadMode.Draft, ReadPurpose.Change, null, change, null), CancellationToken.None);
+            var fieldMappings = await store.ListRelationsAsync(read, field.Revision.UnitId, "reverse", "mapsTo", null, 30, CancellationToken.None);
+            Assert.Single(fieldMappings.Items);
+            Assert.Equal(mapping.Revision.UnitId, fieldMappings.Items[0].UnitId);
+            var rules = await store.ListRelationsAsync(read, attribute.Revision.UnitId, "reverse", "usesFact", null, 30, CancellationToken.None);
+            Assert.Equal(2, rules.Items.Count);
+            Assert.Contains(rules.Items, relation => relation.Body.GetProperty("from").GetProperty("unitId").GetGuid() == firstRule.Revision.UnitId);
+            Assert.Contains(rules.Items, relation => relation.Body.GetProperty("from").GetProperty("unitId").GetGuid() == secondRule.Revision.UnitId);
+            var facts = JsonSerializer.SerializeToElement(new Dictionary<string, string> { [attribute.Revision.UnitId.ToString()] = "yes" });
+            Assert.Equal("matched", (await store.EvaluateRuleAsync(read, firstRule.Revision.UnitId, facts, CancellationToken.None)).Status);
+
+            var reader = await projects.ResolvePrincipalAsync($"https://identity.test/{Guid.NewGuid():N}", "restricted-reader", PrincipalKind.Human, CancellationToken.None);
+            await using (var db = new NpgsqlConnection(administrator.ConnectionString))
+            {
+                await db.OpenAsync();
+                await using var membership = db.CreateCommand();
+                membership.CommandText = "INSERT INTO identity.membership(project_id,principal_id,roles) VALUES(@project,@reader,ARRAY['Contributor']); INSERT INTO access.grant(project_id,grant_id,unit_id,principal_id,action,field_paths,effect,created_by) VALUES(@project,@grant,@unit,@reader,'read',ARRAY['*'],'deny',@owner);";
+                membership.Parameters.AddWithValue("project", project.ProjectId); membership.Parameters.AddWithValue("reader", reader.PrincipalId);
+                membership.Parameters.AddWithValue("grant", Guid.NewGuid()); membership.Parameters.AddWithValue("unit", secondRule.Revision.UnitId); membership.Parameters.AddWithValue("owner", owner.PrincipalId);
+                await membership.ExecuteNonQueryAsync();
+            }
+            var restrictedRead = await policy.CreateReadContextAsync(reader.PrincipalId, project.ProjectId, new(ReadMode.Draft, ReadPurpose.Change, null, change, null), CancellationToken.None);
+            var visibleRules = await store.ListRelationsAsync(restrictedRead, attribute.Revision.UnitId, "reverse", "usesFact", null, 30, CancellationToken.None);
+            var visible = Assert.Single(visibleRules.Items);
+            Assert.Equal(firstRule.Revision.UnitId, visible.Body.GetProperty("from").GetProperty("unitId").GetGuid());
+            Assert.DoesNotContain(secondRule.Revision.UnitId.ToString(), JsonSerializer.Serialize(visibleRules));
+
+            var nextChange = await ChangeSetAsync(administrator.ConnectionString, project);
+            var renamedField = DataFieldInput("renamed_amount_v2", source.Revision) with { UnitId = field.Revision.UnitId };
+            var renamed = await store.ReviseDraftAsync(owner, project.ProjectId, nextChange, field.Revision.UnitId, renamedField, secondUse.ProjectVersion, "t09-field-rename-0001", "r9", null, CancellationToken.None);
+            Assert.Equal(field.Revision.UnitId, renamed.Revision.UnitId);
+            Assert.Equal("Technical field rename only", renamed.Revision.Body.GetProperty("businessMeaning").GetString());
+            var nextRead = await policy.CreateReadContextAsync(owner.PrincipalId, project.ProjectId, new(ReadMode.Draft, ReadPurpose.Change, null, nextChange, null), CancellationToken.None);
+            Assert.Equal("renamed_amount_v2", (await store.GetUnitAsync(nextRead, field.Revision.UnitId, CancellationToken.None)).Title);
+            Assert.Single((await store.ListRelationsAsync(read, field.Revision.UnitId, "reverse", "mapsTo", null, 30, CancellationToken.None)).Items);
+            Assert.Equal(2, (await store.ListRelationsAsync(read, attribute.Revision.UnitId, "reverse", "usesFact", null, 30, CancellationToken.None)).Items.Count);
+
+            async Task<RevisionMutation> Add(RevisionInput input)
+            {
+                var result = await store.CreateDraftAsync(owner, project.ProjectId, change, input, version, $"t09-{Guid.NewGuid():N}", Guid.NewGuid().ToString(), null, CancellationToken.None);
+                version = result.ProjectVersion; return result;
+            }
+        }
+        finally
+        {
+            NpgsqlConnection.ClearAllPools(); administrator.Database = "postgres";
+            await using var connection = new NpgsqlConnection(administrator.ConnectionString); await connection.OpenAsync();
+            await using var command = connection.CreateCommand(); command.CommandText = $"DROP DATABASE IF EXISTS {database} WITH (FORCE)"; await command.ExecuteNonQueryAsync();
+        }
+    }
+
+    private static RevisionInput VocabularyInput(string title, string kind, RevisionView source) => new(null, title, kind, "1.0", null, "normative", "unverified", Json("{}"),
+        JsonSerializer.SerializeToElement(new { definition = "Independent business meaning survives physical field changes", contextKey = "atlas-test", aliases = new[] { "Amount" }, businessSemantics = "Missing and null are business decisions, not SQL defaults" }),
+        Json("[]"), JsonSerializer.SerializeToElement(new[] { Evidence(source) }), Json("[]"), Json("[\"business\"]"));
+
+    private static RevisionInput DataFieldInput(string title, RevisionView source) => new(null, title, "DataField", "1.0", null, "normative", "unverified", Json("{}"),
+        JsonSerializer.SerializeToElement(new { businessMeaning = "Technical field rename only", valueType = "decimal", missingNullSemantics = "Defined independently by the business attribute", origin = "AT-T09 synthetic schema", constraints = Array.Empty<string>(), mappingRefs = Array.Empty<object>() }),
+        Json("[]"), JsonSerializer.SerializeToElement(new[] { Evidence(source) }), Json("[]"), Json("[\"system\"]"));
+
+    private static RevisionInput CanonicalRuleInput(string title, RevisionView attribute, RevisionView source) => new(null, title, "BusinessRule", "1.0", null, "normative", "unverified", Json("{}"),
+        JsonSerializer.SerializeToElement(new { purpose = "AT-T09 deterministic rule", evaluationMode = "structured", inputs = new[] { new { attribute = new { unitId = attribute.UnitId }, valueType = "string" } }, priorityPolicy = "unique",
+            rows = new[] { new { rowId = "yes", when = new { op = "eq", comparison = "ordinal", left = new { kind = "field", attributeId = attribute.UnitId }, right = new { kind = "literal", valueType = "string", value = "yes" } }, outcome = new { kind = "perform", description = "Return only" }, evidenceRefs = new[] { Evidence(source) } } },
+            exceptionExplanation = "none", caseRefs = Array.Empty<object>() }),
+        Json("[]"), JsonSerializer.SerializeToElement(new[] { Evidence(source) }), Json("[]"), Json("[\"business\"]"));
+
+    private static RevisionInput RelationInput(string title, string predicate, RevisionView from, RevisionView to, RevisionView source) => new(null, title, "Relationship", "1.0", null, "normative", "unverified", Json("{}"),
+        JsonSerializer.SerializeToElement(new { predicate, from = new { unitId = from.UnitId }, to = new { unitId = to.UnitId }, meaning = RelationSemantics.Meaning(predicate) }),
+        Json("[]"), JsonSerializer.SerializeToElement(new[] { Evidence(source) }), Json("[]"), Json("[\"knowledge\"]"));
 
     private static RevisionInput Input(string title, string kind, string type, RevisionView? source, Guid? subject = null)
     {

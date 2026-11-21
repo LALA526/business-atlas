@@ -1,5 +1,8 @@
 using System.Text.Json;
 using KnowledgeCore.Application;
+using KnowledgeCore.Contracts;
+using KnowledgeCore.Relations;
+using KnowledgeCore.Vocabulary;
 
 namespace Atlas.Domain.Tests;
 
@@ -52,6 +55,33 @@ public sealed class KnowledgeCoreTests
     {
         var result = RuleEvaluator.Evaluate(Rule("ordered"), Json($"{{\"{Region}\":\"EU\"}}"));
         Assert.Equal("unknown", result.Status);
+    }
+
+    [Fact]
+    public void AT_T09_Renaming_vocabulary_retains_identity_semantics_and_former_alias()
+    {
+        var unitId = Guid.NewGuid();
+        var previous = new RevisionView(unitId, Guid.NewGuid(), 1, "旧字段名", "BusinessAttribute", "1.0", "normative", "unverified",
+            Json("{}"), Json("""{"definition":"Stable business meaning","contextKey":"sales","aliases":["Amount"]}"""), Json("[]"), Json("[]"), Json("[]"), "hash", DateTimeOffset.UnixEpoch, Guid.Empty, ["business"]);
+        var input = new RevisionInput(unitId, "新字段名", "BusinessAttribute", "1.0", null, "normative", "unverified", Json("{}"),
+            Json("""{"definition":"Stable business meaning","contextKey":"sales","aliases":["Amount"]}"""), Json("[]"), Json("[]"), Json("[]"), Json("[\"business\"]"));
+
+        var revised = VocabularySemantics.RetainFormerNameAsAlias(input, previous);
+
+        Assert.Equal(unitId, revised.UnitId);
+        Assert.Equal("Stable business meaning", revised.Body.GetProperty("definition").GetString());
+        Assert.Contains("旧字段名", revised.Body.GetProperty("aliases").EnumerateArray().Select(alias => alias.GetString()));
+        Assert.Equal(VocabularySemantics.NormalizeForLookup(" \u00c9tat "), VocabularySemantics.NormalizeForLookup("e\u0301tat"));
+    }
+
+    [Fact]
+    public void AT_T09_Typed_predicates_do_not_turn_dependencies_into_execution()
+    {
+        RelationSemantics.ValidateEndpoints("mapsTo", "BusinessAttribute", "DataField");
+        RelationSemantics.ValidateEndpoints("usesFact", "BusinessRule", "BusinessAttribute");
+        Assert.Equal("业务到实现语义映射", RelationSemantics.Meaning("mapsTo"));
+        Assert.NotEqual(RelationSemantics.Meaning("implements"), RelationSemantics.Meaning("triggers"));
+        Assert.Throws<ProjectIdentity.Application.ProjectIdentityException>(() => RelationSemantics.ValidateEndpoints("usesFact", "DataField", "BusinessRule"));
     }
 
     private static JsonElement Facts(string amount, string region) => Json(JsonSerializer.Serialize(new Dictionary<string, string> { [Amount.ToString()] = amount, [Region.ToString()] = region }));

@@ -5,6 +5,8 @@ using AccessApplicability.Contracts;
 using AccessApplicability.Infrastructure;
 using KnowledgeCore.Application;
 using KnowledgeCore.Contracts;
+using KnowledgeCore.Relations;
+using KnowledgeCore.Vocabulary;
 using Npgsql;
 using NpgsqlTypes;
 using ProjectIdentity.Application;
@@ -76,17 +78,23 @@ public sealed class PostgresKnowledgeStore(string connectionString, PostgresAcce
             """;
         AddContextParameters(command, context); command.Parameters.AddWithValue("root", rootUnitId);
         command.Parameters.AddWithValue("direction", direction); command.Parameters.AddWithValue("predicate", NpgsqlDbType.Text, (object?)predicate ?? DBNull.Value);
-        var page = await ReadPageAsync(command, context, cursor, limit, item => item.UnitId, ct);
-        foreach (var relation in page.Items)
+        var page = await ReadPageAsync(command, context, cursor, limit, item => item.UnitId, ct, visibilityFilter: async (relation, token) =>
         {
-            var body = relation.Body;
-            if (body.TryGetProperty("from", out var from) && body.TryGetProperty("to", out var to))
+            try
             {
-                await AuthorizeEndpointAsync(context, from, ct);
-                await AuthorizeEndpointAsync(context, to, ct);
+                var body = relation.Body;
+                if (!body.TryGetProperty("from", out var from) || !body.TryGetProperty("to", out var to)) return false;
+                await AuthorizeEndpointAsync(context, from, token);
+                await AuthorizeEndpointAsync(context, to, token);
+                return true;
             }
-        }
-        await access.EnsureCurrentAsync(context, ct);
+            catch (ProjectIdentityException exception) when (exception.StatusCode == 404)
+            {
+                // A restricted endpoint makes the whole relation invisible. Do not reveal its
+                // existence, endpoint names, or a count through a failed/partially filled page.
+                return false;
+            }
+        });
         return page;
     }
 
@@ -121,6 +129,7 @@ public sealed class PostgresKnowledgeStore(string connectionString, PostgresAcce
         {
             var previous = await LatestRevisionAsync(tx, projectId, unitId, ct) ?? throw ProjectIdentityException.NotFound();
             if (previous.Kind != input.Kind) throw ProjectIdentityException.Conflict("A unit kind cannot change across revisions.");
+            input = VocabularySemantics.RetainFormerNameAsAlias(input, previous);
             parent = previous.RevisionId; revNo = checked(previous.RevNo + 1);
             await EnsureExternalIdentityStableAsync(tx, projectId, unitId, input.ExternalId, ct);
             if (await ChangeItemExistsAsync(tx, projectId, changeSetId, unitId, ct)) throw ProjectIdentityException.Conflict("This unit already has a proposal in the change set.");
@@ -139,7 +148,7 @@ public sealed class PostgresKnowledgeStore(string connectionString, PostgresAcce
         await InsertReferencesAsync(tx, projectId, revision, ct);
         await InsertEvidenceAsync(tx, projectId, revision, actor.PrincipalId, ct);
         if (!requestedUnit.HasValue && input.ExternalId is not null) await InsertExternalIdentityAsync(tx, projectId, unitId, input.ExternalId, ct);
-        if (input.Kind == "Relation") await InsertRelationAsync(tx, projectId, revision, ct);
+        if (RelationSemantics.IsRelation(input.Kind)) await InsertRelationAsync(tx, projectId, revision, ct);
         await using (var write = tx.CreateCommand())
         {
             write.CommandText = """
@@ -173,7 +182,7 @@ public sealed class PostgresKnowledgeStore(string connectionString, PostgresAcce
     public async Task<RuleResult> EvaluateRuleAsync(ResolvedReadContext context, Guid unitId, JsonElement facts, CancellationToken ct)
     {
         var revision = await GetUnitAsync(context, unitId, ct);
-        if (revision.Kind != "Rule") throw ProjectIdentityException.Invalid("The selected unit is not a Rule.");
+        if (revision.Kind is not ("Rule" or "BusinessRule")) throw ProjectIdentityException.Invalid("The selected unit is not a business Rule.");
         if (revision.FactKind != "normative") throw ProjectIdentityException.Invalid("Only a normative rule can be evaluated; observations are not normative targets.");
         foreach (var input in revision.Body.TryGetProperty("inputs", out var inputs) && inputs.ValueKind == JsonValueKind.Array ? inputs.EnumerateArray() : [])
             if (input.TryGetProperty("attribute", out var attribute)) await AuthorizeEndpointAsync(context, attribute, ct);
@@ -248,12 +257,18 @@ public sealed class PostgresKnowledgeStore(string connectionString, PostgresAcce
     private static async Task InsertRelationAsync(NpgsqlTransaction tx, Guid projectId, RevisionView revision, CancellationToken ct)
     {
         var body = revision.Body;
-        if (!body.TryGetProperty("predicate", out var predicate) || !body.TryGetProperty("from", out var from) || !body.TryGetProperty("to", out var to)) throw ProjectIdentityException.Invalid("Relation requires predicate, from, and to.");
-        await RequireUnitAsync(tx, projectId, from.GetProperty("unitId").GetGuid(), ct); await RequireUnitAsync(tx, projectId, to.GetProperty("unitId").GetGuid(), ct);
+        RelationSemantics.ValidateShape(body);
+        var predicate = body.GetProperty("predicate").GetString()!;
+        var from = body.GetProperty("from"); var to = body.GetProperty("to");
+        var fromId = from.GetProperty("unitId").GetGuid(); var toId = to.GetProperty("unitId").GetGuid();
+        var fromKind = await RequireUnitKindAsync(tx, projectId, fromId, ct);
+        var toKind = await RequireUnitKindAsync(tx, projectId, toId, ct);
+        RelationSemantics.ValidateEndpoints(predicate, fromKind, toKind);
+        if (predicate == "supersedes" && fromId == toId) throw ProjectIdentityException.Invalid("A supersedes relation cannot point to itself.");
         await using var command = tx.CreateCommand();
         command.CommandText = "INSERT INTO core.relation_index (project_id,relation_revision_id,predicate,from_unit_id,to_unit_id) VALUES (@project,@revision,@predicate,@from,@to);";
-        command.Parameters.AddWithValue("project", projectId); command.Parameters.AddWithValue("revision", revision.RevisionId); command.Parameters.AddWithValue("predicate", predicate.GetString()!);
-        command.Parameters.AddWithValue("from", from.GetProperty("unitId").GetGuid()); command.Parameters.AddWithValue("to", to.GetProperty("unitId").GetGuid());
+        command.Parameters.AddWithValue("project", projectId); command.Parameters.AddWithValue("revision", revision.RevisionId);
+        command.Parameters.AddWithValue("predicate", predicate); command.Parameters.AddWithValue("from", fromId); command.Parameters.AddWithValue("to", toId);
         await command.ExecuteNonQueryAsync(ct);
     }
 
@@ -276,14 +291,18 @@ public sealed class PostgresKnowledgeStore(string connectionString, PostgresAcce
         if (await command.ExecuteScalarAsync(ct) is not true) throw ProjectIdentityException.Conflict("An external identity cannot be changed or added during revision.");
     }
 
-    private async Task<RevisionViewPage> ReadPageAsync(NpgsqlCommand command, ResolvedReadContext context, string? cursor, int limit, Func<RevisionView, Guid> cursorKey, CancellationToken ct, bool exactRevision = true)
+    private async Task<RevisionViewPage> ReadPageAsync(NpgsqlCommand command, ResolvedReadContext context, string? cursor, int limit, Func<RevisionView, Guid> cursorKey, CancellationToken ct, bool exactRevision = true, Func<RevisionView, CancellationToken, Task<bool>>? visibilityFilter = null)
     {
         var after = DecodeCursor(cursor); var candidates = new List<RevisionView>();
         await using (var reader = await command.ExecuteReaderAsync(ct)) while (await reader.ReadAsync(ct)) candidates.Add(ReadRevision(reader));
         var authorized = new List<RevisionView>();
         foreach (var item in candidates)
         {
-            try { await AuthorizeAsync(context, item, ct, exactRevision); authorized.Add(item); }
+            try
+            {
+                await AuthorizeAsync(context, item, ct, exactRevision);
+                if (visibilityFilter is null || await visibilityFilter(item, ct)) authorized.Add(item);
+            }
             catch (ProjectIdentityException exception) when (exception.StatusCode == 404) { }
         }
         var items = authorized.Where(item => !after.HasValue || cursorKey(item).CompareTo(after.Value) > 0).Take(limit + 1).ToList();
@@ -349,6 +368,13 @@ public sealed class PostgresKnowledgeStore(string connectionString, PostgresAcce
     { await using var command = tx.CreateCommand(); command.CommandText = "INSERT INTO core.unit (project_id,unit_id,kind,owner_id,visibility,created_by) VALUES (@project,@unit,@kind,@actor,0,@actor);"; command.Parameters.AddWithValue("project", projectId); command.Parameters.AddWithValue("unit", unitId); command.Parameters.AddWithValue("kind", kind); command.Parameters.AddWithValue("actor", actor); await command.ExecuteNonQueryAsync(ct); }
     private static async Task RequireUnitAsync(NpgsqlTransaction tx, Guid projectId, Guid unitId, CancellationToken ct)
     { await using var command = tx.CreateCommand(); command.CommandText = "SELECT EXISTS (SELECT 1 FROM core.unit WHERE project_id=@project AND unit_id=@unit);"; command.Parameters.AddWithValue("project", projectId); command.Parameters.AddWithValue("unit", unitId); if (await command.ExecuteScalarAsync(ct) is not true) throw ProjectIdentityException.Invalid("A referenced unit does not exist in this project."); }
+    private static async Task<string> RequireUnitKindAsync(NpgsqlTransaction tx, Guid projectId, Guid unitId, CancellationToken ct)
+    {
+        await using var command = tx.CreateCommand();
+        command.CommandText = "SELECT kind FROM core.unit WHERE project_id=@project AND unit_id=@unit AND archived_at IS NULL;";
+        command.Parameters.AddWithValue("project", projectId); command.Parameters.AddWithValue("unit", unitId);
+        return await command.ExecuteScalarAsync(ct) as string ?? throw ProjectIdentityException.Invalid("A referenced unit does not exist in this project.");
+    }
     private static async Task RequireExactRevisionAsync(NpgsqlTransaction tx, Guid projectId, Guid unitId, Guid revisionId, CancellationToken ct)
     { await using var command = tx.CreateCommand(); command.CommandText = "SELECT EXISTS (SELECT 1 FROM core.revision WHERE project_id=@project AND unit_id=@unit AND revision_id=@revision);"; command.Parameters.AddWithValue("project", projectId); command.Parameters.AddWithValue("unit", unitId); command.Parameters.AddWithValue("revision", revisionId); if (await command.ExecuteScalarAsync(ct) is not true) throw ProjectIdentityException.Invalid("A reference must resolve to an exact revision in this project."); }
 
@@ -370,6 +396,8 @@ public sealed class PostgresKnowledgeStore(string connectionString, PostgresAcce
         if (!FactKinds.Contains(input.FactKind) || !Verifications.Contains(input.Verification)) throw ProjectIdentityException.Invalid("factKind or verification is invalid.");
         if (input.Applicability.ValueKind != JsonValueKind.Object || input.Body.ValueKind != JsonValueKind.Object || input.Blocks.ValueKind != JsonValueKind.Array || input.Evidence.ValueKind != JsonValueKind.Array || input.Unknowns.ValueKind != JsonValueKind.Array || input.CategoryKeys.ValueKind != JsonValueKind.Array) throw ProjectIdentityException.Invalid("The revision content has an invalid shape.");
         if (input.ExternalId is { } identity && (string.IsNullOrWhiteSpace(identity.Namespace) || string.IsNullOrWhiteSpace(identity.ExternalType) || string.IsNullOrWhiteSpace(identity.Id) || identity.Namespace.Length > 200 || identity.ExternalType.Length > 200 || identity.Id.Length > 1000)) throw ProjectIdentityException.Invalid("externalId fields are required and bounded.");
+        VocabularySemantics.Validate(input);
+        if (RelationSemantics.IsRelation(input.Kind)) RelationSemantics.ValidateShape(input.Body);
         foreach (var evidence in input.Evidence.EnumerateArray()) ValidateEvidence(evidence);
         if (input.FactKind == "observed" && input.Body.TryGetProperty("evidenceRefs", out var observationEvidence) && observationEvidence.ValueKind == JsonValueKind.Array)
             foreach (var evidence in observationEvidence.EnumerateArray()) ValidateEvidence(evidence);
