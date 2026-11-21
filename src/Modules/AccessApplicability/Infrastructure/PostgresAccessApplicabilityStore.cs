@@ -251,8 +251,8 @@ public sealed class PostgresAccessApplicabilityStore(string connectionString)
                 VALUES (@project,@actor,'setResourceGrant',@key,@digest,@result::jsonb);
                 INSERT INTO ops.audit_event (project_id,actor_id,action,resource_ref,result_code,request_id,trace_id)
                 VALUES (@project,@actor,'setResourceGrant',@resource::jsonb,'OK',@request,@trace);
-                INSERT INTO ops.outbox (project_id,event_id,event_type,aggregate_id,aggregate_revision,schema_version,payload)
-                VALUES (@project,@event,'AccessPolicyChanged.v1',@unit,@policyVersion,'1.2',@eventPayload::jsonb);
+                INSERT INTO ops.outbox (project_id,event_id,event_type,aggregate_id,aggregate_revision,schema_version,payload,state)
+                VALUES (@project,@event,'AccessPolicyChanged.v1',@unit,@policyVersion,'1.2',@eventPayload::jsonb,'queued');
                 """;
             update.Parameters.AddWithValue("project", projectId);
             update.Parameters.AddWithValue("actor", actor.PrincipalId);

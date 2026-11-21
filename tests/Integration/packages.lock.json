@@ -527,6 +527,7 @@
           "Microsoft.AspNetCore.Authentication.OpenIdConnect": "[10.0.15, )",
           "PlatformOps": "[1.0.0, )",
           "ProjectIdentity": "[1.0.0, )",
+          "ReadSearchExplain": "[1.0.0, )",
           "SchemaCatalog": "[1.0.0, )"
         }
       },
@@ -569,6 +570,15 @@
         "type": "Project",
         "dependencies": {
           "BuildingBlocks": "[1.0.0, )"
+        }
+      },
+      "readsearchexplain": {
+        "type": "Project",
+        "dependencies": {
+          "AccessApplicability": "[1.0.0, )",
+          "KnowledgeCore": "[1.0.0, )",
+          "PlatformOps": "[1.0.0, )",
+          "ProjectIdentity": "[1.0.0, )"
         }
       },
       "schemacatalog": {

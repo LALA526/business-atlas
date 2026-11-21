@@ -161,6 +161,15 @@
           "BuildingBlocks": "[1.0.0, )"
         }
       },
+      "readsearchexplain": {
+        "type": "Project",
+        "dependencies": {
+          "AccessApplicability": "[1.0.0, )",
+          "KnowledgeCore": "[1.0.0, )",
+          "PlatformOps": "[1.0.0, )",
+          "ProjectIdentity": "[1.0.0, )"
+        }
+      },
       "schemacatalog": {
         "type": "Project",
         "dependencies": {
