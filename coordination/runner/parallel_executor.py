@@ -98,7 +98,7 @@ class ParallelAtlasRunner(ar.AtlasRunner):
         qa_tree=self._detached_worktree(row,'qa');verification_tree=self._detached_worktree(row,'verification')
         policy=ar.VerificationPolicy.from_committed(self.repo,row['base_sha'],self.policy_path)
         policy.command_for(row['task_id'],qa_tree)
-        qa_prompt=self._prompt_context(row)+'\nIndependently inspect this exact committed candidate and acceptance criteria. Do not modify source. Coordinator-owned deterministic verification runs separately. Return ONLY strict JSON with exactly verdict/findings/evidence. A pass requires actual evidence and does not replace review, CI or deployment.'
+        qa_prompt=self._prompt_context(row)+'\nIndependently inspect this exact committed candidate and acceptance criteria. Do not modify source. Coordinator-owned deterministic verification runs separately. Do not launch scripts/ci/verify, Docker or server smoke processes in this QA lane; inspect and run focused unit tests only, using /Users/fox/Workspace/projects/business-atlas-preflight/.venv/bin/python for Python dependencies. The host verifier supplies mandatory full-build evidence. Return ONLY strict JSON with exactly verdict/findings/evidence. A pass requires actual evidence and does not replace review, CI or deployment.'
         self._validation_cache=None;started=time.time()
         with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
             qa_future=pool.submit(self._invoke,'atlas-qa',qa_prompt,qa_tree,log_dir,timeout_seconds)

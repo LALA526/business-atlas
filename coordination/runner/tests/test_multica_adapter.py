@@ -122,4 +122,44 @@ class NativeMulticaTests(unittest.TestCase):
                 self.adapter().run('atlas-leader','T01',missing,self.log,10)
         self.assertFalse(any(c[:2]==('issue','create') for c in self.calls))
 
+    def test_board_session_error_cannot_abort_authoritative_development(self):
+        self.binding['tasks']['T01']={'id':'requirement','description':'baseline'}
+        def command(*args):raise RunnerError('multica_api_failed','session temporarily unavailable')
+        adapter=MulticaAdapter(self.binding,ProcessSupervisor(),command=command)
+        with patch('pathlib.Path.home',return_value=self.home):
+            adapter.sync_status({'tasks':[{'taskId':'T01','state':'running','phase':'developer'}]})
+        pending=self.home/'Workspace/projects/business-atlas-preflight/runner-state-multica/status-sync-pending.json'
+        self.assertTrue(pending.is_file())
+
+    def test_successful_execution_survives_board_done_transport_failure(self):
+        original=self.command
+        def command(*args):
+            if args[:2]==('issue','status') and 'done' in args:raise RunnerError('multica_api_failed','board temporarily unavailable')
+            return original(*args)
+        with patch('pathlib.Path.home',return_value=self.home):
+            result=MulticaAdapter(self.binding,ProcessSupervisor(),command=command,sleep=lambda _:None).run('atlas-leader','T01',self.cwd,self.log,10)
+        self.assertTrue(result.ok)
+        receipt=json.loads(Path(result.log_paths[0]).read_text())
+        self.assertIn('run',receipt)
+        self.assertNotIn('category',receipt)
+
+    def test_cli_timeout_is_normalized_as_transport_failure(self):
+        with patch('pathlib.Path.home',return_value=self.home),patch('multica_adapter.subprocess.run',side_effect=subprocess.TimeoutExpired(['multica'],60)):
+            with self.assertRaises(RunnerError) as raised:self.adapter()._command('issue','list')
+        self.assertEqual(raised.exception.category,'multica_api_failed')
+
+    def test_execution_status_queue_is_replayed_and_cleared(self):
+        original=self.command;unavailable=[True]
+        def command(*args):
+            if args[:2]==('issue','status') and 'done' in args and unavailable[0]:raise RunnerError('multica_api_failed','temporary')
+            return original(*args)
+        adapter=MulticaAdapter(self.binding,ProcessSupervisor(),command=command,sleep=lambda _:None)
+        with patch('pathlib.Path.home',return_value=self.home):
+            self.assertTrue(adapter.run('atlas-leader','T01',self.cwd,self.log,10).ok)
+            queue=self.home/'Workspace/projects/business-atlas-preflight/runner-state-multica/status-sync-executions'
+            self.assertTrue(list(queue.glob('*.json')))
+            unavailable[0]=False
+            adapter.sync_status({'tasks':[]})
+            self.assertFalse(list(queue.glob('*.json')))
+
 if __name__=='__main__':unittest.main()

@@ -871,7 +871,8 @@ class AtlasRunner:
             "contract references before acting. Do not modify shared contracts/migrations owned by "
             "other tasks, do not claim independent approval, and report real evidence.\n"
             + json.dumps(task, ensure_ascii=False, indent=2)
-            + f"\nBase SHA: {row['base_sha']}\nContract digest: {row['contract_digest']}\n"
+            + f"\nBase SHA: {row['base_sha']}\nCandidate SHA: {row['candidate_sha'] or 'not committed yet'}\nContract digest: {row['contract_digest']}\n"
+            + "The Candidate SHA above is the only candidate identity. A native issue title/run ID is an execution receipt, never a Git commit. The host binds a real draft PR before independent review; never infer SHA or PR identity from random issue suffixes.\n"
         )
 
     def _development_worktree(self, row: sqlite3.Row) -> Path:
@@ -924,7 +925,7 @@ class AtlasRunner:
     def _run_developer(self, row: sqlite3.Row) -> None:
         worktree = self._development_worktree(row)
         feedback = ""
-        if row["failure_category"] in ("review_rejected", "qa_rejected", "integration_failed"):
+        if row["failure_category"] in ("review_rejected", "qa_rejected", "integration_failed", "delivery_setup_failed"):
             feedback = (
                 "\nAddress the persisted independent review/QA findings; do not weaken acceptance checks. "
                 f"Previous findings: {row['failure_detail'] or 'see evidence'}"
@@ -942,7 +943,7 @@ class AtlasRunner:
             + feedback
             + "\nImplement this task on the existing task branch/worktree. Analyze actual callers and data "
             "flow. Add meaningful tests and knowledge candidates. Do not self-approve or claim CI/PR/deployment. "
-            "The coordinator will commit the resulting worktree as the candidate."
+            "Merge approved origin/main into this task branch if it has advanced, preserving source and frozen inputs; resolve ordinary conflicts. The host refreshes the approved base and factual proposal hashes before review. The coordinator will commit the resulting worktree as the candidate."
         )
         result = self.invoke_role("atlas-builder", prompt, worktree, Path(row["evidence_dir"]))
         if not result.ok:
@@ -951,6 +952,27 @@ class AtlasRunner:
         if git(worktree, "status", "--porcelain").stdout.strip():
             git(worktree, "add", "-A")
             git(worktree, "commit", "-m", f"{row['task_id']} candidate attempt {row['attempt']}")
+        preliminary = git_head(worktree)
+        git(self.repo, "merge-base", "--is-ancestor", row["base_sha"], preliminary)
+        if preliminary == row["base_sha"]:
+            raise RunnerError("candidate_empty", "candidate SHA equals base SHA")
+        if hasattr(self.integration, "prepare_candidate"):
+            try:
+                approved = self.current_base()
+                if git(self.repo, "merge-base", "--is-ancestor", approved, preliminary, check=False).returncode != 0:
+                    raise RunnerError("delivery_setup_failed", "Merge approved origin/main into the task branch and resolve conflicts before delivery")
+                if approved != row["base_sha"]:
+                    self.ledger._owned(row["task_id"], self.owner, row["fence"], self.clock())
+                    changed = self.ledger.connection.execute("UPDATE tasks SET base_sha=? WHERE task_id=? AND phase='developer' AND lease_owner=? AND fence=?", (approved,row["task_id"],self.owner,row["fence"]))
+                    if changed.rowcount != 1:raise RunnerError("lease_fenced", "Approved base refresh lost ownership")
+                    self.ledger._event(row["task_id"], "approved_base_refreshed", row["fence"], approved, self.clock())
+                    row = self.ledger.get(row["task_id"])
+                draft = self.integration.prepare_candidate(self.ledger.task(row), worktree, approved)
+                if draft:
+                    with self.ledger.connection:
+                        self.ledger.set_metadata("taskPR:" + row["task_id"], str(draft))
+            except Exception as error:
+                raise RunnerError("delivery_setup_failed", "Real draft PR binding failed; preserve source. " + str(error)[:240]) from error
         candidate = git_head(worktree)
         git(self.repo, "merge-base", "--is-ancestor", row["base_sha"], candidate)
         if candidate == row["base_sha"]:

@@ -26,3 +26,11 @@ is never reset or deleted. Three attempts per epoch are followed by another
 independent diagnosis. Cooldowns prevent failed diagnosis token loops. Parallel
 manager continues other dependency-ready disjoint tasks while any task blocks.
 All-done is observed only from the existing delivery ledger, never manufactured.
+
+2026-11-21 delivery coordination correction:
+A blocked review/QA verdict is not proof of missing external authorization.
+Independently triage its actual evidence. Only a plan identifying a real external
+input remains blocked; a technical identity/environment blocker may return to
+development, preserving the original receipt and all acceptance gates. Each role
+receives the full candidate SHA explicitly; native execution receipt IDs are never
+commit identities. Bind real draft PR identity before independent review.

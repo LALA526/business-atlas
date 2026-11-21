@@ -1,6 +1,6 @@
 """Concrete Azure PR/build/deployment gate for the Atlas preparation runner."""
 from pathlib import Path
-import json, subprocess, time, urllib.parse, urllib.error
+import hashlib, json, subprocess, time, urllib.parse, urllib.error
 from atlas_runner import IntegrationResult, RunnerError
 
 class AzureGateBackend:
@@ -50,6 +50,50 @@ class AzureGateBackend:
                 return 'succeeded', str(build['id'])
         return 'pending', ''
 
+    def prepare_candidate(self,task,worktree,base_sha=None):
+        """Bind real PR identity before review, without approving or merging it."""
+        worktree=Path(worktree)
+        branch=task['plannedBranch']
+        if not task.get('taskId','').startswith('T'):return None
+        query=urllib.parse.urlencode({'searchCriteria.sourceRefName':'refs/heads/'+branch,'searchCriteria.targetRefName':'refs/heads/main','searchCriteria.status':'active','api-version':'7.1'})
+        prs=self.api(self.pr_path('?'+query))['value']
+        if len(prs)>1:raise RunnerError('delivery_setup_failed','Ambiguous active task PR')
+        if prs and not prs[0].get('isDraft'):
+            self.api(self.pr_path('/'+str(prs[0]['pullRequestId'])+'?api-version=7.1'),'PATCH',{'isDraft':True})
+        subprocess.run(['git','push','origin','HEAD:refs/heads/'+branch],cwd=worktree,check=True,capture_output=True)
+        pr=prs[0] if prs else self.api(self.pr_path('?api-version=7.1'),'POST',{'sourceRefName':'refs/heads/'+branch,'targetRefName':'refs/heads/main','title':task['taskId']+': '+task.get('title','Requirement delivery'),'description':'Requirements: '+', '.join(task.get('requirementIds',[]))+'\nDraft identity reservation. Independent review, QA and required CI remain mandatory.','isDraft':True})
+        pr_id=str(pr['pullRequestId']);changed=False
+        for file in (worktree/'knowledge/proposals').rglob('*.json'):
+            document=json.loads(file.read_text())
+            if document.get('taskId')!=task['taskId']:continue
+            before=json.dumps(document,sort_keys=True)
+            repo=document['repo']
+            if base_sha and document.get('schemaVersion')=='1.3.0':
+                repo['baseSha']=base_sha
+                output=subprocess.check_output(['git','diff','--no-renames','--name-status',base_sha,'HEAD'],cwd=worktree,text=True)
+                facts=[]
+                for line in output.splitlines():
+                    kind,path=line.split('\t')
+                    if path.startswith('knowledge/proposals/'):continue
+                    fact={'path':path,'changeType':{'A':'added','M':'modified','D':'removed'}[kind]}
+                    if kind!='D':fact['contentSha256']=hashlib.sha256(subprocess.check_output(['git','show','HEAD:'+path],cwd=worktree)).hexdigest()
+                    facts.append(fact)
+                document['changedFiles']=facts
+                for anchor in document.get('sourceAnchors',[]):
+                    if 'contentSha256' in anchor:anchor['contentSha256']=hashlib.sha256(subprocess.check_output(['git','show','HEAD:'+anchor['path']],cwd=worktree)).hexdigest()
+                    if 'blobSha' in anchor:anchor['blobSha']=subprocess.check_output(['git','rev-parse','HEAD:'+anchor['path']],cwd=worktree,text=True).strip()
+            if repo.get('branch')!=branch:raise RunnerError('delivery_setup_failed','Proposal branch mismatch')
+            if repo.get('pullRequestId')!=pr_id:
+                if str(repo.get('pullRequestId','')).upper()!='PENDING':raise RunnerError('delivery_setup_failed','Proposal already references another real PR')
+                repo['pullRequestId']=pr_id
+            if json.dumps(document,sort_keys=True)!=before:
+                file.write_text(json.dumps(document,ensure_ascii=False,indent=2)+'\n');changed=True
+        if changed:
+            subprocess.run(['git','add','knowledge/proposals'],cwd=worktree,check=True,capture_output=True)
+            subprocess.run(['git','commit','-m','Bind '+task['taskId']+' knowledge to actual draft PR '+pr_id],cwd=worktree,check=True,capture_output=True)
+            subprocess.run(['git','push','origin','HEAD:refs/heads/'+branch],cwd=worktree,check=True,capture_output=True)
+        return pr_id
+
     def integrate(self, task, candidate_sha, evidence_dir):
         try:
             return self._integrate(task, candidate_sha, evidence_dir)
@@ -84,6 +128,8 @@ class AzureGateBackend:
             if pr.get('status') == 'abandoned':
                 return IntegrationResult('failed', candidate_sha, pr_id=pr_id, detail='PR abandoned')
             if pr.get('status') == 'active':
+                if pr.get('isDraft'):
+                    self.api(self.pr_path('/' + pr_id + '?api-version=7.1'), 'PATCH', {'isDraft': False})
                 evaluations = self.policies(pr_id)
                 required = [e for e in evaluations if e.get('configuration', {}).get('isEnabled') and e.get('configuration', {}).get('isBlocking')]
                 own_build = any(e.get('configuration', {}).get('settings', {}).get('buildDefinitionId') == self.config['pipelineId'] for e in required)

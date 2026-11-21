@@ -15,7 +15,7 @@ class RecoveryTests(RunnerFixture):
  def test_escalation_opens_new_bounded_epoch_without_accepting_code(self):
   r=self.setup_runner();before=r.ledger.get('T01')['candidate_sha']
   with patch.object(recovery,'settle_dispatches',return_value=True):self.assertEqual(recovery.recover(r,r.ledger.get('T01'),lambda *a:PLAN,lambda:200),'repair_planned')
-  row=r.ledger.get('T01');self.assertEqual(row['phase'],'leader');self.assertEqual(row['candidate_sha'],before);self.assertEqual(row['failure_category'],'review_rejected')
+  row=r.ledger.get('T01');self.assertEqual(row['phase'],'leader');self.assertEqual(row['candidate_sha'],before);self.assertEqual(row['failure_category'],'recovery_planned')
   self.assertEqual(recovery.attempt_cost(r.ledger,row),0)
   with r.ledger.connection:r.ledger.connection.execute("update tasks set attempt=6 where task_id='T01'")
   self.assertIsNone(r.ledger.claim('x',201,60,1,self.base_sha,self.state/'evidence',lambda _:None,max_attempts=3))
@@ -89,10 +89,14 @@ class RecoveryTests(RunnerFixture):
   self.assertIsNone(r.ledger.claim('x',200,60,1,self.base_sha,self.state/'evidence',lambda _:None,max_attempts=3))
   row=r.ledger.get('T01');self.assertEqual(row['failure_category'],'attempt_exhausted')
   with patch.object(recovery,'settle_dispatches',return_value=True):self.assertEqual(recovery.recover(r,row,lambda *a:PLAN,lambda:201),'repair_planned')
- def test_review_and_qa_blocked_verdicts_remain_protected(self):
-  for category in ('review_blocked','qa_blocked'):
-   r=self.setup_runner(category)
-   self.assertEqual(recovery.recover(r,r.ledger.get('T01'),lambda *a:self.fail()),'protected')
+ def test_qa_blocked_is_triaged_and_external_input_is_preserved(self):
+  r=self.setup_runner('qa_blocked');plan={**PLAN,'decision':'external','externalNeed':'actual business identity required'}
+  with patch.object(recovery,'settle_dispatches',return_value=True):self.assertEqual(recovery.recover(r,r.ledger.get('T01'),lambda *a:plan,lambda:200),'external')
+  self.assertEqual(r.ledger.get('T01')['phase'],'blocked')
+ def test_technical_qa_blocker_gets_claimable_repair_epoch(self):
+  r=self.setup_runner('qa_blocked')
+  with patch.object(recovery,'settle_dispatches',return_value=True):self.assertEqual(recovery.recover(r,r.ledger.get('T01'),lambda *a:PLAN,lambda:200),'repair_planned')
+  self.assertIsNotNone(r.ledger.claim('worker',201,60,1,self.base_sha,self.state/'evidence',lambda _:None,max_attempts=3))
  def test_same_second_historical_wait_is_not_subtracted_twice(self):
   r=self.setup_runner()
   r.ledger._event('T01','provider_wait',0,'old wait',200)
@@ -115,3 +119,33 @@ class RecoveryTests(RunnerFixture):
   with patch.object(recovery,'settle_dispatches',return_value=True),patch.object(r.ledger,'set_metadata',side_effect=broken):
    with self.assertRaises(OSError):recovery.recover(r,row,lambda *a:PLAN,lambda:200)
   after=r.ledger.get('T01');self.assertEqual(after['phase'],'blocked');self.assertEqual(after['fence'],row['fence']);self.assertNotIn('attemptBase',recovery.checkpoint(r,'T01'))
+
+ def test_stop_at_recovery_entry_never_calls_diagnosis(self):
+  r=self.setup_runner();(self.state/'STOP').touch()
+  self.assertEqual(recovery.recover(r,r.ledger.get('T01'),lambda *a:self.fail()),'paused')
+ def test_stop_after_settlement_never_calls_diagnosis(self):
+  r=self.setup_runner()
+  def settle(*a):(self.state/'STOP').touch();return True
+  with patch.object(recovery,'settle_dispatches',side_effect=settle):self.assertEqual(recovery.recover(r,r.ledger.get('T01'),lambda *a:self.fail()),'paused')
+ def test_empty_run_list_cannot_prove_old_actor_terminal(self):
+  r=self.setup_runner();folder=self.state/'native-dispatch';folder.mkdir();f=folder/'intent.json';f.write_text(json.dumps({'prompt':'{"taskId":"T01"}','issue':{'id':'owned'},'cwd':str(self.repo)}))
+  r.adapter.command=lambda *a:[]
+  with patch.object(recovery.time,'sleep',return_value=None):
+   with self.assertRaises(ar.RunnerError):recovery.settle_dispatches(r,'T01')
+  self.assertTrue(f.exists())
+
+ def test_another_exhausted_recovery_epoch_can_be_diagnosed(self):
+  r=self.setup_runner()
+  with patch.object(recovery,'settle_dispatches',return_value=True):
+   self.assertEqual(recovery.recover(r,r.ledger.get('T01'),lambda *a:PLAN,lambda:200),'repair_planned')
+   r.ledger.connection.execute("update tasks set phase='developer',attempt=6,failure_category='recovery_planned' where task_id='T01'")
+   self.assertIsNone(r.ledger.claim('next',201,60,1,self.base_sha,self.state/'evidence',lambda _:None,max_attempts=3))
+   self.assertEqual(recovery.recover(r,r.ledger.get('T01'),lambda *a:PLAN,lambda:202),'repair_planned')
+  self.assertEqual(recovery.checkpoint(r,'T01')['cycle'],2)
+
+ def test_stop_during_failed_preflight_cannot_restart_services(self):
+  r=self.setup_runner()
+  def preflight():(self.state/'STOP').touch();return {'ready':False}
+  with patch.object(r,'preflight',side_effect=preflight),patch.object(recovery.subprocess,'run') as run:
+   self.assertEqual(recovery.supervise(r)['status'],'paused')
+  run.assert_not_called()

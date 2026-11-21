@@ -11,12 +11,15 @@ class MulticaAdapter:
         self.sleep=sleep
 
     def _command(self,*args):
-        control_dir=Path.home()/'Workspace/projects/business-atlas-preflight/multica-control'
-        control_dir.mkdir(parents=True,exist_ok=True)
-        control_dir.chmod(0o700)
-        result=subprocess.run(['multica','--profile',self.binding['profile'],'--workspace-id',self.binding['workspaceId'],*args],cwd=control_dir,capture_output=True,text=True,timeout=60,env={k:v for k,v in os.environ.items() if not k.startswith('MULTICA_') and k not in ('AZURE_DEVOPS_PAT','PERSONAL_ACCESS_TOKEN','ADO_MCP_AUTH_TOKEN','AZURE_DEVOPS_EXT_PAT')})
-        if result.returncode: raise RunnerError('multica_api_failed',result.stderr[:300])
-        return json.loads(result.stdout)
+        try:
+            control_dir=Path.home()/'Workspace/projects/business-atlas-preflight/multica-control'
+            control_dir.mkdir(parents=True,exist_ok=True)
+            control_dir.chmod(0o700)
+            result=subprocess.run(['multica','--profile',self.binding['profile'],'--workspace-id',self.binding['workspaceId'],*args],cwd=control_dir,capture_output=True,text=True,timeout=60,env={k:v for k,v in os.environ.items() if not k.startswith('MULTICA_') and k not in ('AZURE_DEVOPS_PAT','PERSONAL_ACCESS_TOKEN','ADO_MCP_AUTH_TOKEN','AZURE_DEVOPS_EXT_PAT')})
+            if result.returncode: raise RunnerError('multica_api_failed',result.stderr[:300])
+            return json.loads(result.stdout)
+        except (subprocess.TimeoutExpired,OSError,ValueError) as error:
+            raise RunnerError('multica_api_failed','Multica CLI transport or JSON response temporarily unavailable') from error
 
     def preflight(self):
         runtimes=self.command('runtime','list','--output','json')
@@ -66,7 +69,7 @@ class MulticaAdapter:
             input_file.chmod(0o600)
             input_digest=hashlib.sha256(input_file.read_bytes()).hexdigest()
             if not saved:
-                title=task_id+' · '+role+' · '+uuid.uuid4().hex[:12]
+                title=task_id+' · '+role+' · execution-receipt '+str(uuid.uuid4())
                 saved={'cwd':str(cwd),'prompt':prompt,'title':title,'issue':None}
                 write_json(active,saved)
             issue=saved.get('issue')
@@ -118,8 +121,13 @@ class MulticaAdapter:
                             return RoleResult(False,category='runtime_cleanup_pending',retryable=True,log_paths=(str(receipt),))
                         if not input_file.is_file() or not prompt_file.is_file() or hashlib.sha256(input_file.read_bytes()).hexdigest()!=input_digest or prompt_file.read_text()!=prompt:
                             raise RunnerError('input_mutated','Native role changed its coordinator-owned input')
+                        try:
+                            self.command('issue','status',issue['id'],'done','--no-start','--output','json')
+                        except RunnerError as error:
+                            if error.category!='multica_api_failed':raise
+                            queue=state.parent/'status-sync-executions';queue.mkdir(exist_ok=True)
+                            write_json(queue/(issue['id']+'.json'),{'issueId':issue['id'],'receipt':str(receipt)})
                         active.unlink(missing_ok=True)
-                        self.command('issue','status',issue['id'],'done','--no-start','--output','json')
                         return RoleResult(True,text=text,log_paths=(str(receipt),))
                     category,retryable=classify_role_failure(str(run.get('error'))+' '+text)
                     if category=='blocked_quota':
@@ -173,6 +181,19 @@ class MulticaAdapter:
             return False
 
     def sync_status(self,status):
+        sync_dir=Path.home()/'Workspace/projects/business-atlas-preflight/runner-state-multica'
+        # Retry execution receipts separately from authoritative requirement states.
+        for file in (sync_dir/'status-sync-executions').glob('*.json'):
+            entry=json.loads(file.read_text());receipt=json.loads(Path(entry['receipt']).read_text());accepted=receipt.get('run',{})
+            if accepted.get('status')!='completed' or accepted.get('runtime_id')!=self.binding['runtimeId']:continue
+            try:
+                runs=self.command('issue','runs',entry['issueId'],'--output','json')
+                if not runs or any(r['status'] not in ('completed','failed','cancelled') for r in runs) or not any(r['id']==accepted['id'] for r in runs):continue
+                self.command('issue','status',entry['issueId'],'done','--no-start','--output','json')
+                file.unlink(missing_ok=True)
+            except RunnerError as error:
+                if error.category!='multica_api_failed':raise
+        failed=False
         for task in status['tasks']:
             item=self.binding['tasks'].get(task['taskId'])
             if not item or task['state']=='planned': continue
@@ -183,10 +204,21 @@ class MulticaAdapter:
                 state='done'
             else:
                 state='blocked' if task['state'] in ('blocked','waiting_provider') else ('in_review' if task['phase'] in ('review','qa','integration','pending_integration') else 'in_progress')
-            self.command('issue','status',item['id'],state,'--no-start','--output','json')
+            try:
+                self.command('issue','status',item['id'],state,'--no-start','--output','json')
+            except RunnerError as error:
+                if error.category!='multica_api_failed':raise
+                # Board mirroring is not product execution or acceptance.
+                failed=True
+                pending=sync_dir/'status-sync-pending.json'
+                write_json(pending,{'needsLedgerResync':True,'category':error.category,'at':int(time.time())})
+
+        if not failed:(sync_dir/'status-sync-pending.json').unlink(missing_ok=True)
 
 class MulticaIntegration:
     def __init__(self, backend, adapter): self.backend,self.adapter=backend,adapter
+    def prepare_candidate(self,task,worktree,base_sha=None):
+        return self.backend.prepare_candidate(task,worktree,base_sha)
     def preflight(self):
         azure=self.backend.preflight()
         native=self.adapter.preflight()
@@ -200,5 +232,10 @@ class MulticaIntegration:
             url='https://dev.azure.com/2717243207/Business%20Atlas/_git/Business%20Atlas/pullrequest/'+str(result.pr_id)
             desc=item['description']+'\n\nActual PR: '+url+'\nCandidate: '+candidate_sha+'\nIntegration evidence:\n'+json.dumps(dataclasses.asdict(result),ensure_ascii=False,indent=2)
             # Only sync_status may publish done, after the ledger accepts all gates.
-            self.adapter.command('issue','update',item['id'],'--description',desc,'--status','in_review','--no-start','--pr-auto-complete','off','--output','json')
+            try:
+                self.adapter.command('issue','update',item['id'],'--description',desc,'--status','in_review','--no-start','--pr-auto-complete','off','--output','json')
+            except RunnerError as error:
+                if error.category!='multica_api_failed':raise
+                # The Azure receipt is authoritative; board transport cannot erase it.
+
         return result
