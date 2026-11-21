@@ -70,6 +70,14 @@ public static class AtlasAuthentication
             options.SignedOutCallbackPath = "/signout-callback-oidc";
             options.CorrelationCookie.SecurePolicy = cookieSecurePolicy;
             options.NonceCookie.SecurePolicy = cookieSecurePolicy;
+            if (cookieSecurePolicy == CookieSecurePolicy.SameAsRequest)
+            {
+                // Browsers reject SameSite=None cookies without Secure on the explicit HTTP LAN preview.
+                options.CorrelationCookie.SameSite = SameSiteMode.Lax;
+                options.NonceCookie.SameSite = SameSiteMode.Lax;
+                options.ResponseMode = "query";
+            }
+
             options.ResponseType = "code";
             options.UsePkce = true;
             options.SaveTokens = false;

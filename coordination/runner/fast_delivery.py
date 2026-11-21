@@ -65,7 +65,7 @@ class FastRunner(ParallelAtlasRunner):
   commit=pr['lastMergeCommit']['commitId']
   for tick in range(240):
    self._check_stop();self.ledger.heartbeat(row['task_id'],self.owner,row['fence'],self.clock(),self.lease_seconds)
-   builds=request(project_path('/_apis/build/builds?definitions=3&branchName=refs/heads/main&$top=30&api-version=7.1'))['value']
+   builds=request(project_path('/_apis/build/builds?definitions=3&branchName=refs/heads/main&queryOrder=queueTimeDescending&$top=30&api-version=7.1'))['value']
    builds=[b for b in builds if b.get('sourceVersion')==commit]
    if builds:
     b=builds[0]

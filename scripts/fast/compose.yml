@@ -34,7 +34,7 @@ services:
     volumes: [./keycloak:/opt/keycloak/data/import:ro]
     depends_on:
       postgres: {condition: service_healthy}
-    mem_limit: 768m
+    mem_limit: 1024m
   migrate:
     image: mcr.microsoft.com/dotnet/aspnet:10.0
     profiles: [tools]
