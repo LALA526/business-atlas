@@ -85,7 +85,7 @@ def serve():
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument('command', choices=['prepare', 'status', 'preflight', 'start', 'stop', 'serve', 'wake'])
+    p.add_argument('command', choices=['prepare', 'status', 'preflight', 'start', 'stop', 'serve', 'wake', 'supervise'])
     args = p.parse_args()
     if args.command == 'prepare':
         prepare()
@@ -96,6 +96,14 @@ def main():
         value = snapshot()
         print(json.dumps(value, ensure_ascii=False, indent=2))
         return 0 if value['ready'] else 2
+    if args.command == 'supervise':
+        from autonomous_recovery import supervise
+        runner = ar.build_real_runner(REPO, STATE, CONTROLS)
+        try:
+            print(json.dumps(supervise(runner), ensure_ascii=False))
+        finally:
+            runner.close()
+        return 0
     if args.command == 'wake':
         from provider_recovery import wake
         runner = ar.build_real_runner(REPO, STATE, CONTROLS)

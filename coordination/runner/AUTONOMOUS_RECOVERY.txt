@@ -1,0 +1,28 @@
+Autonomous recovery supervisor
+
+Each bounded repair epoch triggers independent read-only diagnosis, not silent
+termination. Persistent per-task plans rotate minimal reproduction, focused
+repair decomposition, and caller/data-flow replanning. Accepted plans feed
+builder input; fresh review, QA, deterministic verification, protected PR and
+real deployment remain mandatory. No supervisor path can accept a stage or
+mark a task done. Original baseline/DAG and source worktrees remain intact.
+
+A separate launchd service invokes atlasctl supervise every 120 seconds. It
+respects enabled/stopRequested/STOP, shares the coordinator's exclusive writer
+lock, and never restarts a running coordinator. Dispatch recovery blocks old
+issue retries and confirms native actors and their managed briefs are terminal
+before archiving journals and permitting another actor. Missing creation receipts
+fail closed. Leases/candidate/fence are rechecked after diagnosis.
+
+Model/API diagnosis failures retain a durable exponential cooldown up to one
+hour. Plans requesting external credentials/business facts preserve the blocker
+and record the exact missing input; they are not invented. Provider quota
+recovery remains the verified-model router's responsibility. Named launchd
+services are kickstarted without -k so active CI/model runs are not interrupted.
+Main protected CI, baseline hashes and build/deploy agents must pass preflight.
+
+Per-task recovery metadata defines a new attempt epoch; total attempt history
+is never reset or deleted. Three attempts per epoch are followed by another
+independent diagnosis. Cooldowns prevent failed diagnosis token loops. Parallel
+manager continues other dependency-ready disjoint tasks while any task blocks.
+All-done is observed only from the existing delivery ledger, never manufactured.

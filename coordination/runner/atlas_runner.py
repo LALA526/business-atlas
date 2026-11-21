@@ -536,11 +536,13 @@ class Ledger:
             selected: sqlite3.Row | None = None
             for row in candidates:
                 category = row["failure_category"] or ""
-                provider_waits = self.connection.execute("SELECT COUNT(*) FROM events WHERE task_id=? AND event_type IN ('provider_wait','pause_wait')", (row["task_id"],)).fetchone()[0]
-                exhausted = max_attempts is not None and row["attempt"] - provider_waits >= max_attempts and row["phase"] not in ("integration", "pending_integration")
+                from autonomous_recovery import attempt_cost
+                exhausted = max_attempts is not None and attempt_cost(self, row) >= max_attempts and row["phase"] not in ("integration", "pending_integration")
                 if row["phase"] == "blocked":
                     continue
                 if exhausted or category.startswith("blocked_") or category.endswith("_blocked"):
+                    if exhausted and not category:
+                        self.connection.execute("UPDATE tasks SET failure_category='attempt_exhausted',failure_detail='Bounded attempt epoch exhausted after a checkpoint; independent recovery diagnosis required' WHERE task_id=?", (row["task_id"],))
                     self.connection.execute("UPDATE tasks SET phase='blocked',lease_owner=NULL,lease_expires_at=NULL,fence=fence+1 WHERE task_id=?", (row["task_id"],))
                     continue
                 if row["lease_owner"] is not None:
@@ -927,6 +929,11 @@ class AtlasRunner:
                 "\nAddress the persisted independent review/QA findings; do not weaken acceptance checks. "
                 f"Previous findings: {row['failure_detail'] or 'see evidence'}"
             )
+        recovery_raw = self.ledger.get_metadata("recovery:" + row["task_id"])
+        if recovery_raw:
+            recovery = json.loads(recovery_raw)
+            if recovery.get("plan"):
+                feedback += "\nExecute this independently diagnosed recovery plan. Preserve all acceptance gates and existing work. " + json.dumps(recovery["plan"], ensure_ascii=False)
         plan = self.ledger.latest_accepted(row["task_id"], "leader")
         plan_text = Path(plan["artifact_path"]).read_text() if plan else ""
         prompt = (
