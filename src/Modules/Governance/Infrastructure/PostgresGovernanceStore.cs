@@ -159,6 +159,7 @@ public sealed class PostgresGovernanceStore(string connectionString, PostgresKno
             if (request.Decision is not ("approve" or "reject" or "request_changes")) throw ProjectIdentityException.Invalid("The review decision is invalid.");
             var requirements = ParseRequirements(row.ReviewRequirements);
             var selected = request.SlotIds.Select(slot => requirements.SingleOrDefault(item => item.SlotId == slot) ?? throw ProjectIdentityException.Invalid("A requested approval slot does not exist.")).ToArray();
+            await AuthorizeChangeSetAsync(actor.PrincipalId, projectId, await ReadChangeSetAsync(tx, projectId, id, ct), ct);
             var roles = await RolesAsync(tx, projectId, actor.PrincipalId, ct);
             foreach (var slot in selected)
             {
@@ -204,7 +205,7 @@ public sealed class PostgresGovernanceStore(string connectionString, PostgresKno
         var replay = await FindIdempotencyAsync<GovernanceMutation<BaselineView>>(tx, projectId, actor.PrincipalId, "publishChangeSet", key, digest, ct);
         if (replay is not null) { await tx.CommitAsync(ct); return replay; }
         if (project.Version != expectedVersion) throw ProjectIdentityException.CasMismatch();
-        if (!project.Roles.Contains("KnowledgePublisher", StringComparer.Ordinal) || actor.Kind == PrincipalKind.Agent) throw ProjectIdentityException.Forbidden();
+        if (!project.Roles.Contains("KnowledgePublisher", StringComparer.Ordinal) || actor.Kind != PrincipalKind.Human) throw ProjectIdentityException.Forbidden();
         var row = await ReadRowAsync(tx, projectId, changeSetId, true, ct);
         if (row.State != "approved" || row.BaseBaselineId != request.BaseBaselineId || row.BaseBaselineId != project.CurrentBaselineId || !FixedEquals(row.SubmitDigest, request.SubmitDigest)) throw ProjectIdentityException.Conflict("The change set is not approved for the current base and submitted digest.");
         var items = await ReadItemsAsync(tx, projectId, changeSetId, ct);
@@ -468,12 +469,14 @@ public sealed class PostgresGovernanceStore(string connectionString, PostgresKno
 
     private static async Task EnsureReviewAuthorityCurrentAsync(NpgsqlTransaction tx, Guid projectId, Guid id, long seq, CancellationToken ct)
     {
-        await using var command = tx.CreateCommand(); command.CommandText = """
-            SELECT EXISTS (
-              SELECT 1 FROM gov.review_decision rd JOIN identity.membership m ON m.project_id=rd.project_id AND m.principal_id=rd.actor_id AND m.active
-              JOIN identity.principal p ON p.principal_id=rd.actor_id AND p.active AND p.kind='human'
-              WHERE rd.project_id=@project AND rd.change_set_id=@id AND rd.submitted_seq=@seq AND rd.decision='approve' AND rd.approval_role=ANY(m.roles))
-            HAVING count(*)=(SELECT count(*) FROM gov.review_decision WHERE project_id=@project AND change_set_id=@id AND submitted_seq=@seq AND decision='approve');
+        await using var command = tx.CreateCommand();         command.CommandText = """
+            SELECT NOT EXISTS (
+              SELECT 1 FROM gov.review_decision rd
+              WHERE rd.project_id=@project AND rd.change_set_id=@id AND rd.submitted_seq=@seq AND rd.decision='approve'
+                AND NOT EXISTS (
+                  SELECT 1 FROM identity.membership m JOIN identity.principal p ON p.principal_id=m.principal_id
+                  WHERE m.project_id=rd.project_id AND m.principal_id=rd.actor_id AND m.active
+                    AND p.active AND p.kind='human' AND rd.approval_role=ANY(m.roles)));
             """;
         command.Parameters.AddWithValue("project", projectId); command.Parameters.AddWithValue("id", id); command.Parameters.AddWithValue("seq", seq);
         if (await command.ExecuteScalarAsync(ct) is not true) throw ProjectIdentityException.Conflict("An approver's authority has changed; a fresh review is required.");

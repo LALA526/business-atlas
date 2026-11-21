@@ -57,7 +57,7 @@ public sealed class PostgresAccessApplicabilityStore(string connectionString)
         else
         {
             if (request.ChangeSetId is null) throw ProjectIdentityException.Invalid("Draft reads require an explicit changeSetId.");
-            if (!roles.Any(role => role is "Contributor" or "AgentProposer" or "ProjectAdmin")) throw ProjectIdentityException.Forbidden();
+            if (!roles.Any(role => role is "Contributor" or "AgentProposer" or "ProjectAdmin" or "BusinessOwner" or "TechOwner" or "QaApprover" or "SecurityOwner" or "DataOwner" or "KnowledgePublisher")) throw ProjectIdentityException.Forbidden();
             await RequireDraftAsync(transaction, projectId, request.ChangeSetId.Value, baselineId, ct);
         }
 

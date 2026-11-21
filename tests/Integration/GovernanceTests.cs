@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using AccessApplicability.Application;
 using AccessApplicability.Contracts;
@@ -8,6 +10,7 @@ using KnowledgeCore.Contracts;
 using KnowledgeCore.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using ProjectIdentity.Application;
 using ProjectIdentity.Contracts;
 using ProjectIdentity.Infrastructure;
 
@@ -86,6 +89,120 @@ public sealed class GovernanceTests
             await using var connection = new NpgsqlConnection(administrator.ConnectionString); await connection.OpenAsync();
             await using var command = connection.CreateCommand(); command.CommandText = $"DROP DATABASE IF EXISTS {database} WITH (FORCE)"; await command.ExecuteNonQueryAsync();
         }
+    }
+
+    [PostgreSqlFact]
+    public async Task AT_T14_Concurrent_review_authorization_rollback_and_canonical_baseline_hash()
+    {
+        var administrator = new NpgsqlConnectionStringBuilder(Environment.GetEnvironmentVariable("ATLAS_TEST_CONNECTIONSTRING"));
+        var database = $"atlas_t14_{Guid.NewGuid():N}";
+        await using (var connection = new NpgsqlConnection(administrator.ConnectionString))
+        {
+            await connection.OpenAsync(); await using var command = connection.CreateCommand(); command.CommandText = $"CREATE DATABASE {database}"; await command.ExecuteNonQueryAsync();
+        }
+        administrator.Database = database;
+        try
+        {
+            await MigrateAsync(administrator.ConnectionString);
+            var runtime = new NpgsqlConnectionStringBuilder(administrator.ConnectionString) { Options = "-c role=atlas_app" }.ConnectionString;
+            var projects = new PostgresProjectIdentityStore(runtime);
+            var access = new PostgresAccessApplicabilityStore(runtime);
+            var knowledge = new PostgresKnowledgeStore(runtime, access);
+            var governance = new PostgresGovernanceStore(runtime, knowledge, access);
+            var author = await projects.ResolvePrincipalAsync($"https://identity.test/{Guid.NewGuid():N}", "author", PrincipalKind.Human, CancellationToken.None);
+            var firstReviewer = await projects.ResolvePrincipalAsync($"https://identity.test/{Guid.NewGuid():N}", "reviewer-a", PrincipalKind.Human, CancellationToken.None);
+            var secondReviewer = await projects.ResolvePrincipalAsync($"https://identity.test/{Guid.NewGuid():N}", "reviewer-b", PrincipalKind.Human, CancellationToken.None);
+            var publisher = await projects.ResolvePrincipalAsync($"https://identity.test/{Guid.NewGuid():N}", "publisher", PrincipalKind.Service, CancellationToken.None);
+            var project = await projects.CreateProjectAsync(author, new("Governance conflicts", $"governance-{Guid.NewGuid():N}", "t14-project-0001"), "r1", null, CancellationToken.None);
+            await AddMembershipAsync(administrator.ConnectionString, project.ProjectId, firstReviewer.PrincipalId, ["BusinessOwner"]);
+            await AddMembershipAsync(administrator.ConnectionString, project.ProjectId, secondReviewer.PrincipalId, ["BusinessOwner"]);
+            await AddMembershipAsync(administrator.ConnectionString, project.ProjectId, publisher.PrincipalId, ["KnowledgePublisher"]);
+            await AddRolesAsync(administrator.ConnectionString, project.ProjectId, author.PrincipalId, ["KnowledgePublisher"]);
+
+            var proposal = await governance.SubmitProposalAsync(author, project.ProjectId, new(project.CurrentBaselineId, "AT-T14 candidates", null, [Input("Rule A"), Input("Rule B")], []), "t14-proposal-0001", "r2", null, CancellationToken.None);
+            var items = proposal.Data.Items.Select((item, index) => new ChangeItemInput(item.UnitId, item.Action, item.BaseRevisionId, item.ProposedRevisionId, $"group-{index}", item.Reason)).ToArray();
+            var amended = await governance.AmendChangeSetAsync(author, project.ProjectId, proposal.Data.ChangeSetId, new(null, items, null), proposal.ProjectVersion, "t14-amend-0001", "r3", null, CancellationToken.None);
+            var submitted = await governance.SubmitChangeSetAsync(author, project.ProjectId, proposal.Data.ChangeSetId, new([], []), amended.ProjectVersion, "t14-submit-0001", "r4", null, CancellationToken.None);
+            Assert.Equal(2, submitted.Data.Approvals.Count);
+            var slots = submitted.Data.Approvals.OrderBy(slot => slot.SlotId, StringComparer.Ordinal).ToArray();
+
+            var selfReview = await Assert.ThrowsAsync<ProjectIdentityException>(() => governance.ReviewChangeSetAsync(author, project.ProjectId, proposal.Data.ChangeSetId,
+                new(submitted.Data.SubmitDigest!, submitted.Data.SubmittedSeq!.Value, [slots[0].SlotId], "approve", "Self approval must fail", Json("{}")), submitted.ProjectVersion, "t14-self-0001", "r5", null, CancellationToken.None));
+            Assert.Equal(403, selfReview.StatusCode);
+
+            var reviews = await Task.WhenAll(
+                ReviewAsync(governance, firstReviewer, project.ProjectId, proposal.Data.ChangeSetId, submitted, slots[0].SlotId, "t14-review-a"),
+                ReviewAsync(governance, secondReviewer, project.ProjectId, proposal.Data.ChangeSetId, submitted, slots[1].SlotId, "t14-review-b"));
+            Assert.True(reviews.Count(result => result.Error is null) == 1, string.Join("; ", reviews.Select(result => $"{result.Error?.StatusCode}: {result.Error?.Message}")));
+            Assert.Equal(412, Assert.Single(reviews, result => result.Error is not null).Error!.StatusCode);
+            var partiallyApproved = await governance.GetChangeSetAsync(author.PrincipalId, project.ProjectId, proposal.Data.ChangeSetId, CancellationToken.None);
+            Assert.Equal("in_review", partiallyApproved.State);
+            var pending = Assert.Single(partiallyApproved.Approvals, slot => slot.Status == "pending");
+            var completed = await governance.ReviewChangeSetAsync(secondReviewer, project.ProjectId, proposal.Data.ChangeSetId,
+                new(submitted.Data.SubmitDigest!, submitted.Data.SubmittedSeq!.Value, [pending.SlotId], "approve", "Fresh CAS review", Json("{}")), reviews.Single(result => result.Error is null).Version, "t14-review-final", "r8", null, CancellationToken.None);
+            Assert.Equal("approved", completed.Data.State);
+
+            var forbiddenPublisher = await Assert.ThrowsAsync<ProjectIdentityException>(() => governance.PublishChangeSetAsync(publisher, project.ProjectId, proposal.Data.ChangeSetId,
+                new(submitted.Data.SubmitDigest!, project.CurrentBaselineId), completed.ProjectVersion, "t14-service-publish", "r9", null, CancellationToken.None));
+            Assert.Equal(403, forbiddenPublisher.StatusCode);
+
+            await InstallPublishFailureTriggerAsync(administrator.ConnectionString);
+            await Assert.ThrowsAsync<PostgresException>(() => governance.PublishChangeSetAsync(author, project.ProjectId, proposal.Data.ChangeSetId,
+                new(submitted.Data.SubmitDigest!, project.CurrentBaselineId), completed.ProjectVersion, "t14-rollback-publish", "r10", null, CancellationToken.None));
+            var rolledBack = await governance.GetChangeSetAsync(author.PrincipalId, project.ProjectId, proposal.Data.ChangeSetId, CancellationToken.None);
+            Assert.Equal("approved", rolledBack.State);
+            Assert.Equal(completed.Data.Version, rolledBack.Version);
+            Assert.Empty(await ScalarListAsync(administrator.ConnectionString, "SELECT baseline_id FROM gov.baseline WHERE change_set_id=@id", proposal.Data.ChangeSetId));
+            Assert.Empty(await ScalarListAsync(administrator.ConnectionString, "SELECT event_id FROM ops.outbox WHERE event_type='BaselinePublished.v1' AND payload->>'changeSetId'=@id::text", proposal.Data.ChangeSetId));
+            Assert.Empty(await ScalarListAsync(administrator.ConnectionString, "SELECT principal_id FROM ops.idempotency WHERE operation_id='publishChangeSet' AND idempotency_key='t14-rollback-publish'"));
+            await DropPublishFailureTriggerAsync(administrator.ConnectionString);
+
+            var published = await governance.PublishChangeSetAsync(author, project.ProjectId, proposal.Data.ChangeSetId,
+                new(submitted.Data.SubmitDigest!, project.CurrentBaselineId), completed.ProjectVersion, "t14-publish-0001", "r11", null, CancellationToken.None);
+            var entries = submitted.Data.Items.OrderBy(item => item.UnitId).Select(item => $"{{\"revisionId\":\"{item.ProposedRevisionId}\",\"unitId\":\"{item.UnitId}\"}}");
+            var canonical = $"{{\"entries\":[{string.Join(',', entries)}],\"number\":1,\"parentBaselineId\":\"{project.CurrentBaselineId}\",\"projectId\":\"{project.ProjectId}\"}}";
+            var expectedHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(canonical))).ToLowerInvariant();
+            Assert.Equal(expectedHash, published.Data.Digest);
+            Assert.Equal(published.Data.Digest, (await governance.ListBaselinesAsync(author.PrincipalId, project.ProjectId, null, 10, CancellationToken.None)).Items.Single(item => item.BaselineId == published.Data.BaselineId).Digest);
+        }
+        finally
+        {
+            NpgsqlConnection.ClearAllPools(); administrator.Database = "postgres";
+            await using var connection = new NpgsqlConnection(administrator.ConnectionString); await connection.OpenAsync();
+            await using var command = connection.CreateCommand(); command.CommandText = $"DROP DATABASE IF EXISTS {database} WITH (FORCE)"; await command.ExecuteNonQueryAsync();
+        }
+    }
+
+    private static async Task<(ProjectIdentityException? Error, long Version)> ReviewAsync(PostgresGovernanceStore governance, AtlasPrincipal reviewer, Guid projectId, Guid changeSetId, GovernanceMutation<ChangeSetView> submitted, string slotId, string key)
+    {
+        try
+        {
+            var result = await governance.ReviewChangeSetAsync(reviewer, projectId, changeSetId, new(submitted.Data.SubmitDigest!, submitted.Data.SubmittedSeq!.Value, [slotId], "approve", "Concurrent human review", Json("{}")), submitted.ProjectVersion, key, key, null, CancellationToken.None);
+            return (null, result.ProjectVersion);
+        }
+        catch (ProjectIdentityException exception) { return (exception, submitted.ProjectVersion); }
+    }
+
+    private static async Task InstallPublishFailureTriggerAsync(string connection)
+    {
+        await using var db = new NpgsqlConnection(connection); await db.OpenAsync(); await using var command = db.CreateCommand();
+        command.CommandText = """
+            CREATE FUNCTION ops.fail_t14_publish() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'AT-T14 forced final-step failure'; END; $$;
+            CREATE TRIGGER fail_t14_publish BEFORE INSERT ON ops.audit_event FOR EACH ROW WHEN (NEW.action='publishChangeSet') EXECUTE FUNCTION ops.fail_t14_publish();
+            """; await command.ExecuteNonQueryAsync();
+    }
+
+    private static async Task DropPublishFailureTriggerAsync(string connection)
+    {
+        await using var db = new NpgsqlConnection(connection); await db.OpenAsync(); await using var command = db.CreateCommand();
+        command.CommandText = "DROP TRIGGER fail_t14_publish ON ops.audit_event; DROP FUNCTION ops.fail_t14_publish();"; await command.ExecuteNonQueryAsync();
+    }
+
+    private static async Task<List<Guid>> ScalarListAsync(string connection, string sql, Guid? id = null)
+    {
+        await using var db = new NpgsqlConnection(connection); await db.OpenAsync(); await using var command = db.CreateCommand(); command.CommandText = sql;
+        if (id.HasValue) command.Parameters.AddWithValue("id", id.Value);
+        var result = new List<Guid>(); await using var reader = await command.ExecuteReaderAsync(); while (await reader.ReadAsync()) result.Add(reader.GetGuid(0)); return result;
     }
 
     private static RevisionInput Input(string title) => new(null, title, "Source", "1.0", null, "normative", "unverified", Json("{}"),
