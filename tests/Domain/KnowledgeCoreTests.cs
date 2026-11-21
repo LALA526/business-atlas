@@ -1,6 +1,7 @@
 using System.Text.Json;
 using KnowledgeCore.Application;
 using KnowledgeCore.Contracts;
+using KnowledgeCore.Flows;
 using KnowledgeCore.Relations;
 using KnowledgeCore.Vocabulary;
 
@@ -83,6 +84,90 @@ public sealed class KnowledgeCoreTests
         Assert.NotEqual(RelationSemantics.Meaning("implements"), RelationSemantics.Meaning("triggers"));
         Assert.Throws<ProjectIdentity.Application.ProjectIdentityException>(() => RelationSemantics.ValidateEndpoints("usesFact", "DataField", "BusinessRule"));
     }
+
+    [Fact]
+    public void AT_T11_Manufacturing_flow_projection_preserves_seven_stages_twelve_nodes_and_fourteen_edges()
+    {
+        var flow = FlowSemantics.Project(GoldenFlow());
+
+        Assert.Equal(7, flow.Stages.Count);
+        Assert.Equal(12, flow.Nodes.Count);
+        Assert.Equal(14, flow.Edges.Count);
+        Assert.All(flow.Stages, stage => Assert.NotEmpty(stage.NodeIds));
+        Assert.Equal(2, flow.Edges.Count(edge => edge.Kind == "return"));
+        Assert.Contains(flow.Edges, edge => edge.EdgeId == "e4" && edge.GuardRuleRefs.Single().GetProperty("unitId").GetGuid() == Region);
+        Assert.Equal("s1", flow.Edges.Single(edge => edge.EdgeId == "e7").ToStageId);
+    }
+
+    [Fact]
+    public void AT_T11_Flow_validation_rejects_dropped_stages_edges_and_guard_references()
+    {
+        var missingStage = JsonNode(GoldenFlow());
+        missingStage["stageOrder"]!.AsArray().RemoveAt(6);
+        Assert.Throws<ProjectIdentity.Application.ProjectIdentityException>(() => FlowSemantics.Validate(Json(missingStage)));
+
+        var missingGuard = JsonNode(GoldenFlow());
+        missingGuard["edges"]![3]!["guardRuleRefs"] = new System.Text.Json.Nodes.JsonArray();
+        missingGuard["edges"]![3]!["conditionText"] = "";
+        Assert.Throws<ProjectIdentity.Application.ProjectIdentityException>(() => FlowSemantics.Validate(Json(missingGuard)));
+
+        var missingNode = JsonNode(GoldenFlow());
+        missingNode["edges"]![0]!["toNodeId"] = "invented";
+        Assert.Throws<ProjectIdentity.Application.ProjectIdentityException>(() => FlowSemantics.Validate(Json(missingNode)));
+    }
+
+    [Fact]
+    public void AT_T11_Transition_guards_are_explicit_and_non_execution_relations_do_not_create_order()
+    {
+        var transition = Json($$"""
+            {"object":{"unitId":"{{Amount}}"},"from":{"unitId":"{{Region}}"},"to":{"unitId":"{{Region}}"},
+             "trigger":{"unitId":"{{Amount}}"},"guardRuleRefs":[{"unitId":"{{Region}}"}]}
+            """);
+        FlowSemantics.ValidateTransition(transition);
+        Assert.Equal(Region, FlowSemantics.TransitionRuleReferences(transition).Single().GetProperty("unitId").GetGuid());
+        Assert.True(RelationSemantics.IsExecutionRelation("triggers"));
+        Assert.True(RelationSemantics.IsExecutionRelation("followsWhen"));
+        Assert.False(RelationSemantics.IsExecutionRelation("contains"));
+        Assert.False(RelationSemantics.IsExecutionRelation("calls"));
+        Assert.False(RelationSemantics.IsExecutionRelation("implements"));
+        Assert.False(RelationSemantics.IsExecutionRelation("constrains"));
+    }
+
+    private static JsonElement GoldenFlow() => Json($$"""
+        {"purpose":"Synthetic manufacturing semantic-conservation fixture","stageOrder":["s1","s2","s3","s4","s5","s6","s7"],
+         "stages":[
+           {"stageId":"s1","title":"Intake"},{"stageId":"s2","title":"Review"},{"stageId":"s3","title":"Plan"},
+           {"stageId":"s4","title":"Prepare"},{"stageId":"s5","title":"Produce"},{"stageId":"s6","title":"Inspect"},{"stageId":"s7","title":"Complete"}],
+         "entryNodeId":"n1","endNodeIds":["n12"],
+         "nodes":[
+           {"nodeId":"n1","stageId":"s1","kind":"start","title":"Start","ruleRefs":[]},
+           {"nodeId":"n2","stageId":"s1","kind":"action","title":"Capture","ruleRefs":[]},
+           {"nodeId":"n3","stageId":"s2","kind":"decision","title":"Review","ruleRefs":[{"unitId":"{{Amount}}"}]},
+           {"nodeId":"n4","stageId":"s3","kind":"action","title":"Plan","ruleRefs":[]},
+           {"nodeId":"n5","stageId":"s3","kind":"event","title":"Ready","ruleRefs":[]},
+           {"nodeId":"n6","stageId":"s4","kind":"action","title":"Prepare","ruleRefs":[]},
+           {"nodeId":"n7","stageId":"s2","kind":"exception","title":"Correct","ruleRefs":[]},
+           {"nodeId":"n8","stageId":"s5","kind":"action","title":"Produce","ruleRefs":[]},
+           {"nodeId":"n9","stageId":"s5","kind":"action","title":"Record","ruleRefs":[]},
+           {"nodeId":"n10","stageId":"s6","kind":"action","title":"Inspect","ruleRefs":[]},
+           {"nodeId":"n11","stageId":"s7","kind":"action","title":"Release","ruleRefs":[]},
+           {"nodeId":"n12","stageId":"s7","kind":"end","title":"End","ruleRefs":[]}],
+         "edges":[
+           {"edgeId":"e1","fromNodeId":"n1","toNodeId":"n2","kind":"sequence","guardRuleRefs":[]},
+           {"edgeId":"e2","fromNodeId":"n2","toNodeId":"n3","kind":"sequence","guardRuleRefs":[]},
+           {"edgeId":"e3","fromNodeId":"n3","toNodeId":"n4","kind":"conditional","conditionText":"Accepted","guardRuleRefs":[{"unitId":"{{Amount}}"}]},
+           {"edgeId":"e4","fromNodeId":"n3","toNodeId":"n7","kind":"conditional","conditionText":"Correction required","guardRuleRefs":[{"unitId":"{{Region}}"}]},
+           {"edgeId":"e5","fromNodeId":"n4","toNodeId":"n5","kind":"sequence","guardRuleRefs":[]},
+           {"edgeId":"e6","fromNodeId":"n5","toNodeId":"n6","kind":"sequence","guardRuleRefs":[]},
+           {"edgeId":"e7","fromNodeId":"n7","toNodeId":"n2","kind":"return","guardRuleRefs":[]},
+           {"edgeId":"e8","fromNodeId":"n6","toNodeId":"n8","kind":"sequence","guardRuleRefs":[]},
+           {"edgeId":"e9","fromNodeId":"n8","toNodeId":"n9","kind":"sequence","guardRuleRefs":[]},
+           {"edgeId":"e10","fromNodeId":"n9","toNodeId":"n10","kind":"sequence","guardRuleRefs":[]},
+           {"edgeId":"e11","fromNodeId":"n10","toNodeId":"n11","kind":"sequence","guardRuleRefs":[]},
+           {"edgeId":"e12","fromNodeId":"n11","toNodeId":"n12","kind":"sequence","guardRuleRefs":[]},
+           {"edgeId":"e13","fromNodeId":"n6","toNodeId":"n3","kind":"return","conditionText":"Re-review","guardRuleRefs":[]},
+           {"edgeId":"e14","fromNodeId":"n10","toNodeId":"n8","kind":"exception","conditionText":"Rework","guardRuleRefs":[]}]}
+        """);
 
     private static JsonElement Facts(string amount, string region) => Json(JsonSerializer.Serialize(new Dictionary<string, string> { [Amount.ToString()] = amount, [Region.ToString()] = region }));
     private static JsonElement Rule(string policy) => Json("""

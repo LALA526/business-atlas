@@ -6,6 +6,7 @@ using AccessApplicability.Infrastructure;
 using KnowledgeCore.Application;
 using KnowledgeCore.Contracts;
 using KnowledgeCore.Relations;
+using KnowledgeCore.Flows;
 using KnowledgeCore.Vocabulary;
 using Npgsql;
 using NpgsqlTypes;
@@ -145,6 +146,7 @@ public sealed class PostgresKnowledgeStore(string connectionString, PostgresAcce
             input.Verification, input.Applicability.Clone(), input.Body.Clone(), input.Blocks.Clone(), input.Evidence.Clone(), input.Unknowns.Clone(),
             ContentHash(input), createdAt, actor.PrincipalId, Strings(input.CategoryKeys)) { ParentRevisionId = parent };
         await InsertRevisionAsync(tx, projectId, revision, input.SchemaDefinitionRevisionId, ct);
+        await ValidateRuleReferencesAsync(tx, projectId, revision, ct);
         await InsertReferencesAsync(tx, projectId, revision, ct);
         await InsertEvidenceAsync(tx, projectId, revision, actor.PrincipalId, ct);
         if (!requestedUnit.HasValue && input.ExternalId is not null) await InsertExternalIdentityAsync(tx, projectId, unitId, input.ExternalId, ct);
@@ -234,6 +236,20 @@ public sealed class PostgresKnowledgeStore(string connectionString, PostgresAcce
             command.Parameters.AddWithValue("source", revision.RevisionId); command.Parameters.AddWithValue("key", path);
             command.Parameters.AddWithValue("unit", target.Unit); command.Parameters.AddWithValue("revision", NpgsqlDbType.Uuid, (object?)target.Revision ?? DBNull.Value);
             await command.ExecuteNonQueryAsync(ct);
+        }
+    }
+
+    private static async Task ValidateRuleReferencesAsync(NpgsqlTransaction tx, Guid projectId, RevisionView revision, CancellationToken ct)
+    {
+        var references = revision.Kind == "Flow" ? FlowSemantics.RuleReferences(revision.Body)
+            : revision.Kind == "Transition" ? FlowSemantics.TransitionRuleReferences(revision.Body)
+            : [];
+        foreach (var reference in references)
+        {
+            var unitId = reference.GetProperty("unitId").GetGuid();
+            var kind = await RequireUnitKindAsync(tx, projectId, unitId, ct);
+            if (kind is not ("Rule" or "BusinessRule"))
+                throw ProjectIdentityException.Invalid("Flow and transition guard/rule references must target a BusinessRule.");
         }
     }
 
@@ -398,6 +414,8 @@ public sealed class PostgresKnowledgeStore(string connectionString, PostgresAcce
         if (input.ExternalId is { } identity && (string.IsNullOrWhiteSpace(identity.Namespace) || string.IsNullOrWhiteSpace(identity.ExternalType) || string.IsNullOrWhiteSpace(identity.Id) || identity.Namespace.Length > 200 || identity.ExternalType.Length > 200 || identity.Id.Length > 1000)) throw ProjectIdentityException.Invalid("externalId fields are required and bounded.");
         VocabularySemantics.Validate(input);
         if (RelationSemantics.IsRelation(input.Kind)) RelationSemantics.ValidateShape(input.Body);
+        if (input.Kind == "Flow") FlowSemantics.Validate(input.Body);
+        if (input.Kind == "Transition") FlowSemantics.ValidateTransition(input.Body);
         foreach (var evidence in input.Evidence.EnumerateArray()) ValidateEvidence(evidence);
         if (input.FactKind == "observed" && input.Body.TryGetProperty("evidenceRefs", out var observationEvidence) && observationEvidence.ValueKind == JsonValueKind.Array)
             foreach (var evidence in observationEvidence.EnumerateArray()) ValidateEvidence(evidence);

@@ -37,6 +37,9 @@ public static class RelationSemantics
 
     public static bool IsRelation(string kind) => kind is "Relationship" or "Relation";
 
+    /// <summary>Only these predicates assert business execution; all other relations must not create flow edges.</summary>
+    public static bool IsExecutionRelation(string predicate) => predicate is "triggers" or "followsWhen";
+
     public static string Meaning(string predicate) => Definitions.TryGetValue(predicate, out var definition)
         ? definition.Meaning : throw ProjectIdentityException.Invalid($"The relation predicate '{predicate}' is not registered.");
 
