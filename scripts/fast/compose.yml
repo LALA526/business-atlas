@@ -62,9 +62,11 @@ services:
       Authentication__Bearer__Authority: http://192.168.10.10:15809/auth/realms/atlas
       Authentication__Bearer__MetadataAddress: http://identity:8080/realms/atlas/.well-known/openid-configuration
       Authentication__Bearer__Audience: business-atlas-api
+      ImportEvidence__PrivateBlobRoot: /var/lib/atlas/blobs
     volumes:
       - ./api:/app:ro
       - atlas-keys:/var/lib/atlas/keys
+      - atlas-private-blobs:/var/lib/atlas/blobs
     depends_on:
       postgres: {condition: service_healthy}
       identity: {condition: service_started}
@@ -92,3 +94,4 @@ services:
 volumes:
   atlas-postgres:
   atlas-keys:
+  atlas-private-blobs:

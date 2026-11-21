@@ -14,6 +14,10 @@ using Atlas.Api.Auth;
 using Atlas.Api.Platform;
 using Atlas.Api.SchemaCatalog;
 using Atlas.Api.KnowledgeCore;
+using Atlas.Api.ImportEvidence;
+using ImportEvidence.Application;
+using ImportEvidence.Blob;
+using ImportEvidence.Infrastructure;
 using KnowledgeCore.Infrastructure;
 using SchemaCatalog.Infrastructure;
 
@@ -25,6 +29,9 @@ builder.Services.AddSingleton(new PostgresAccessApplicabilityStore(builder.Confi
 builder.Services.AddSingleton<PostgresSchemaCatalogStore>();
 builder.Services.AddSingleton(services => new PostgresKnowledgeStore(builder.Configuration.GetConnectionString("Atlas") ?? string.Empty, services.GetRequiredService<PostgresAccessApplicabilityStore>()));
 builder.Services.AddSingleton<PolicyService>();
+builder.Services.AddSingleton<IPrivateBlobStorage>(new PrivateBlobStorage(builder.Configuration["ImportEvidence:PrivateBlobRoot"] ?? throw new InvalidOperationException("ImportEvidence:PrivateBlobRoot is required.")));
+builder.Services.AddSingleton<IContentScanner, BuiltInContentScanner>();
+builder.Services.AddSingleton<PostgresImportEvidenceStore>();
 builder.Services.AddSingleton<IPolicyService>(services => services.GetRequiredService<PolicyService>());
 builder.Services.AddSingleton<IReadContextFactory>(services => services.GetRequiredService<PolicyService>());
 builder.Services.ConfigureHttpJsonOptions(options => options.SerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower)));
@@ -47,6 +54,7 @@ app.MapAccessEndpoints();
 app.MapPlatformEndpoints();
 app.MapSchemaCatalogEndpoints();
 app.MapKnowledgeEndpoints();
+app.MapImportEvidenceEndpoints();
 
 app.MapGet("/health/live", (HttpContext context) => HealthResponse(context, "ok"));
 app.MapGet("/health/ready", async (HttpContext context, HealthState state, AtlasDbContext database, CancellationToken ct) =>

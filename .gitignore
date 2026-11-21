@@ -12,3 +12,4 @@ apps/web/dist/
 apps/web/*.tsbuildinfo
 
 .atlas-runtime/
+.atlas-data/

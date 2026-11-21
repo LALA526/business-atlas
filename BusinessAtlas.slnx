@@ -9,6 +9,7 @@
     <Project Path="src/Modules/ProjectIdentity/ProjectIdentity.csproj" />
     <Project Path="src/Modules/SchemaCatalog/SchemaCatalog.csproj" />
     <Project Path="src/Modules/KnowledgeCore/KnowledgeCore.csproj" />
+    <Project Path="src/Modules/ImportEvidence/ImportEvidence.csproj" />
   </Folder>
   <Folder Name="/tests/" />
   <Folder Name="/tests/Contract/">
