@@ -38,9 +38,9 @@ public static class IdentityEndpoints
             [AtlasAuthentication.CookieScheme, AtlasAuthentication.OidcScheme])).RequireAuthorization();
 
         var projects = app.MapGroup("/api/v1/projects").RequireAuthorization("AtlasRead");
-        projects.MapGet("/", async (HttpContext context, string? cursor, int? limit, CancellationToken ct) => Execute(context, async principal =>
+        projects.MapGet("/", async (HttpContext context, string? cursor, int? limit, CancellationToken ct) => await Execute(context, async principal =>
             Results.Ok(Envelope(context, await Store(context).ListProjectsAsync(principal.PrincipalId, cursor, PageLimit(limit), ct))), ct));
-        projects.MapPost("/", async (HttpContext context, CreateProjectRequest? request, CancellationToken ct) => Execute(context, async principal =>
+        projects.MapPost("/", async (HttpContext context, CreateProjectRequest? request, CancellationToken ct) => await Execute(context, async principal =>
         {
             if (request is null) throw ProjectIdentityException.Invalid("A project request body is required.");
             RequireAdminScope(context);
@@ -50,14 +50,14 @@ public static class IdentityEndpoints
             return Results.Created($"/api/v1/projects/{result.ProjectId}", Envelope(context, result));
         }, ct));
 
-        projects.MapGet("/{projectId:guid}", async (HttpContext context, Guid projectId, CancellationToken ct) => Execute(context, async principal =>
+        projects.MapGet("/{projectId:guid}", async (HttpContext context, Guid projectId, CancellationToken ct) => await Execute(context, async principal =>
         {
             var result = await Store(context).GetProjectAsync(principal.PrincipalId, projectId, ct);
             context.Response.Headers.ETag = ETag(result.Version);
             return Results.Ok(Envelope(context, result));
         }, ct));
 
-        projects.MapPatch("/{projectId:guid}", async (HttpContext context, Guid projectId, UpdateProjectRequest? request, CancellationToken ct) => Execute(context, async principal =>
+        projects.MapPatch("/{projectId:guid}", async (HttpContext context, Guid projectId, UpdateProjectRequest? request, CancellationToken ct) => await Execute(context, async principal =>
         {
             RequireAdminScope(context);
             if (request is null) throw ProjectIdentityException.Invalid("A project request body is required.");
@@ -67,13 +67,13 @@ public static class IdentityEndpoints
             return Results.Ok(Envelope(context, result));
         }, ct));
 
-        projects.MapGet("/{projectId:guid}/members", async (HttpContext context, Guid projectId, string? cursor, int? limit, CancellationToken ct) => Execute(context, async principal =>
+        projects.MapGet("/{projectId:guid}/members", async (HttpContext context, Guid projectId, string? cursor, int? limit, CancellationToken ct) => await Execute(context, async principal =>
         {
             RequireAdminScope(context);
             return Results.Ok(Envelope(context, await Store(context).ListMembersAsync(principal.PrincipalId, projectId, cursor, PageLimit(limit), ct)));
         }, ct));
 
-        projects.MapPut("/{projectId:guid}/members/{principalId:guid}", async (HttpContext context, Guid projectId, Guid principalId, MembershipRequest? request, CancellationToken ct) => Execute(context, async principal =>
+        projects.MapPut("/{projectId:guid}/members/{principalId:guid}", async (HttpContext context, Guid projectId, Guid principalId, MembershipRequest? request, CancellationToken ct) => await Execute(context, async principal =>
         {
             RequireAdminScope(context);
             if (request is null) throw ProjectIdentityException.Invalid("A membership request body is required.");
@@ -84,7 +84,7 @@ public static class IdentityEndpoints
             return Results.Ok(Envelope(context, result.Membership));
         }, ct));
 
-        projects.MapDelete("/{projectId:guid}/members/{principalId:guid}", async (HttpContext context, Guid projectId, Guid principalId, CancellationToken ct) => Execute(context, async principal =>
+        projects.MapDelete("/{projectId:guid}/members/{principalId:guid}", async (HttpContext context, Guid projectId, Guid principalId, CancellationToken ct) => await Execute(context, async principal =>
         {
             RequireAdminScope(context);
             var version = await Store(context).RemoveMembershipAsync(principal, projectId, principalId,
