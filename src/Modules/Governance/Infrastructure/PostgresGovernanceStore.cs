@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using Governance.Contracts;
+using Governance.Baselines;
 using AccessApplicability.Contracts;
 using AccessApplicability.Infrastructure;
 using KnowledgeCore.Application;
@@ -227,9 +228,9 @@ public sealed class PostgresGovernanceStore(string connectionString, PostgresKno
             INSERT INTO gov.baseline(project_id,baseline_id,baseline_no,parent_baseline_id,change_set_id,registry_version,digest,sealed,created_by,created_at)
             VALUES(@project,@baseline,@number,@parent,@changeSet,@registry,@digest,false,@actor,@createdAt);
             INSERT INTO gov.baseline_entry(project_id,baseline_id,unit_id,revision_id)
-            SELECT @project,@baseline,unit_id,revision_id FROM gov.baseline_entry WHERE project_id=@project AND baseline_id=@parent;
-            DELETE FROM gov.baseline_entry WHERE project_id=@project AND baseline_id=@baseline
-              AND unit_id IN (SELECT unit_id FROM gov.change_item WHERE project_id=@project AND change_set_id=@changeSet);
+            SELECT @project,@baseline,unit_id,revision_id FROM gov.baseline_entry
+            WHERE project_id=@project AND baseline_id=@parent
+              AND unit_id NOT IN (SELECT unit_id FROM gov.change_item WHERE project_id=@project AND change_set_id=@changeSet);
             UPDATE core.revision SET sealed=true WHERE project_id=@project AND NOT sealed AND revision_id IN
               (SELECT proposed_revision_id FROM gov.change_item WHERE project_id=@project AND change_set_id=@changeSet AND proposed_revision_id IS NOT NULL);
             INSERT INTO gov.baseline_entry(project_id,baseline_id,unit_id,revision_id)
@@ -246,6 +247,7 @@ public sealed class PostgresGovernanceStore(string connectionString, PostgresKno
             """, ct, ("project", projectId), ("baseline", baselineId), ("number", number), ("digest", baselineDigest), ("changeSet", changeSetId), ("event", Guid.NewGuid()),
             ("payload", JsonSerializer.Serialize(new { projectId, baselineId, number, changeSetId, baselineDigest }, Json)));
         var baseline = new BaselineView(baselineId, number, current.BaselineId, changeSetId, current.RegistryVersion, baselineDigest, createdAt);
+        await BaselineReviewInvalidation.RecordAsync(tx, projectId, baselineId, number, changeSetId, createdAt, ct);
         var result = new GovernanceMutation<BaselineView>(baseline, checked(project.Version + 1));
         await SaveResultAsync(tx, projectId, actor.PrincipalId, "publishChangeSet", key, digest, result, requestId, traceId, ct);
         await tx.CommitAsync(ct); return result;
