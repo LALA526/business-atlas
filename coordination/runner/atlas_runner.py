@@ -1096,7 +1096,7 @@ class AtlasRunner:
                 base,
                 self.evidence_root,
                 self.reconcile,
-                max_attempts=int(self.controls.get("maxTaskAttempts", 3)),
+                max_attempts=None if self.controls.get("fastDelivery") else int(self.controls.get("maxTaskAttempts", 3)),
                 worker_slot=self.controls.get("workerSlot"),
             )
         except RunnerError as error:
@@ -1344,6 +1344,9 @@ def build_real_runner(repo: Path, state_dir: Path, controls_path: Path, override
             adapter = MulticaAdapter(binding, supervisor)
     else:
         adapter = OpenCodeAdapter(model, supervisor)
+    if controls.get("fastDelivery"):
+        from fast_delivery import FastRunner
+        return FastRunner(repo, repo / DEFAULT_BASELINE, state_dir, controls, adapter, PendingIntegrationBackend(), supervisor=supervisor)
     integration_config = controls["integration"]
     if integration_config.get("backend") == "azure_gates":
         from azure_gate_backend import AzureGateBackend

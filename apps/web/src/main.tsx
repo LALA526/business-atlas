@@ -8,7 +8,7 @@ createRoot(root).render(
   <StrictMode>
     <main>
       <h1>Business Atlas</h1>
-      <p>PREPARATION build. Product workspaces are not implemented in T02.</p>
+      <p>开发预览：API、后台进程和网页框架已部署。业务功能正在开发。</p>
     </main>
   </StrictMode>,
 );

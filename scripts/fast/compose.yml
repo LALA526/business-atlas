@@ -1,0 +1,26 @@
+services:
+  api:
+    image: mcr.microsoft.com/dotnet/aspnet:10.0
+    restart: unless-stopped
+    working_dir: /app
+    command: [dotnet, Atlas.Api.dll]
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ASPNETCORE_ENVIRONMENT: Production
+    volumes: [./api:/app:ro]
+    mem_limit: 512m
+  worker:
+    image: mcr.microsoft.com/dotnet/aspnet:10.0
+    restart: unless-stopped
+    working_dir: /app
+    command: [dotnet, Atlas.Worker.dll]
+    environment:
+      DOTNET_ENVIRONMENT: Production
+    volumes: [./worker:/app:ro]
+    mem_limit: 256m
+  web:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports: [127.0.0.1:15809:8080]
+    volumes: [./web:/srv:ro, ./Caddyfile:/etc/caddy/Caddyfile:ro]
+    mem_limit: 128m
