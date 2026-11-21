@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using ProjectIdentity.Application;
 using ProjectIdentity.Contracts;
 using ProjectIdentity.Infrastructure;
+using Atlas.Api.Hubs;
 
 namespace Atlas.Api.Auth;
 
@@ -81,6 +82,7 @@ public static class IdentityEndpoints
                 new ChangeMembershipCommand(principalId, request.Roles, request.Clearance, request.Active, ExpectedVersion(context), IdempotencyKey(context)),
                 RequestId(context), TraceId(context), ct);
             context.Response.Headers.ETag = ETag(result.PolicyVersion);
+            await context.RequestServices.GetRequiredService<ProjectRealtimeNotifier>().RevokePrincipalAsync(projectId, principalId, ct);
             return Results.Ok(Envelope(context, result.Membership));
         }, ct));
 
@@ -90,6 +92,7 @@ public static class IdentityEndpoints
             var version = await Store(context).RemoveMembershipAsync(principal, projectId, principalId,
                 ExpectedVersion(context), IdempotencyKey(context), RequestId(context), TraceId(context), ct);
             context.Response.Headers.ETag = ETag(version);
+            await context.RequestServices.GetRequiredService<ProjectRealtimeNotifier>().RevokePrincipalAsync(projectId, principalId, ct);
             return Results.Ok(Envelope(context, new { id = principalId, version }));
         }, ct));
         return app;

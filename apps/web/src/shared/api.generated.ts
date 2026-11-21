@@ -2441,6 +2441,8 @@ export interface components {
             createdAt: string;
             version: number;
             target: components["schemas"]["ActivityInput"];
+            /** Format: uuid */
+            authorId: string;
         };
         Job: {
             /** Format: uuid */

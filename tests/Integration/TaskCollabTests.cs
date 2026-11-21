@@ -77,6 +77,57 @@ public sealed class TaskCollabTests
     }
 
     [PostgreSqlFact]
+    public async Task AT_T26_Two_people_comment_resolve_feedback_and_revoke_realtime_access()
+    {
+        var administrator = new NpgsqlConnectionStringBuilder(Environment.GetEnvironmentVariable("ATLAS_TEST_CONNECTIONSTRING"));
+        var database = $"atlas_t26_{Guid.NewGuid():N}";
+        await using (var connection = new NpgsqlConnection(administrator.ConnectionString))
+        {
+            await connection.OpenAsync(); await using var command = connection.CreateCommand(); command.CommandText = $"CREATE DATABASE {database}"; await command.ExecuteNonQueryAsync();
+        }
+        administrator.Database = database;
+        try
+        {
+            var options = new DbContextOptionsBuilder<BuildingBlocks.Persistence.AtlasDbContext>().UseNpgsql(administrator.ConnectionString).Options;
+            await using (var context = new BuildingBlocks.Persistence.AtlasDbContext(options)) await context.Database.MigrateAsync();
+            var runtime = new NpgsqlConnectionStringBuilder(administrator.ConnectionString) { Options = "-c role=atlas_app" }.ConnectionString;
+            var projects = new PostgresProjectIdentityStore(runtime);
+            var collab = new PostgresTaskCollabStore(runtime, new PostgresAccessApplicabilityStore(runtime));
+            var first = await projects.ResolvePrincipalAsync($"https://identity.test/{Guid.NewGuid():N}", "first", PrincipalKind.Human, CancellationToken.None);
+            var second = await projects.ResolvePrincipalAsync($"https://identity.test/{Guid.NewGuid():N}", "second", PrincipalKind.Human, CancellationToken.None);
+            var project = await projects.CreateProjectAsync(first, new("Concurrent collaboration", $"collab-{Guid.NewGuid():N}", "t26-project-0001"), "r1", null, CancellationToken.None);
+            await AddMembership(administrator.ConnectionString, project.ProjectId, second.PrincipalId, "Contributor");
+            var task = await collab.CreateTaskAsync(first, project.ProjectId, new("Review the approval outcome together", null, null, null, null), "t26-task-00001", "r2", null, CancellationToken.None);
+
+            var comments = await Task.WhenAll(
+                collab.CreateActivityAsync(first, project.ProjectId, "comment", new(null, null, task.TaskId, null, Json("{\"segmentId\":\"outcome\"}"), "First reviewer comment"), "t26-comment-001", "r3", null, CancellationToken.None),
+                collab.CreateActivityAsync(second, project.ProjectId, "comment", new(null, null, task.TaskId, null, Json("{\"segmentId\":\"outcome\"}"), "Second reviewer comment"), "t26-comment-002", "r4", null, CancellationToken.None));
+            Assert.Equal(2, comments.Select(comment => comment.Id).Distinct().Count());
+            Assert.Equal(first.PrincipalId, comments[0].AuthorId); Assert.Equal(second.PrincipalId, comments[1].AuthorId);
+            Assert.Equal(2, (await collab.ListActivitiesAsync(second.PrincipalId, project.ProjectId, "comment", task.TaskId, null, null, null, 30, CancellationToken.None)).Items.Count);
+
+            var resolved = await collab.ResolveActivityAsync(first, project.ProjectId, "comment", comments[0].Id, new("Addressed in the candidate", null, task.TaskId), comments[0].Version, "t26-resolve-001", "r5", null, CancellationToken.None);
+            var conflict = await Assert.ThrowsAsync<ProjectIdentityException>(() => collab.ResolveActivityAsync(second, project.ProjectId, "comment", comments[0].Id, new("Concurrent stale resolution", null, null), comments[0].Version, "t26-resolve-002", "r6", null, CancellationToken.None));
+            Assert.Equal(412, conflict.StatusCode); Assert.Equal("addressed", resolved.State);
+
+            var feedback = await collab.CreateActivityAsync(second, project.ProjectId, "feedback", new(null, null, task.TaskId, null, Json("{}"), "Please clarify the review outcome"), "t26-feedback-01", "r7", null, CancellationToken.None);
+            var routed = await collab.ResolveActivityAsync(first, project.ProjectId, "feedback", feedback.Id, new("Routed to the review task", null, task.TaskId), feedback.Version, "t26-feedback-02", "r8", null, CancellationToken.None);
+            Assert.Equal("closed", (await collab.ResolveActivityAsync(second, project.ProjectId, "feedback", feedback.Id, new("The task response is verified", null, null), routed.Version, "t26-feedback-03", "r9", null, CancellationToken.None)).State);
+            Assert.True(await collab.CanReadProjectAsync(second.PrincipalId, project.ProjectId, CancellationToken.None));
+            await Revoke(administrator.ConnectionString, project.ProjectId, second.PrincipalId);
+            Assert.False(await collab.CanReadProjectAsync(second.PrincipalId, project.ProjectId, CancellationToken.None));
+            var forbidden = await Assert.ThrowsAsync<ProjectIdentityException>(() => collab.ListActivitiesAsync(second.PrincipalId, project.ProjectId, "comment", task.TaskId, null, null, null, 30, CancellationToken.None));
+            Assert.Equal(404, forbidden.StatusCode);
+        }
+        finally
+        {
+            NpgsqlConnection.ClearAllPools(); administrator.Database = "postgres";
+            await using var connection = new NpgsqlConnection(administrator.ConnectionString); await connection.OpenAsync();
+            await using var command = connection.CreateCommand(); command.CommandText = $"DROP DATABASE IF EXISTS {database} WITH (FORCE)"; await command.ExecuteNonQueryAsync();
+        }
+    }
+
+    [PostgreSqlFact]
     public async Task AT_T22_Field_reverse_semantics_requirements_candidates_and_blind_spots()
     {
         var administrator = new NpgsqlConnectionStringBuilder(Environment.GetEnvironmentVariable("ATLAS_TEST_CONNECTIONSTRING"));
@@ -182,6 +233,9 @@ public sealed class TaskCollabTests
     }
 
     private static JsonElement Json(string value) => JsonDocument.Parse(value).RootElement.Clone();
-    private static async Task AddReader(string connection, Guid project, Guid principal)
-    { await using var db = new NpgsqlConnection(connection); await db.OpenAsync(); await using var command = db.CreateCommand(); command.CommandText = "INSERT INTO identity.membership(project_id,principal_id,roles) VALUES(@project,@principal,ARRAY['ProjectReader'])"; command.Parameters.AddWithValue("project", project); command.Parameters.AddWithValue("principal", principal); await command.ExecuteNonQueryAsync(); }
+    private static Task AddReader(string connection, Guid project, Guid principal) => AddMembership(connection, project, principal, "ProjectReader");
+    private static async Task AddMembership(string connection, Guid project, Guid principal, string role)
+    { await using var db = new NpgsqlConnection(connection); await db.OpenAsync(); await using var command = db.CreateCommand(); command.CommandText = "INSERT INTO identity.membership(project_id,principal_id,roles) VALUES(@project,@principal,ARRAY[@role])"; command.Parameters.AddWithValue("project", project); command.Parameters.AddWithValue("principal", principal); command.Parameters.AddWithValue("role", role); await command.ExecuteNonQueryAsync(); }
+    private static async Task Revoke(string connection, Guid project, Guid principal)
+    { await using var db = new NpgsqlConnection(connection); await db.OpenAsync(); await using var command = db.CreateCommand(); command.CommandText = "UPDATE identity.membership SET active=false WHERE project_id=@project AND principal_id=@principal"; command.Parameters.AddWithValue("project", project); command.Parameters.AddWithValue("principal", principal); await command.ExecuteNonQueryAsync(); }
 }

@@ -18,6 +18,7 @@ using Atlas.Api.ImportEvidence;
 using Atlas.Api.Governance;
 using Atlas.Api.ReadSearchExplain;
 using Atlas.Api.TaskCollab;
+using Atlas.Api.Hubs;
 using TaskCollab.Infrastructure;
 using ReadSearchExplain.Export;
 using ReadSearchExplain.Search;
@@ -44,6 +45,9 @@ builder.Services.AddSingleton(services => new PostgresReadSearchService(builder.
 builder.Services.AddSingleton<ReadingProjectionService>();
 builder.Services.AddScoped<PostgresExportService>();
 builder.Services.AddSingleton(services => new PostgresTaskCollabStore(builder.Configuration.GetConnectionString("Atlas") ?? string.Empty, services.GetRequiredService<PostgresAccessApplicabilityStore>()));
+builder.Services.AddSignalR();
+builder.Services.AddSingleton<ProjectHubConnections>();
+builder.Services.AddSingleton<ProjectRealtimeNotifier>();
 builder.Services.AddSingleton<IPolicyService>(services => services.GetRequiredService<PolicyService>());
 builder.Services.AddSingleton<IReadContextFactory>(services => services.GetRequiredService<PolicyService>());
 builder.Services.ConfigureHttpJsonOptions(options => options.SerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower)));
@@ -70,6 +74,7 @@ app.MapImportEvidenceEndpoints();
 app.MapGovernanceEndpoints();
 app.MapReadSearchExplainEndpoints();
 app.MapTaskCollabEndpoints();
+app.MapHub<ProjectHub>("/hubs/project");
 
 app.MapGet("/health/live", (HttpContext context) => HealthResponse(context, "ok"));
 app.MapGet("/health/ready", async (HttpContext context, HealthState state, AtlasDbContext database, CancellationToken ct) =>

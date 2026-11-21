@@ -287,6 +287,17 @@ public sealed class PostgresTaskCollabStore(string connectionString, PostgresAcc
             await Execute(tx, "UPDATE collab.task SET state=@state,version=version+1 WHERE project_id=@project AND task_id=@task", ct, ("project", project), ("task", task), ("state", next));
         }, ct);
 
+    public async Task<bool> CanReadProjectAsync(Guid principal, Guid project, CancellationToken ct)
+    {
+        try
+        {
+            await using var connection = await OpenAsync(ct); await using var tx = await connection.BeginTransactionAsync(ct);
+            await Context(tx, project, principal, ct); await RequireMember(tx, project, principal, false, ct);
+            return true;
+        }
+        catch (ProjectIdentityException exception) when (exception.StatusCode is 403 or 404) { return false; }
+    }
+
     public Task<ActivityPage> ListActivitiesAsync(Guid principal, Guid project, string kind, Guid? task, Guid? unit, Guid? changeSet, string? cursor, int limit, CancellationToken ct) => ListActivitiesInternal(principal, project, kind, task, unit, changeSet, cursor, limit, ct);
     public Task<ActivityView> CreateActivityAsync(AtlasPrincipal actor, Guid project, string kind, ActivityInput request, string key, string requestId, string? trace, CancellationToken ct) => CreateActivityInternal(actor, project, kind, request, key, requestId, trace, ct);
     public Task<ActivityView> ResolveActivityAsync(AtlasPrincipal actor, Guid project, string kind, Guid activity, ResolveActivityRequest request, long expected, string key, string requestId, string? trace, CancellationToken ct) => ResolveActivityInternal(actor, project, kind, activity, request, expected, key, requestId, trace, ct);
@@ -296,7 +307,7 @@ public sealed class PostgresTaskCollabStore(string connectionString, PostgresAcc
         var table = Table(kind); var idColumn = kind == "feedback" ? "feedback_id" : kind + "_id"; var after = Cursor(cursor);
         await using var connection = await OpenAsync(ct); await using var tx = await connection.BeginTransactionAsync(ct); await Context(tx, project, principal, ct); await RequireMember(tx, project, principal, false, ct);
         var items = new List<ActivityView>(); await using var command = Command(tx);
-        command.CommandText = $"SELECT {idColumn},unit_id,revision_id,task_id,change_set_id,anchor,body,state,created_at,version FROM collab.{table} WHERE project_id=@project AND (@task IS NULL OR task_id=@task) AND (@unit IS NULL OR unit_id=@unit) AND (@changeSet IS NULL OR change_set_id=@changeSet) AND (@after IS NULL OR {idColumn}>@after) ORDER BY {idColumn} LIMIT @limit";
+        command.CommandText = $"SELECT {idColumn},unit_id,revision_id,task_id,change_set_id,anchor,body,state,created_at,version,created_by FROM collab.{table} WHERE project_id=@project AND (@task IS NULL OR task_id=@task) AND (@unit IS NULL OR unit_id=@unit) AND (@changeSet IS NULL OR change_set_id=@changeSet) AND (@after IS NULL OR {idColumn}>@after) ORDER BY {idColumn} LIMIT @limit";
         Add(command, "project", project); Add(command, "task", task, NpgsqlDbType.Uuid); Add(command, "unit", unit, NpgsqlDbType.Uuid); Add(command, "changeSet", changeSet, NpgsqlDbType.Uuid); Add(command, "after", after, NpgsqlDbType.Uuid); Add(command, "limit", limit + 1);
         await using var reader = await command.ExecuteReaderAsync(ct); while (await reader.ReadAsync(ct)) items.Add(ReadActivity(reader)); await reader.DisposeAsync();
         var next = items.Count > limit ? Encode(items[limit - 1].Id) : null; if (items.Count > limit) items.RemoveAt(limit);
@@ -389,11 +400,11 @@ public sealed class PostgresTaskCollabStore(string connectionString, PostgresAcc
     private async Task<ActivityView> ReadActivityById(NpgsqlTransaction tx, Guid project, string kind, Guid id, CancellationToken ct)
     {
         var table = Table(kind); var idColumn = kind == "feedback" ? "feedback_id" : kind + "_id"; await using var command = Command(tx);
-        command.CommandText = $"SELECT {idColumn},unit_id,revision_id,task_id,change_set_id,anchor,body,state,created_at,version FROM collab.{table} WHERE project_id=@project AND {idColumn}=@id FOR UPDATE"; Add(command, "project", project); Add(command, "id", id);
+        command.CommandText = $"SELECT {idColumn},unit_id,revision_id,task_id,change_set_id,anchor,body,state,created_at,version,created_by FROM collab.{table} WHERE project_id=@project AND {idColumn}=@id FOR UPDATE"; Add(command, "project", project); Add(command, "id", id);
         await using var reader = await command.ExecuteReaderAsync(ct); if (!await reader.ReadAsync(ct)) throw ProjectIdentityException.NotFound(); return ReadActivity(reader);
     }
 
-    private static ActivityView ReadActivity(NpgsqlDataReader reader) => new(reader.GetGuid(0), reader.GetString(7), reader.GetString(6), reader.GetFieldValue<DateTimeOffset>(8), reader.GetInt64(9), new(reader.IsDBNull(1) ? null : reader.GetGuid(1), reader.IsDBNull(2) ? null : reader.GetGuid(2), reader.IsDBNull(3) ? null : reader.GetGuid(3), reader.IsDBNull(4) ? null : reader.GetGuid(4), Element(reader.GetString(5)), reader.GetString(6)));
+    private static ActivityView ReadActivity(NpgsqlDataReader reader) => new(reader.GetGuid(0), reader.GetString(7), reader.GetString(6), reader.GetFieldValue<DateTimeOffset>(8), reader.GetInt64(9), new(reader.IsDBNull(1) ? null : reader.GetGuid(1), reader.IsDBNull(2) ? null : reader.GetGuid(2), reader.IsDBNull(3) ? null : reader.GetGuid(3), reader.IsDBNull(4) ? null : reader.GetGuid(4), Element(reader.GetString(5)), reader.GetString(6)), reader.GetGuid(10));
 
     private async Task ValidateActivityTargets(NpgsqlTransaction tx, Guid principal, Guid project, ActivityInput request, CancellationToken ct)
     {

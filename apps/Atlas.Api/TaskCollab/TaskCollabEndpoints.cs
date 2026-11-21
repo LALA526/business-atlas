@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Text.Json;
 using Atlas.Api.Auth;
+using Atlas.Api.Hubs;
 using ProjectIdentity.Application;
 using ProjectIdentity.Contracts;
 using TaskCollab.Contracts;
@@ -43,7 +44,19 @@ public static class TaskCollabEndpoints
     private static async Task<IResult> Execute(HttpContext context, Func<AtlasPrincipal, Task<IResult>> action, CancellationToken ct)
     {
         context.Response.Headers.CacheControl = "no-store"; context.Response.Headers.Vary = "Authorization, Cookie";
-        try { return await action(await context.ResolveAtlasPrincipalAsync(ct)); }
+        try
+        {
+            var result = await action(await context.ResolveAtlasPrincipalAsync(ct));
+            if (!HttpMethods.IsGet(context.Request.Method) && Guid.TryParse(context.Request.RouteValues["projectId"]?.ToString(), out var projectId))
+            {
+                var path = context.Request.Path.Value ?? string.Empty;
+                var kind = path.Contains("/comments", StringComparison.Ordinal) ? "comment.changed" :
+                    path.Contains("/feedback", StringComparison.Ordinal) ? "feedback.changed" :
+                    path.Contains("/issues", StringComparison.Ordinal) ? "issue.changed" : "task.changed";
+                await context.RequestServices.GetRequiredService<ProjectRealtimeNotifier>().PublishAsync(projectId, kind, ct);
+            }
+            return result;
+        }
         catch (ProjectIdentityException exception) { return Results.Json(Error(context, exception.Code, exception.Message), statusCode: exception.StatusCode); }
         catch (JsonException exception) { return Results.Json(Error(context, "VALIDATION_FAILED", exception.Message), statusCode: 400); }
         catch (UnauthorizedAccessException exception) { return Results.Json(Error(context, "UNAUTHORIZED", exception.Message), statusCode: 401); }

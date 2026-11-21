@@ -13176,6 +13176,9 @@ components:
           minimum: 1
         target:
           $ref: '#/components/schemas/ActivityInput'
+        authorId:
+          type: string
+          format: uuid
       required:
       - id
       - state
@@ -13183,6 +13186,7 @@ components:
       - createdAt
       - version
       - target
+      - authorId
       additionalProperties: false
     Job:
       type: object

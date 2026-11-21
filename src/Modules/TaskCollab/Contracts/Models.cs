@@ -26,7 +26,7 @@ public sealed record InvestigationInput(Guid? InvestigationId, [property: JsonRe
     [property: JsonRequired] IReadOnlyList<string> Exclusions, [property: JsonRequired] string CaptureKind, [property: JsonRequired] IReadOnlyList<JsonElement> Evidence, Guid? RunId);
 public sealed record JobView(Guid JobId, string Kind, string State, long Version, int Attempt, double? Progress, string? ResultRef, string? ErrorCode, IReadOnlyList<Unknown> Unknowns);
 public sealed record ActivityInput(Guid? UnitId, Guid? RevisionId, Guid? TaskId, Guid? ChangeSetId, JsonElement Anchor, [property: JsonRequired] string Body);
-public sealed record ActivityView(Guid Id, string State, string Body, DateTimeOffset CreatedAt, long Version, ActivityInput Target);
+public sealed record ActivityView(Guid Id, string State, string Body, DateTimeOffset CreatedAt, long Version, ActivityInput Target, Guid AuthorId);
 public sealed record ActivityPage(IReadOnlyList<ActivityView> Items, string? NextCursor);
 public sealed record ResolveActivityRequest([property: JsonRequired] string Reason, Guid? ChangeSetId, Guid? TaskId);
 public sealed record AuditEntryView(Guid AuditId, string Action, JsonElement ResourceRef, string ResultCode, DateTimeOffset OccurredAt, string RequestId, Guid? ActorId);

@@ -126,12 +126,14 @@ public static class AtlasAuthentication
         return services;
     }
 
-    public static async Task<AtlasPrincipal> ResolveAtlasPrincipalAsync(this HttpContext context, CancellationToken cancellationToken)
+    public static Task<AtlasPrincipal> ResolveAtlasPrincipalAsync(this HttpContext context, CancellationToken cancellationToken) =>
+        context.User.ResolveAtlasPrincipalAsync(context.RequestServices, cancellationToken);
+
+    public static async Task<AtlasPrincipal> ResolveAtlasPrincipalAsync(this ClaimsPrincipal user, IServiceProvider services, CancellationToken cancellationToken)
     {
-        var user = context.User;
         var issuer = user.FindFirst("iss")?.Value;
         var subject = user.FindFirst("sub")?.Value;
-        if (issuer is null && context.RequestServices.GetService<IConfiguration>() is { } configuration)
+        if (issuer is null && services.GetService<IConfiguration>() is { } configuration)
             issuer = user.Identity?.AuthenticationType == BearerScheme
                 ? configuration["Authentication:Bearer:Authority"]
                 : configuration["Authentication:Oidc:Authority"];
@@ -143,7 +145,7 @@ public static class AtlasAuthentication
             kind = PrincipalKind.Agent;
         else if (isBearer && (user.HasClaim("client_id", subject) || user.HasClaim("azp", subject)))
             kind = PrincipalKind.Service;
-        return await context.RequestServices.GetRequiredService<PostgresProjectIdentityStore>()
+        return await services.GetRequiredService<PostgresProjectIdentityStore>()
             .ResolvePrincipalAsync(issuer, subject, kind, cancellationToken);
     }
 
