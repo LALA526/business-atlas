@@ -12,6 +12,7 @@
     <Project Path="src/Modules/Governance/Governance.csproj" />
     <Project Path="src/Modules/AccessApplicability/AccessApplicability.csproj" />
     <Project Path="src/Modules/ImportEvidence/ImportEvidence.csproj" />
+    <Project Path="src/Modules/TaskCollab/TaskCollab.csproj" />
   </Folder>
   <Folder Name="/tests/" />
   <Folder Name="/tests/Contract/">

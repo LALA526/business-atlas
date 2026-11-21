@@ -17,6 +17,8 @@ using Atlas.Api.KnowledgeCore;
 using Atlas.Api.ImportEvidence;
 using Atlas.Api.Governance;
 using Atlas.Api.ReadSearchExplain;
+using Atlas.Api.TaskCollab;
+using TaskCollab.Infrastructure;
 using ReadSearchExplain.Export;
 using ReadSearchExplain.Search;
 using Governance.Infrastructure;
@@ -41,6 +43,7 @@ builder.Services.AddSingleton<PostgresImportEvidenceStore>();
 builder.Services.AddSingleton(services => new PostgresReadSearchService(builder.Configuration.GetConnectionString("Atlas") ?? string.Empty, services.GetRequiredService<PostgresKnowledgeStore>(), services.GetRequiredService<PostgresAccessApplicabilityStore>(), builder.Configuration["ReadSearchExplain:CursorKey"] ?? throw new InvalidOperationException("ReadSearchExplain:CursorKey is required.")));
 builder.Services.AddSingleton<ReadingProjectionService>();
 builder.Services.AddScoped<PostgresExportService>();
+builder.Services.AddSingleton(services => new PostgresTaskCollabStore(builder.Configuration.GetConnectionString("Atlas") ?? string.Empty, services.GetRequiredService<PostgresAccessApplicabilityStore>()));
 builder.Services.AddSingleton<IPolicyService>(services => services.GetRequiredService<PolicyService>());
 builder.Services.AddSingleton<IReadContextFactory>(services => services.GetRequiredService<PolicyService>());
 builder.Services.ConfigureHttpJsonOptions(options => options.SerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower)));
@@ -66,6 +69,7 @@ app.MapKnowledgeEndpoints();
 app.MapImportEvidenceEndpoints();
 app.MapGovernanceEndpoints();
 app.MapReadSearchExplainEndpoints();
+app.MapTaskCollabEndpoints();
 
 app.MapGet("/health/live", (HttpContext context) => HealthResponse(context, "ok"));
 app.MapGet("/health/ready", async (HttpContext context, HealthState state, AtlasDbContext database, CancellationToken ct) =>

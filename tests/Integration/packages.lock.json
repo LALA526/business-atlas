@@ -528,7 +528,8 @@
           "PlatformOps": "[1.0.0, )",
           "ProjectIdentity": "[1.0.0, )",
           "ReadSearchExplain": "[1.0.0, )",
-          "SchemaCatalog": "[1.0.0, )"
+          "SchemaCatalog": "[1.0.0, )",
+          "TaskCollab": "[1.0.0, )"
         }
       },
       "buildingblocks": {
@@ -582,6 +583,13 @@
         }
       },
       "schemacatalog": {
+        "type": "Project",
+        "dependencies": {
+          "AccessApplicability": "[1.0.0, )",
+          "ProjectIdentity": "[1.0.0, )"
+        }
+      },
+      "taskcollab": {
         "type": "Project",
         "dependencies": {
           "AccessApplicability": "[1.0.0, )",
