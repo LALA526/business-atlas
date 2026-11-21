@@ -21,6 +21,7 @@
     <ProjectReference Include="../../src/Modules/SchemaCatalog/SchemaCatalog.csproj" />
     <ProjectReference Include="../../src/Modules/KnowledgeCore/KnowledgeCore.csproj" />
     <ProjectReference Include="../../src/Modules/ImportEvidence/ImportEvidence.csproj" />
+    <ProjectReference Include="../../src/Modules/ReadSearchExplain/ReadSearchExplain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
