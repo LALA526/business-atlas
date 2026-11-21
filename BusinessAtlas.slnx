@@ -1,0 +1,28 @@
+<Solution>
+  <Folder Name="/apps/">
+    <Project Path="apps/Atlas.Api/Atlas.Api.csproj" />
+    <Project Path="apps/Atlas.Worker/Atlas.Worker.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/BuildingBlocks/BuildingBlocks.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+  <Folder Name="/tests/Contract/">
+    <Project Path="tests/Contract/Atlas.Contract.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/Domain/">
+    <Project Path="tests/Domain/Atlas.Domain.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/EndToEnd/">
+    <Project Path="tests/EndToEnd/Atlas.EndToEnd.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/GoldenSemantic/">
+    <Project Path="tests/GoldenSemantic/Atlas.GoldenSemantic.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/Integration/">
+    <Project Path="tests/Integration/Atlas.Integration.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/Security/">
+    <Project Path="tests/Security/Atlas.Security.Tests.csproj" />
+  </Folder>
+</Solution>

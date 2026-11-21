@@ -7,5 +7,8 @@ node_modules/
 
 __pycache__/
 *.pyc
+artifacts/
+apps/web/dist/
+apps/web/*.tsbuildinfo
 
 .atlas-runtime/

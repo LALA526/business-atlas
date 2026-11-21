@@ -1,0 +1,564 @@
+{
+  "schemaVersion": "1.3.0",
+  "proposalId": "KCP-T02-001",
+  "projectId": "PRJ-SELF",
+  "taskId": "T02",
+  "requirementIds": [
+    "ENG-ARCH-001",
+    "ENG-ARCH-002",
+    "ENG-DEL-003",
+    "PD-37"
+  ],
+  "changeKind": "feature",
+  "repo": {
+    "url": "https://dev.azure.com/2717243207/Business%20Atlas/_git/Business%20Atlas",
+    "branch": "task/T02",
+    "pullRequestId": "11",
+    "baseSha": "9e42ed7744989d7a75b358e2d39019856c8a8cbd"
+  },
+  "changedFiles": [
+    {
+      "path": ".gitignore",
+      "changeType": "modified",
+      "contentSha256": "76bf2fbbb4ea1844603840eba0f1c532c279c23f353cc2905f48ee899507c049"
+    },
+    {
+      "path": "BusinessAtlas.slnx",
+      "changeType": "added",
+      "contentSha256": "7a251ab83e1611f46723b0ccb29524764ba1bcb0622ff2457e928f31e429d177"
+    },
+    {
+      "path": "Directory.Build.props",
+      "changeType": "added",
+      "contentSha256": "38d66d1798f4a450c954de1b056b779fb6b6bdea1ad83ca2d9199f37ee923f39"
+    },
+    {
+      "path": "Directory.Packages.props",
+      "changeType": "added",
+      "contentSha256": "dc6e5233e4825db3251a1995e429db25da6c8d981417e31f0d146c5e32274486"
+    },
+    {
+      "path": "apps/Atlas.Api/Atlas.Api.csproj",
+      "changeType": "added",
+      "contentSha256": "e0b2567421658fc1a9c1f6d6299a58e9bf7977813e6696363e8c6eedfe6f6daa"
+    },
+    {
+      "path": "apps/Atlas.Api/Program.cs",
+      "changeType": "added",
+      "contentSha256": "d2dc043a786fd149de392f5e08605827ebd287a215cda8649cb347a1afecdf71"
+    },
+    {
+      "path": "apps/Atlas.Api/Properties/launchSettings.json",
+      "changeType": "added",
+      "contentSha256": "9bccca7fc147830bfde9bb23a1b83911b3feba5bfdabadc8a79e9bd1ca154ea8"
+    },
+    {
+      "path": "apps/Atlas.Api/appsettings.Development.json",
+      "changeType": "added",
+      "contentSha256": "817db0bf2ecca78364c41dbaf7949bf2504cf47a1c3d0d54f3be8178fefc030b"
+    },
+    {
+      "path": "apps/Atlas.Api/appsettings.json",
+      "changeType": "added",
+      "contentSha256": "2d8bb40059df22089b94c025be8baad5a869b72d4d755d199c872f03bfe6f225"
+    },
+    {
+      "path": "apps/Atlas.Api/packages.lock.json",
+      "changeType": "added",
+      "contentSha256": "4dac8c102f08d0be7e238fe1c9c6958bc34cd61974f603a69d97f10d031fdb94"
+    },
+    {
+      "path": "apps/Atlas.Worker/Atlas.Worker.csproj",
+      "changeType": "added",
+      "contentSha256": "2048bccfbd3d928002b7b11268bc304c3e9619b4f827338f29978f707ef9fc06"
+    },
+    {
+      "path": "apps/Atlas.Worker/Program.cs",
+      "changeType": "added",
+      "contentSha256": "0e170e6b49b537053e7b06ba7c18449b035bd8337a49c37e5c74cd306033beb6"
+    },
+    {
+      "path": "apps/Atlas.Worker/Properties/launchSettings.json",
+      "changeType": "added",
+      "contentSha256": "266b35dd77b0297470540439cbb0ddd62558d3f3dd0c673b7d475e8c3e346bcb"
+    },
+    {
+      "path": "apps/Atlas.Worker/Worker.cs",
+      "changeType": "added",
+      "contentSha256": "7074b7f0fda13bebb657e22be44ffb2c63e6234d2e0e281551f4f94ec50a762e"
+    },
+    {
+      "path": "apps/Atlas.Worker/appsettings.Development.json",
+      "changeType": "added",
+      "contentSha256": "93ad1e10cea3e4ceb9d81081b69cd69e54eeea86fc6120f6dfb6377814fceae0"
+    },
+    {
+      "path": "apps/Atlas.Worker/appsettings.json",
+      "changeType": "added",
+      "contentSha256": "93ad1e10cea3e4ceb9d81081b69cd69e54eeea86fc6120f6dfb6377814fceae0"
+    },
+    {
+      "path": "apps/Atlas.Worker/packages.lock.json",
+      "changeType": "added",
+      "contentSha256": "39b2d474b8c59865cf162c43cbbc185b9c3735508ba850b6bba2181c65977bf2"
+    },
+    {
+      "path": "apps/web/.nvmrc",
+      "changeType": "added",
+      "contentSha256": "584f19ccde29925286e32f566a2aa06c89efb4e2eb2bb2fc9ea5d56e2d190ac4"
+    },
+    {
+      "path": "apps/web/index.html",
+      "changeType": "added",
+      "contentSha256": "5c1017b151c1a8d2c87c31e118cd26e76bf7c50a789308b53f4a9a654b38b970"
+    },
+    {
+      "path": "apps/web/package-lock.json",
+      "changeType": "added",
+      "contentSha256": "0296efbcbf98853917fd48ae9918ebe01ac4fcc2ae3446bae6f0ff1420d69a1e"
+    },
+    {
+      "path": "apps/web/package.json",
+      "changeType": "added",
+      "contentSha256": "a7c10f0b970e6089d953d04f65fa673448df6ac88d1cac409db1133a012bcb0a"
+    },
+    {
+      "path": "apps/web/src/main.tsx",
+      "changeType": "added",
+      "contentSha256": "aef37f62d71affe3b9b4ce19fbcc3314371fe9849ece1b6a28c56273a588be14"
+    },
+    {
+      "path": "apps/web/tsconfig.json",
+      "changeType": "added",
+      "contentSha256": "0e94de4be951569506c300fe34eba83029b1c88906f5f8424adf93d501961691"
+    },
+    {
+      "path": "apps/web/vite.config.ts",
+      "changeType": "added",
+      "contentSha256": "d1bf20324809996534f30069114a1c15784969e2f090cb36f871d688dde2ca9f"
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "changeType": "modified",
+      "contentSha256": "ec2ea311c5301586a1a551dd5303d96ec267b33fe6513cddcb300d647819b9c6"
+    },
+    {
+      "path": "scripts/ci/checkout_candidate.sh",
+      "changeType": "added",
+      "contentSha256": "82da3861162dfb7692e7fa7b94a73daee8232ce11d3fdf1aef620b059e336455"
+    },
+    {
+      "path": "scripts/ci/pull_arm64.py",
+      "changeType": "added",
+      "contentSha256": "00cc20c3a3f5350e3d4abf67016555103a677db7a72e81f9ce544fcf1da3f4fc"
+    },
+    {
+      "path": "scripts/ci/verify",
+      "changeType": "added",
+      "contentSha256": "fdddcbc4a78891ff92d93b4d77d9917f96f78a43853f8e2e04369c272833e5be"
+    },
+    {
+      "path": "scripts/ci/verify_context.sh",
+      "changeType": "added",
+      "contentSha256": "47307f27010199695a4fcba09d9710507092dd109349d403f2f3eb380fdc2fbc"
+    },
+    {
+      "path": "scripts/knowledge/candidate_build.py",
+      "changeType": "added",
+      "contentSha256": "47289846540d99179ce0a49ab9516ae0186a0dbcd1f72c48b0314d206bdf5d0e"
+    },
+    {
+      "path": "scripts/knowledge/ci_context.py",
+      "changeType": "added",
+      "contentSha256": "c24dbef315d62bbd9fb42d28b9132d9724e54a16a972b6547ba9df85237fe1d4"
+    },
+    {
+      "path": "scripts/knowledge/delivery.py",
+      "changeType": "added",
+      "contentSha256": "34c1c8b93d5feb9e19e83453eef7ad17fe34ab20f7aaa812d57cbfcd79cf0dd0"
+    },
+    {
+      "path": "scripts/knowledge/evidence/T02-negative-ci.json",
+      "changeType": "added",
+      "contentSha256": "3a4d777fb48eaca5acee8583d8b99bfddfac0bfe06ef14f7c481d1d6dca77a4f"
+    },
+    {
+      "path": "scripts/knowledge/test_candidate_build.py",
+      "changeType": "added",
+      "contentSha256": "d5fd1ea31c5c97ea07fb55ec7c495c6cfc34c3ff70c749c2cc8a495b6dfa62d6"
+    },
+    {
+      "path": "scripts/knowledge/test_candidate_checkout.py",
+      "changeType": "added",
+      "contentSha256": "4d54fdb945557b672cca026996cf097060c60185ac467f970ce711662b64feeb"
+    },
+    {
+      "path": "scripts/knowledge/test_delivery.py",
+      "changeType": "added",
+      "contentSha256": "c08c4f0d4554db7139dec40fa06b9e4e2b081fb27357496022280aa0b3a0261c"
+    },
+    {
+      "path": "scripts/knowledge/test_pull_deadline.py",
+      "changeType": "added",
+      "contentSha256": "911b113934607c350e54809913b91982dcfc68be1708af66a0ab206023a62997"
+    },
+    {
+      "path": "scripts/knowledge/test_real_azure_context.py",
+      "changeType": "added",
+      "contentSha256": "8f6c776ea57c067f0a0522f0cd08b9d0cbe1d8bd068534748835bfe6e640c5de"
+    },
+    {
+      "path": "src/BuildingBlocks/BuildingBlocks.csproj",
+      "changeType": "added",
+      "contentSha256": "11c0c110e19c9eaeaef66a0382f7a3e4ff6ab395d99ca6664e1ba378371cc47c"
+    },
+    {
+      "path": "src/BuildingBlocks/HealthState.cs",
+      "changeType": "added",
+      "contentSha256": "d4ff294678bc9eeb60d19bd453b9d87c2a80bb27d0d1a8e5abf1202c2db9e7c2"
+    },
+    {
+      "path": "src/BuildingBlocks/packages.lock.json",
+      "changeType": "added",
+      "contentSha256": "03eeadc5ef377c17f787ab65f41fb4c8a9c936bb7f7f4171111fdeec8a81cb46"
+    },
+    {
+      "path": "tests/Contract/ArchitectureReferenceTests.cs",
+      "changeType": "added",
+      "contentSha256": "78f904ab48578fe12d90b6f7348eb056d9618c1eeaefbd6e5d458b5504e3317c"
+    },
+    {
+      "path": "tests/Contract/Atlas.Contract.Tests.csproj",
+      "changeType": "added",
+      "contentSha256": "335730013a1463933c4c7d475c71c18be979c367dace35e3f548f594b698cfad"
+    },
+    {
+      "path": "tests/Contract/packages.lock.json",
+      "changeType": "added",
+      "contentSha256": "22eb5185e74f33834f42cf244a4857a8f1c37e38970b51c119ccce3630aeb728"
+    },
+    {
+      "path": "tests/Domain/Atlas.Domain.Tests.csproj",
+      "changeType": "added",
+      "contentSha256": "cc7ba905c79511a0579849e9146659bc480641c5f4bf1217291929784518ac70"
+    },
+    {
+      "path": "tests/Domain/HealthStateTests.cs",
+      "changeType": "added",
+      "contentSha256": "e5cf6c48d4a1afb640cf1651ae0ab001f62f4de6c0ee5031d59e27e2e2aa919d"
+    },
+    {
+      "path": "tests/Domain/packages.lock.json",
+      "changeType": "added",
+      "contentSha256": "f32e7d9208e4fede2c5796090d9a1f3839076cd725d45171b2c6d86c6f3933fe"
+    },
+    {
+      "path": "tests/EndToEnd/Atlas.EndToEnd.Tests.csproj",
+      "changeType": "added",
+      "contentSha256": "335730013a1463933c4c7d475c71c18be979c367dace35e3f548f594b698cfad"
+    },
+    {
+      "path": "tests/EndToEnd/packages.lock.json",
+      "changeType": "added",
+      "contentSha256": "22eb5185e74f33834f42cf244a4857a8f1c37e38970b51c119ccce3630aeb728"
+    },
+    {
+      "path": "tests/GoldenSemantic/Atlas.GoldenSemantic.Tests.csproj",
+      "changeType": "added",
+      "contentSha256": "335730013a1463933c4c7d475c71c18be979c367dace35e3f548f594b698cfad"
+    },
+    {
+      "path": "tests/GoldenSemantic/packages.lock.json",
+      "changeType": "added",
+      "contentSha256": "22eb5185e74f33834f42cf244a4857a8f1c37e38970b51c119ccce3630aeb728"
+    },
+    {
+      "path": "tests/Integration/Atlas.Integration.Tests.csproj",
+      "changeType": "added",
+      "contentSha256": "eea07be24127a6be21591a66bb4a460bd2f57f3c9af8293778ba890f4556afe6"
+    },
+    {
+      "path": "tests/Integration/HealthEndpointTests.cs",
+      "changeType": "added",
+      "contentSha256": "a5ac86d9a42c0a07a86b1182e947a5c16207d3821cdf5148dd8c26e6f1f20673"
+    },
+    {
+      "path": "tests/Integration/packages.lock.json",
+      "changeType": "added",
+      "contentSha256": "b9b6a2f57082ef40f9b930f9191a19057abe56fa57815e848d06e462f259e893"
+    },
+    {
+      "path": "tests/Security/Atlas.Security.Tests.csproj",
+      "changeType": "added",
+      "contentSha256": "335730013a1463933c4c7d475c71c18be979c367dace35e3f548f594b698cfad"
+    },
+    {
+      "path": "tests/Security/HealthDisclosureTests.cs",
+      "changeType": "added",
+      "contentSha256": "a87c568e8de4fc74f8847ce7daf55ff4e8b1f3c386f9b14f471129c89206d3a6"
+    },
+    {
+      "path": "tests/Security/packages.lock.json",
+      "changeType": "added",
+      "contentSha256": "22eb5185e74f33834f42cf244a4857a8f1c37e38970b51c119ccce3630aeb728"
+    }
+  ],
+  "entityChanges": [
+    {
+      "stableId": "PD-37",
+      "kind": "added",
+      "factLevel": "documented_intent",
+      "summary": "Git候选账本与合并后Manifest分离保存，候选不声明业务批准。",
+      "sourceAnchorIds": [
+        "knowledge-protocol"
+      ]
+    },
+    {
+      "stableId": "ENG-ARCH-001",
+      "kind": "added",
+      "factLevel": "observed",
+      "summary": "模块化单体以BuildingBlocks无业务引用、Domain禁用跨模块Infrastructure及跨模块Contracts/Application入口约束为初始边界。",
+      "sourceAnchorIds": [
+        "architecture-tests"
+      ]
+    },
+    {
+      "stableId": "ENG-ARCH-002",
+      "kind": "added",
+      "factLevel": "observed",
+      "summary": ".NET 10.0.404与Node 24.22.3锁定，集中包版本和锁文件驱动可复原先决条件。",
+      "sourceAnchorIds": [
+        "reproducible-build"
+      ]
+    },
+    {
+      "stableId": "ENG-DEL-003",
+      "kind": "added",
+      "factLevel": "observed",
+      "summary": "post-merge CI先以System.AccessToken查询Azure Builds API，fail-closed核验同项目、同定义、candidate sourceVersion、PullRequest原因及completed/succeeded，再下载制品；merge要求candidate精确等于source parent，squash/rebase比较完整patch，候选与merged proposal原字节相等；Manifest绑定实际merge SHA、独立candidate/post-merge Build ID、服务端attestation及验证日志digest。",
+      "sourceAnchorIds": [
+        "delivery-gate",
+        "candidate-build-attestation"
+      ]
+    }
+  ],
+  "assertionChanges": [
+    {
+      "stableId": "T02-INVARIANT-SEPARATION",
+      "kind": "added",
+      "factLevel": "documented_intent",
+      "summary": "实现、独立审查、QA、CI、合并、知识批准与部署证据保持分离；candidate变化必须重新验证。"
+    },
+    {
+      "stableId": "T02-INVARIANT-SCOPE",
+      "kind": "added",
+      "factLevel": "documented_intent",
+      "summary": "本候选仅交付PREPARATION骨架，不实现T31摄入/对账，不声称T39-T44或G0-G7完成。"
+    }
+  ],
+  "apiChanges": [
+    {
+      "operationId": "healthLive",
+      "kind": "added",
+      "contractPath": "contracts/openapi.yaml#/paths/~1health~1live",
+      "authorizationPolicy": "public"
+    },
+    {
+      "operationId": "healthReady",
+      "kind": "added",
+      "contractPath": "contracts/openapi.yaml#/paths/~1health~1ready",
+      "authorizationPolicy": "public; 503 uses ErrorEnvelope"
+    }
+  ],
+  "dataChanges": [],
+  "testEvidence": [
+    {
+      "testId": "AT-T02",
+      "result": "passed",
+      "artifactUri": "ci://at-t02-verification"
+    },
+    {
+      "testId": "AT-T02",
+      "result": "passed",
+      "artifactUri": "https://dev.azure.com/2717243207/Business%20Atlas/_build/results?buildId=30"
+    }
+  ],
+  "sourceAnchors": [
+    {
+      "path": "BusinessAtlas.slnx",
+      "locator": "Solution project graph",
+      "contentSha256": "7a251ab83e1611f46723b0ccb29524764ba1bcb0622ff2457e928f31e429d177",
+      "sourceRevision": "candidate"
+    },
+    {
+      "path": "tests/Contract/ArchitectureReferenceTests.cs",
+      "locator": "ArchitectureReferenceTests",
+      "contentSha256": "78f904ab48578fe12d90b6f7348eb056d9618c1eeaefbd6e5d458b5504e3317c",
+      "sourceRevision": "candidate"
+    },
+    {
+      "path": "scripts/ci/checkout_candidate.sh",
+      "locator": "reviewed source checkout before verification",
+      "contentSha256": "82da3861162dfb7692e7fa7b94a73daee8232ce11d3fdf1aef620b059e336455",
+      "sourceRevision": "candidate"
+    },
+    {
+      "path": "scripts/ci/verify",
+      "locator": "AT-T02 executable verification",
+      "contentSha256": "fdddcbc4a78891ff92d93b4d77d9917f96f78a43853f8e2e04369c272833e5be",
+      "sourceRevision": "candidate"
+    },
+    {
+      "path": "scripts/ci/verify_context.sh",
+      "locator": "atlas_verification_candidate and atlas_verification_python",
+      "contentSha256": "47307f27010199695a4fcba09d9710507092dd109349d403f2f3eb380fdc2fbc",
+      "sourceRevision": "candidate"
+    },
+    {
+      "path": "scripts/knowledge/candidate_build.py",
+      "locator": "fetch_build, attest_build, verify_from_environment",
+      "contentSha256": "47289846540d99179ce0a49ab9516ae0186a0dbcd1f72c48b0314d206bdf5d0e",
+      "sourceRevision": "candidate"
+    },
+    {
+      "path": "scripts/knowledge/delivery.py",
+      "locator": "validate_candidate, changed_proposals, create_manifest",
+      "contentSha256": "34c1c8b93d5feb9e19e83453eef7ad17fe34ab20f7aaa812d57cbfcd79cf0dd0",
+      "sourceRevision": "candidate"
+    },
+    {
+      "path": "scripts/knowledge/test_candidate_build.py",
+      "locator": "Azure Builds API positive, rejection, A/B and recovery tests",
+      "contentSha256": "d5fd1ea31c5c97ea07fb55ec7c495c6cfc34c3ff70c749c2cc8a495b6dfa62d6",
+      "sourceRevision": "candidate"
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "locator": "VerifyPreparation and KnowledgeManifest",
+      "contentSha256": "ec2ea311c5301586a1a551dd5303d96ec267b33fe6513cddcb300d647819b9c6",
+      "sourceRevision": "candidate"
+    },
+    {
+      "path": "contracts/openapi.yaml",
+      "locator": "healthLive, healthReady, ErrorEnvelope",
+      "contentSha256": "335a6fcb4886fbb9bea46bda82676f1f471c1c8ef1af3fd414b7ab4e5d579edf",
+      "sourceRevision": "T01 frozen"
+    },
+    {
+      "path": "docs/baselines/T1.0/01_技术实施/01_目标架构与范围.md",
+      "locator": "模块化单体、依赖方向、ARM64",
+      "contentSha256": "01e74d2f62c3051050861b5e6e2ba00d8ab613b8ab876146946c28e5c7e23881",
+      "sourceRevision": "T1.0 original"
+    },
+    {
+      "path": "docs/baselines/T1.0/01_技术实施/08_导入与工程知识交付.md",
+      "locator": "v1.2两阶段与v1.3候选/Manifest",
+      "contentSha256": "02f09dcec62e5ee0dfcfb5b8451b78e593e162f51254a985314b38a98090601e",
+      "sourceRevision": "T1.0 original"
+    }
+  ],
+  "knowledgeStatus": "proposed",
+  "unknowns": [
+    "真实PR编号、独立Review/QA、Azure CI、merge SHA及post-merge Manifest尚不存在；当前PENDING会被真实PR门禁拒绝，创建PR后必须以实际编号更新candidate并重新Review/QA。",
+    "合并流水线必须由协调器提供已通过验证的ATLAS_CANDIDATE_BUILD_ID及真实ATLAS_MERGE_STRATEGY（merge/squash/rebase），以下载同一candidate的验证与PR身份制品；本轮未声称Azure执行成功。",
+    "本地测试日志属于candidate工作树证据；只有Azure发布制品和真实合并才能形成外部交付证据。",
+    "v1.2仅做原schema兼容校验，不静默转换；T31才负责服务摄入、业务审批和完整对账。",
+    "PostgreSQL仅验证ARM64镜像可运行；迁移、扩展、备份恢复与产品数据库能力不属于T02。",
+    "post-merge System.AccessToken必须可读同项目Builds API；真实401/403属于Azure权限阻塞，不得跳过服务端核验或伪造attestation。"
+  ],
+  "errorsObserved": [
+    {
+      "patternId": "T02-MANIFEST-PARTIAL-RECOVERY",
+      "symptom": "初版在两个制品原子写之间中断后拒绝原目录恢复。",
+      "preventionTestId": "test_manifest_recovers_after_interrupted_second_write"
+    },
+    {
+      "patternId": "T02-HISTORICAL-PROPOSAL-SCOPE",
+      "symptom": "初版PR校验遍历历史候选会把后续任务误判为task不符。",
+      "preventionTestId": "test_candidate_git_scope_and_only_changed_proposals"
+    },
+    {
+      "patternId": "T02-LAUNCH-PROFILE-PORT",
+      "symptom": "首次完整本地verify被开发launch profile重定向到5043，5087就绪探针按预期失败。",
+      "preventionTestId": "scripts/ci/verify uses --no-launch-profile and fails closed"
+    },
+    {
+      "patternId": "T02-MERGE-PROPOSAL-DISCOVERY",
+      "symptom": "正常合并不改变已在candidate中的proposal，candidate到merge的diff为空。",
+      "preventionTestId": "test_normal_merge_discovers_candidate_against_target_parent"
+    },
+    {
+      "patternId": "T02-EMPTY-VERIFICATION-DIGEST",
+      "symptom": "新checkout未下载验证制品时散列空目录，无法代表真实测试日志。",
+      "preventionTestId": "test_placeholder_empty_and_tampered_verification_are_rejected"
+    },
+    {
+      "patternId": "T02-UNRESOLVED-EVIDENCE-VERIFY",
+      "symptom": "pending测试位置或source hash失配不能进入verified Manifest。",
+      "preventionTestId": "test_placeholder_empty_and_tampered_verification_are_rejected; test_source_hash_mismatch_cannot_be_remapped_to_verified"
+    },
+    {
+      "patternId": "T02-PR-CANDIDATE-ARTIFACT-PATH",
+      "symptom": "Azure PR默认checkout合成merge HEAD；若验证日志按HEAD命名，KnowledgeManifest按源candidate SHA下载定位将找不到目录。",
+      "preventionTestId": "test_pr_rejects_synthetic_checkout_head_mislabeled_as_candidate; test_pipeline_download_path_matches_pr_verification_artifact_identity"
+    },
+    {
+      "patternId": "T02-SYNTHETIC-MERGE-VERIFICATION",
+      "symptom": "仅在合成merge HEAD上验证却按源candidate SHA发布会把目标分支额外内容误记为已审candidate证据。",
+      "preventionTestId": "test_synthetic_merge_is_replaced_by_exact_candidate_and_guard_rejects_wrong_head; test_pipeline_selects_candidate_before_verification"
+    },
+    {
+      "patternId": "T02-PRIVATE-PYTHON-DEFAULT",
+      "symptom": "产品验证默认开发者私有Python绝对路径会在干净CI代理失败。",
+      "preventionTestId": "test_python_default_is_portable_and_override_is_honored"
+    },
+    {
+      "patternId": "T02-CURRENT-CONTRACT-DIGEST",
+      "symptom": "仅做schema校验会允许候选省略或伪造contractDigests，无法证明其绑定当前冻结合同。",
+      "preventionTestId": "test_candidate_git_scope_and_only_changed_proposals rejects missing, stale and extra contractDigests"
+    },
+    {
+      "patternId": "T02-CONTROLLED-TRACE-IDENTITY",
+      "symptom": "候选与流水线变量填写同一个不存在的task/requirement ID时，集合相等不能证明真实受控trace存在。",
+      "preventionTestId": "test_candidate_git_scope_and_only_changed_proposals rejects unknown task/requirement against frozen DAG"
+    },
+    {
+      "patternId": "T02-NON-MERGE-DELIVERY",
+      "symptom": "squash/rebase后candidate不是最终提交祖先，祖先强制检查会错误阻断合法交付。",
+      "preventionTestId": "test_squash_and_rebase_discover_final_bytes_without_candidate_ancestry"
+    },
+    {
+      "patternId": "T02-REAL-PR-IDENTITY",
+      "symptom": "候选自报branch/PR ID而未与Azure身份比对会让Manifest绑定伪造或PENDING身份。",
+      "preventionTestId": "test_candidate_git_scope_and_only_changed_proposals rejects branch/PR mismatch; test_manifest_rejects_unvalidated_pr_identity"
+    },
+    {
+      "patternId": "T02-CANDIDATE-MERGE-CORRESPONDENCE",
+      "symptom": "仅证明candidate存在于仓库会允许旧PR/build与无关merge错误绑定；merge须精确匹配source parent，squash/rebase须匹配完整已审patch。",
+      "preventionTestId": "test_candidate_from_another_pr_or_build_cannot_bind_to_current_delivery; test_squash_with_extra_unreviewed_change_is_rejected"
+    },
+    {
+      "patternId": "T02-MULTICOMMIT-REBASE-BOUNDARY",
+      "symptom": "仅比较rebase最终提交与target parent的patch会拒绝正常多提交PR，并遗漏早期提交中的proposal；必须以已审提交数为上限定位完整重放序列边界，额外未审改动仍被拒绝。",
+      "preventionTestId": "test_multicommit_rebase_binds_early_proposal_and_complete_patch"
+    },
+    {
+      "patternId": "T02-CANDIDATE-BUILD-SERVER-IDENTITY",
+      "symptom": "仅比较协调器变量与下载制品自报字段，会把错选或无关Build当成已审candidate证据。",
+      "preventionTestId": "test_old_self_reported_build_gate_ab_and_current_service_gate; test_every_server_identity_and_outcome_mismatch_is_rejected"
+    },
+    {
+      "patternId": "T02-CANDIDATE-BUILD-API-FAILURE",
+      "symptom": "401/403、404、网络错误或畸形JSON若被忽略会形成未核实Manifest。",
+      "preventionTestId": "test_http_permission_not_found_network_and_malformed_json_fail_closed"
+    },
+    {
+      "patternId": "T02-CANDIDATE-ATTESTATION-TAMPERING",
+      "symptom": "篡改attestation、candidate/PR/source branch或混用candidate与post-merge Build ID会错误绑定证据。",
+      "preventionTestId": "test_manifest_rejects_tampered_or_wrong_candidate_build_attestation; test_manifest_concurrency_idempotency_and_conflict_recovery"
+    }
+  ],
+  "contractDigests": [
+    "sha256:cd5ff0e65914de567a048a0f41a49ac022936f92aacdc0ffcc7c98b5376cfa97"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "taskId": "T02",
+  "pullRequestId": "11",
+  "buildId": 30,
+  "negativeCandidateSha": "286a9dc6701ccec5ce579dfb3b5b7c12d3f59585",
+  "baseSha": "695896221759157080d13a80bfafe006005f7725",
+  "result": "expected-rejection-observed",
+  "productVerification": "succeeded",
+  "knowledgeGate": "failed: PR has no knowledge proposal",
+  "originalLogSha256": "c5e695a1762bc202e7b64dc266a57fad5c91a2b26517e7ed2ad223c71ce85c93",
+  "buildUrl": "https://dev.azure.com/2717243207/Business%20Atlas/_build/results?buildId=30",
+  "verifiedBy": "Authenticated Azure Build API, timeline and original task log"
+}
