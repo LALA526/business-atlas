@@ -14,7 +14,7 @@ class FastRunner(ParallelAtlasRunner):
   if row['phase'] in ('integration','pending_integration') and not row['candidate_sha']:
    self.ledger.connection.execute("UPDATE tasks SET phase='developer' WHERE task_id=?",(row['task_id'],))
  def _prompt_context(self,row):
-  return 'Implement exactly this Business Atlas functional task. Latest user policy: fast functional delivery; no separate planning/reviewer/QA agents, no knowledge manifests or SHA acceptance gates. Read only relevant baseline references and UI references. Full functional scope and business invariants remain. '+json.dumps(self.ledger.task(row),ensure_ascii=False)
+  return 'Implement exactly this Business Atlas functional task. Latest user policy: fast functional delivery; no separate planning/reviewer/QA agents, no knowledge manifests or SHA acceptance gates. Read only relevant baseline references and UI references. Full functional scope and business invariants remain. '+json.dumps({k:v for k,v in self.ledger.task(row).items() if k not in ('knowledgeOutputs','requiredOutputs')},ensure_ascii=False)
  def _phase(self,row,phase):
   self.ledger._owned(row['task_id'],self.owner,row['fence'],self.clock())
   self.ledger.connection.execute('UPDATE tasks SET phase=? WHERE task_id=?',(phase,row['task_id']))
