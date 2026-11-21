@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using AccessApplicability.Application;
 using AccessApplicability.Contracts;
 using AccessApplicability.Infrastructure;
 using Npgsql;
@@ -8,6 +9,7 @@ using NpgsqlTypes;
 using ProjectIdentity.Application;
 using ProjectIdentity.Contracts;
 using TaskCollab.Contracts;
+using TaskCollab.Impact;
 
 namespace TaskCollab.Infrastructure;
 
@@ -111,16 +113,27 @@ public sealed class PostgresTaskCollabStore(string connectionString, PostgresAcc
         {
             if (!ChangeTypes.Contains(request.ChangeType) || request.RootRefs.Count == 0 || request.RootRefs.Count > 100) throw ProjectIdentityException.Invalid("A supported changeType and 1-100 rootRefs are required.");
             var read = await access.CreateReadContextAsync(actor.PrincipalId, project, request.ReadContext, ct);
-            var queue = new Queue<(Guid Unit, List<JsonElement> Path)>(); var visited = new HashSet<Guid>(); var candidates = new List<(Guid Unit, Guid Revision, List<JsonElement> Path)>();
+            var action = read.Mode == ReadMode.Historical ? "read_history" : "read";
+            var queue = new Queue<ImpactWorkItem>();
+            var visited = new HashSet<ImpactVisit>();
+            var candidates = new Dictionary<Guid, ImpactCandidate>();
+            var rootUnits = request.RootRefs.Select(root => root.UnitId).ToHashSet();
+            var blindSpots = new List<ImpactBlindSpot>();
+            var blindSpotUnits = new HashSet<Guid>();
             foreach (var root in request.RootRefs)
             {
-                var revision = root.RevisionId ?? await BaselineRevision(tx, project, row.BaseBaseline, root.UnitId, ct) ?? throw ProjectIdentityException.Invalid("Every root must resolve to a baseline revision.");
-                await access.AuthorizeReadAsync(read, root.UnitId, read.Mode == ReadMode.Historical ? "read_history" : "read", revision, ct);
-                if (visited.Add(root.UnitId)) queue.Enqueue((root.UnitId, []));
+                var baselineRevision = await BaselineRevision(tx, project, row.BaseBaseline, root.UnitId, ct) ?? throw ProjectIdentityException.Invalid("Every root must resolve to a baseline revision.");
+                if (root.RevisionId.HasValue && root.RevisionId != baselineRevision) throw ProjectIdentityException.Invalid("Root revisions must match the task base baseline.");
+                await access.AuthorizeReadAsync(read, root.UnitId, action, baselineRevision, ct);
+                var kind = await UnitKind(tx, project, root.UnitId, ct);
+                var work = new ImpactWorkItem(root.UnitId, root.UnitId, baselineRevision, kind, null, []);
+                if (visited.Add(new(root.UnitId, root.UnitId, null, read.ContextHash))) queue.Enqueue(work);
             }
-            var edges = 0;
-            while (queue.Count > 0 && candidates.Count < 500 && edges < 1000)
+
+            var edges = 0; var truncated = false;
+            while (queue.Count > 0)
             {
+                if (candidates.Count >= 500 || edges >= 1000) { truncated = true; break; }
                 var current = queue.Dequeue();
                 await using var command = Command(tx);
                 command.CommandText = """
@@ -134,34 +147,66 @@ public sealed class PostgresTaskCollabStore(string connectionString, PostgresAcc
                     JOIN gov.baseline_entry target ON target.project_id=r.project_id AND target.baseline_id=@baseline
                       AND target.unit_id=CASE WHEN r.from_unit_id=@unit THEN r.to_unit_id ELSE r.from_unit_id END
                     WHERE r.project_id=@project AND (r.from_unit_id=@unit OR r.to_unit_id=@unit)
-                      AND r.predicate NOT IN ('contains','dependsOn') ORDER BY r.relation_revision_id
+                      AND r.predicate=ANY(@predicates)
+                    ORDER BY r.relation_revision_id LIMIT @edgeLimit
                     """;
                 Add(command, "project", project); Add(command, "baseline", row.BaseBaseline); Add(command, "unit", current.Unit);
-                var found = new List<(Guid Relation, string Predicate, Guid From, Guid To, Guid Neighbor, string Direction, Guid EdgeUnit)>();
-                await using (var reader = await command.ExecuteReaderAsync(ct)) while (await reader.ReadAsync(ct)) found.Add((reader.GetGuid(0), reader.GetString(1), reader.GetGuid(2), reader.GetGuid(3), reader.GetGuid(4), reader.GetString(5), reader.GetGuid(6)));
+                Add(command, "predicates", ImpactTraversalSemantics.Predicates.ToArray()); Add(command, "edgeLimit", 1001 - edges);
+                var found = new List<ImpactEdge>();
+                await using (var reader = await command.ExecuteReaderAsync(ct)) while (await reader.ReadAsync(ct)) found.Add(new(reader.GetGuid(0), reader.GetString(1), reader.GetGuid(4), reader.GetString(5), reader.GetGuid(6)));
+                var completeNode = found.Count <= 1000 - edges;
+                if (!completeNode) truncated = true;
+
+                if (completeNode && ImpactTraversalSemantics.NeedsImplementation(current.Kind) &&
+                    !found.Any(edge => edge.Predicate == "implements" && edge.Direction == "reverse") &&
+                    blindSpotUnits.Add(current.Unit))
+                {
+                    blindSpots.Add(new(current.Unit, current.Revision, "implementation", "candidate", "No implementation relation is recorded in this baseline. Code existence and behavior remain uninvestigated; this is not evidence of no impact."));
+                }
+
                 foreach (var edge in found)
                 {
-                    if (++edges > 1000 || candidates.Count >= 500) break;
+                    if (edges >= 1000 || candidates.Count >= 500) { truncated = true; break; }
+                    edges++;
+                    if (!ImpactTraversalSemantics.Allows(current.Kind, edge.Predicate, edge.Direction)) continue;
                     var revision = await BaselineRevision(tx, project, row.BaseBaseline, edge.Neighbor, ct) ?? throw ProjectIdentityException.NotFound();
-                    await access.AuthorizeReadAsync(read, edge.Neighbor, read.Mode == ReadMode.Historical ? "read_history" : "read", revision, ct);
-                    if (!visited.Add(edge.Neighbor)) continue;
+                    var resource = await access.AuthorizeReadAsync(read, edge.Neighbor, action, revision, ct);
+                    await access.AuthorizeReadAsync(read, edge.EdgeUnit, action, edge.Relation, ct);
+                    if (ApplicabilityEvaluator.Evaluate(resource.Applicability, read.Context).Status == ApplicabilityStatus.NotApplicable) continue;
+                    var kind = await UnitKind(tx, project, edge.Neighbor, ct);
                     var path = current.Path.Append(JsonSerializer.SerializeToElement(new { edge = new RevisionRef(edge.EdgeUnit, edge.Relation), predicate = edge.Predicate, direction = edge.Direction }, Json)).ToList();
-                    candidates.Add((edge.Neighbor, revision, path)); queue.Enqueue((edge.Neighbor, path));
+                    var reason = $"Potential {request.ChangeType} impact through {edge.Direction} {edge.Predicate}; semantic reachability requires investigation and is not execution evidence.";
+                    if (!rootUnits.Contains(edge.Neighbor) && !candidates.ContainsKey(edge.Neighbor)) candidates.Add(edge.Neighbor, new(edge.Neighbor, revision, kind, path, reason));
+                    var visit = new ImpactVisit(current.Root, edge.Neighbor, edge.Predicate, read.ContextHash);
+                    if (visited.Add(visit)) queue.Enqueue(new(current.Root, edge.Neighbor, revision, kind, edge.Predicate, path));
                 }
             }
+
             var job = Guid.NewGuid(); var ids = new List<Guid>();
-            foreach (var candidate in candidates)
+            foreach (var candidate in candidates.Values)
             {
                 var id = Guid.NewGuid(); ids.Add(id);
                 await Execute(tx, "INSERT INTO collab.impact(project_id,impact_id,task_id,target_unit_id,target_revision_id,locator,path,disposition,inspection_state,reason,risk,evidence_refs,close_state,created_by) VALUES(@project,@id,@task,@unit,@revision,'{}',@path::jsonb,'potential','candidate',@reason,'medium','[]','open',@actor)", ct,
                     ("project", project), ("id", id), ("task", task), ("unit", candidate.Unit), ("revision", candidate.Revision), ("path", JsonSerializer.Serialize(candidate.Path, Json)),
-                    ("reason", $"Reachable from a root through recorded semantic relations; change type {request.ChangeType} requires investigation."), ("actor", actor.PrincipalId));
+                    ("reason", candidate.Reason), ("actor", actor.PrincipalId));
             }
-            var summary = Summary(row.Summary); summary.NextAction = candidates.Count == 0 ? "No semantic candidates found; record any uninvestigated scope" : "Investigate candidate impacts"; summary.ImpactCoverage = new ImpactCoverage { candidateCount = candidates.Count, edgeCount = edges, truncated = candidates.Count >= 500 || edges >= 1000 };
+            var summary = Summary(row.Summary);
+            summary.ImpactCoverage = new ImpactCoverage
+            {
+                candidateCount = candidates.Count, edgeCount = edges, truncated = truncated,
+                coverage = truncated ? "partial" : "bounded_semantic_graph", maxCandidates = 500, maxEdges = 1000,
+                exclusions = ["contains", "dependsOn", "observedAt", "evidencedBy", "supersedes", "conflictsWith"],
+                blindSpots = blindSpots
+            };
+            summary.Unknowns = summary.Unknowns.Where(item => item.Field != "impactCoverage").ToArray();
+            if (truncated || blindSpots.Count > 0)
+                summary.Unknowns = [.. summary.Unknowns, new Unknown("impactCoverage", "Complete the truncated traversal or investigate the recorded missing implementation relations.", "Semantic candidates do not establish source-code coverage.")];
+            summary.NextAction = truncated ? "Continue the bounded impact investigation from the recorded frontier" : blindSpots.Count > 0 ? "Investigate candidate impacts and missing implementation relations" : candidates.Count == 0 ? "No semantic candidates found; record any uninvestigated scope" : "Investigate candidate impacts";
             var resultRef = $"task:{task}:impacts:{row.Version + 1}";
             await Execute(tx, "UPDATE collab.task SET target_summary=@summary::jsonb,version=version+1 WHERE project_id=@project AND task_id=@task; INSERT INTO ops.job(project_id,job_id,kind,requester_id,state,input,result,attempt,max_attempt) VALUES(@project,@job,'impact_analysis',@actor,'succeeded',@input::jsonb,@result::jsonb,0,1)", ct,
-                ("project", project), ("task", task), ("summary", JsonSerializer.Serialize(summary, Json)), ("job", job), ("actor", actor.PrincipalId), ("input", JsonSerializer.Serialize(request, Json)), ("result", JsonSerializer.Serialize(new { resultRef, impactIds = ids, truncated = summary.ImpactCoverage.truncated }, Json)));
-            row.PendingJob = new(job, "impact_analysis", "succeeded", 1, 0, 1, resultRef, null, []);
+                ("project", project), ("task", task), ("summary", JsonSerializer.Serialize(summary, Json)), ("job", job), ("actor", actor.PrincipalId), ("input", JsonSerializer.Serialize(request, Json)),
+                ("result", JsonSerializer.Serialize(new { resultRef, impactIds = ids, truncated, blindSpotCount = blindSpots.Count }, Json)));
+            row.PendingJob = new(job, "impact_analysis", "succeeded", 1, 0, 1, resultRef, null, summary.Unknowns);
         }, ct);
 
     public async Task<ImpactPage> ListImpactsAsync(Guid principal, Guid project, Guid task, string? cursor, int limit, CancellationToken ct)
@@ -404,6 +449,7 @@ public sealed class PostgresTaskCollabStore(string connectionString, PostgresAcc
 
     private static async Task<bool> SealedBaseline(NpgsqlTransaction tx, Guid project, Guid baseline, CancellationToken ct) { await using var command = Command(tx); command.CommandText = "SELECT EXISTS(SELECT 1 FROM gov.baseline WHERE project_id=@project AND baseline_id=@baseline AND sealed)"; Add(command, "project", project); Add(command, "baseline", baseline); return await command.ExecuteScalarAsync(ct) is true; }
     private static async Task<Guid?> BaselineRevision(NpgsqlTransaction tx, Guid project, Guid baseline, Guid unit, CancellationToken ct) { await using var command = Command(tx); command.CommandText = "SELECT revision_id FROM gov.baseline_entry WHERE project_id=@project AND baseline_id=@baseline AND unit_id=@unit"; Add(command, "project", project); Add(command, "baseline", baseline); Add(command, "unit", unit); return await command.ExecuteScalarAsync(ct) as Guid?; }
+    private static async Task<string> UnitKind(NpgsqlTransaction tx, Guid project, Guid unit, CancellationToken ct) { await using var command = Command(tx); command.CommandText = "SELECT kind FROM core.unit WHERE project_id=@project AND unit_id=@unit"; Add(command, "project", project); Add(command, "unit", unit); return await command.ExecuteScalarAsync(ct) as string ?? throw ProjectIdentityException.NotFound(); }
     private static async Task<bool> InvestigationBelongs(NpgsqlTransaction tx, Guid project, Guid task, Guid id, CancellationToken ct) { await using var command = Command(tx); command.CommandText = "SELECT EXISTS(SELECT 1 FROM collab.investigation WHERE project_id=@project AND task_id=@task AND investigation_id=@id)"; Add(command, "project", project); Add(command, "task", task); Add(command, "id", id); return await command.ExecuteScalarAsync(ct) is true; }
     private static async Task<bool> ContextBelongs(NpgsqlTransaction tx, Guid project, Guid task, Guid id, CancellationToken ct) { await using var command = Command(tx); command.CommandText = "SELECT EXISTS(SELECT 1 FROM delivery.task_context WHERE project_id=@project AND task_id=@task AND context_id=@id AND phase='executable' AND NOT EXISTS(SELECT 1 FROM delivery.context_invalidation i WHERE i.project_id=@project AND i.context_id=@id))"; Add(command, "project", project); Add(command, "task", task); Add(command, "id", id); return await command.ExecuteScalarAsync(ct) is true; }
     private static async Task<bool> ChangeSetBelongs(NpgsqlTransaction tx, Guid project, Guid id, CancellationToken ct) { await using var command = Command(tx); command.CommandText = "SELECT EXISTS(SELECT 1 FROM gov.change_set WHERE project_id=@project AND change_set_id=@id)"; Add(command, "project", project); Add(command, "id", id); return await command.ExecuteScalarAsync(ct) is true; }
@@ -453,7 +499,17 @@ public sealed class PostgresTaskCollabStore(string connectionString, PostgresAcc
     }
 
     private sealed class TaskSummary { public IReadOnlyList<TargetChange> TargetChanges { get; set; } = []; public IReadOnlyList<RevisionRef> Preserve { get; set; } = []; public IReadOnlyList<Unknown> Unknowns { get; set; } = []; public IReadOnlyList<RevisionRef> SourceRefs { get; set; } = []; public string? NextAction { get; set; } public ImpactCoverage? ImpactCoverage { get; set; } }
-    private sealed class ImpactCoverage { public int candidateCount { get; set; } public int edgeCount { get; set; } public bool truncated { get; set; } }
+    private sealed class ImpactCoverage
+    {
+        public int candidateCount { get; set; } public int edgeCount { get; set; } public bool truncated { get; set; }
+        public string coverage { get; set; } = "bounded_semantic_graph"; public int maxCandidates { get; set; } public int maxEdges { get; set; }
+        public IReadOnlyList<string> exclusions { get; set; } = []; public IReadOnlyList<ImpactBlindSpot> blindSpots { get; set; } = [];
+    }
+    private sealed record ImpactBlindSpot(Guid UnitId, Guid RevisionId, string Kind, string State, string Reason);
+    private sealed record ImpactWorkItem(Guid Root, Guid Unit, Guid Revision, string Kind, string? IncomingPredicate, List<JsonElement> Path);
+    private sealed record ImpactVisit(Guid Root, Guid Unit, string? Predicate, string ContextHash);
+    private sealed record ImpactEdge(Guid Relation, string Predicate, Guid Neighbor, string Direction, Guid EdgeUnit);
+    private sealed record ImpactCandidate(Guid Unit, Guid Revision, string Kind, List<JsonElement> Path, string Reason);
     private sealed record MembershipContext(Guid Baseline, string[] Roles);
     private sealed class TaskRow
     {
