@@ -148,7 +148,7 @@ class AzureGateBackend:
                     own=evaluation.get('configuration',{}).get('settings',{}).get('buildDefinitionId')==self.config['pipelineId']
                     if own and not self.current_build_policy(evaluation,pr,candidate_sha):
                         key=(evaluation.get('evaluationId'),candidate_sha,pr.get('lastMergeTargetCommit',{}).get('commitId'))
-                        if key[0] and key not in requeued and evaluation.get('status') not in ('queued','running'):
+                        if key[0] and key not in requeued:
                             self.api(self.path('/_apis/policy/evaluations/'+key[0]+'?api-version=7.1-preview.1'),'PATCH',{'status':'queued'})
                             requeued.add(key)
                 all_current=all(self.current_build_policy(e,pr,candidate_sha) for e in required)

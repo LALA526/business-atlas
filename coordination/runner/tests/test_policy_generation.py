@@ -8,7 +8,7 @@ class PolicyGenerationTests(unittest.TestCase):
  @patch('azure_gate_backend.subprocess.run')
  def test_old_failure_old_approval_and_old_target_are_requeued_not_used(self,run):
   run.return_value.returncode=0
-  for old_status,old_source,old_target in [('rejected','d'*40,'c'*40),('approved','d'*40,'c'*40),('approved','a'*40,'e'*40)]:
+  for old_status,old_source,old_target in [('rejected','d'*40,'c'*40),('approved','d'*40,'c'*40),('approved','a'*40,'e'*40),('queued','d'*40,'c'*40),('running','d'*40,'c'*40),('queued','a'*40,'e'*40),('running','a'*40,'e'*40)]:
    with self.subTest(status=old_status,source=old_source,target=old_target),tempfile.TemporaryDirectory() as tmp:
     current=False;merged=False;queues=[];merges=[]
     def api(path,method='GET',body=None):
