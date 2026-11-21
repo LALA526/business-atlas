@@ -100,7 +100,12 @@ def main():
         from autonomous_recovery import supervise
         runner = ar.build_real_runner(REPO, STATE, CONTROLS)
         try:
-            print(json.dumps(supervise(runner), ensure_ascii=False))
+            if runner.controls.get('fastDelivery'):
+                from fast_delivery import supervise_fast
+                result = supervise_fast(runner)
+            else:
+                result = supervise(runner)
+            print(json.dumps(result, ensure_ascii=False))
         finally:
             runner.close()
         return 0
