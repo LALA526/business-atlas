@@ -212,10 +212,23 @@
           "xunit.extensibility.core": "[2.9.3]"
         }
       },
+      "accessapplicability": {
+        "type": "Project",
+        "dependencies": {
+          "BuildingBlocks": "[1.0.0, )",
+          "ProjectIdentity": "[1.0.0, )"
+        }
+      },
       "buildingblocks": {
         "type": "Project",
         "dependencies": {
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.0, )"
+        }
+      },
+      "projectidentity": {
+        "type": "Project",
+        "dependencies": {
+          "BuildingBlocks": "[1.0.0, )"
         }
       },
       "Npgsql.EntityFrameworkCore.PostgreSQL": {

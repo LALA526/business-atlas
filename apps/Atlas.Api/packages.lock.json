@@ -113,6 +113,13 @@
           "Microsoft.IdentityModel.Tokens": "8.19.2"
         }
       },
+      "accessapplicability": {
+        "type": "Project",
+        "dependencies": {
+          "BuildingBlocks": "[1.0.0, )",
+          "ProjectIdentity": "[1.0.0, )"
+        }
+      },
       "buildingblocks": {
         "type": "Project",
         "dependencies": {

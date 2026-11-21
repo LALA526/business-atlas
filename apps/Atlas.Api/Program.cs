@@ -1,4 +1,10 @@
 using System.Diagnostics;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using AccessApplicability.Application;
+using AccessApplicability.Contracts;
+using AccessApplicability.Infrastructure;
+using Atlas.Api.Access;
 using BuildingBlocks;
 using BuildingBlocks.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +16,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<HealthState>();
 builder.Services.AddPlatformOps(builder.Configuration.GetConnectionString("Atlas"));
 builder.Services.AddSingleton(new PostgresProjectIdentityStore(builder.Configuration.GetConnectionString("Atlas") ?? string.Empty));
+builder.Services.AddSingleton(new PostgresAccessApplicabilityStore(builder.Configuration.GetConnectionString("Atlas") ?? string.Empty));
+builder.Services.AddSingleton<PolicyService>();
+builder.Services.AddSingleton<IPolicyService>(services => services.GetRequiredService<PolicyService>());
+builder.Services.AddSingleton<IReadContextFactory>(services => services.GetRequiredService<PolicyService>());
+builder.Services.ConfigureHttpJsonOptions(options => options.SerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower)));
 builder.Services.AddAtlasAuthentication(builder.Configuration, builder.Environment);
 
 var app = builder.Build();
@@ -25,6 +36,7 @@ app.UseAuthentication();
 app.UseAtlasCsrfProtection();
 app.UseAuthorization();
 app.MapIdentityEndpoints();
+app.MapAccessEndpoints();
 
 app.MapGet("/health/live", (HttpContext context) => HealthResponse(context, "ok"));
 app.MapGet("/health/ready", (HttpContext context, HealthState state) =>
