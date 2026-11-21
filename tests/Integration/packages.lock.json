@@ -449,13 +449,20 @@
       "atlas.api": {
         "type": "Project",
         "dependencies": {
-          "BuildingBlocks": "[1.0.0, )"
+          "BuildingBlocks": "[1.0.0, )",
+          "PlatformOps": "[1.0.0, )"
         }
       },
       "buildingblocks": {
         "type": "Project",
         "dependencies": {
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.0, )"
+        }
+      },
+      "platformops": {
+        "type": "Project",
+        "dependencies": {
+          "BuildingBlocks": "[1.0.0, )"
         }
       },
       "Microsoft.Extensions.Hosting": {

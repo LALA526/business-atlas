@@ -1,8 +1,10 @@
 using System.Diagnostics;
 using BuildingBlocks;
+using PlatformOps;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<HealthState>();
+builder.Services.AddPlatformOps(builder.Configuration.GetConnectionString("Atlas"));
 
 var app = builder.Build();
 app.Lifetime.ApplicationStopping.Register(app.Services.GetRequiredService<HealthState>().BeginShutdown);

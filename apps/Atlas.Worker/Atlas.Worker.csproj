@@ -10,4 +10,8 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/Modules/PlatformOps/PlatformOps.csproj" />
+  </ItemGroup>
 </Project>

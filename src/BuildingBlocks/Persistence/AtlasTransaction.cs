@@ -12,7 +12,10 @@ public sealed class AtlasTransaction : IAsyncDisposable
 {
     private readonly AtlasDbContext context;
     private readonly IDbContextTransaction transaction;
+    private readonly List<Func<AtlasTransaction, CancellationToken, Task>> beforeCommitHooks = [];
     private bool completed;
+
+    public AtlasDbContext Context => context;
 
     private AtlasTransaction(AtlasDbContext context, IDbContextTransaction transaction)
     {
@@ -49,10 +52,22 @@ public sealed class AtlasTransaction : IAsyncDisposable
 
     public DbTransaction ConnectionTransaction => transaction.GetDbTransaction();
 
-    public Task CommitAsync(CancellationToken cancellationToken = default)
+    /// <summary>Enlists work that must complete inside this transaction before COMMIT.</summary>
+    public void EnlistBeforeCommit(Func<AtlasTransaction, CancellationToken, Task> hook)
     {
+        ObjectDisposedException.ThrowIf(completed, this);
+        beforeCommitHooks.Add(hook ?? throw new ArgumentNullException(nameof(hook)));
+    }
+
+    public async Task CommitAsync(CancellationToken cancellationToken = default)
+    {
+        foreach (var hook in beforeCommitHooks)
+        {
+            await hook(this, cancellationToken);
+        }
+
+        await transaction.CommitAsync(cancellationToken);
         completed = true;
-        return transaction.CommitAsync(cancellationToken);
     }
 
     public Task RollbackAsync(CancellationToken cancellationToken = default)
