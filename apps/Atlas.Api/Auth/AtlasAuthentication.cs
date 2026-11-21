@@ -84,6 +84,7 @@ public static class AtlasAuthentication
             options.GetClaimsFromUserInfoEndpoint = configuration.GetValue("Authentication:Oidc:UseUserInfo", false);
             options.RequireHttpsMetadata = !configuration.GetValue("Authentication:AllowInsecureLanPreview", false) && !environment.IsDevelopment();
             options.MapInboundClaims = false;
+            options.TokenValidationParameters.AuthenticationType = CookieScheme;
             options.TokenValidationParameters.NameClaimType = "name";
             options.Scope.Clear();
             foreach (var scope in new[] { "openid", "profile", "atlas.read", "atlas.admin" }) options.Scope.Add(scope);
@@ -107,6 +108,7 @@ public static class AtlasAuthentication
             options.MapInboundClaims = false;
             options.TokenValidationParameters = new TokenValidationParameters
             {
+                AuthenticationType = BearerScheme,
                 ValidateIssuer = true,
                 ValidateAudience = true,
                 ValidateLifetime = true,
