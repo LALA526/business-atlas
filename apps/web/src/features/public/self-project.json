@@ -1,0 +1,11 @@
+{
+  "project": {"name": "Business Atlas Self Project", "purpose": "", "audience": "", "boundaries": []},
+  "counts": {"requirements": 0, "tasks": 0, "features": 0},
+  "requirements": [],
+  "tasks": [],
+  "features": [],
+  "design": {"productEvolution": [], "releaseHistory": [], "currentAcceptance": {"decision": "not_ready", "sourcePath": ""}},
+  "documents": [],
+  "sources": [],
+  "provenance": {"sourceRevision": "", "generatedAt": "", "sourceScope": ""}
+}

@@ -236,6 +236,9 @@ h1, h2, h3, h4, .empty-state strong, .projects-main > h1, .overview-hero h1,
 .content-block { border-radius: 3px; }
 .project-card, .unit-results > a, .business-list > a { border-radius: 5px; }
 .project-card { border-color: #e1e4ef; }
+.project-card-row { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.project-card-row .project-card { flex: 1; min-width: 0; }
+.archive-project { flex: 0 0 auto; }
 .project-monogram { border-radius: 8px; background: #eeecff; color: #5d53bf; font-family: inherit; font-weight: 700; }
 .projects-main { max-width: none; margin-left: 238px; padding: 48px 42px; }
 .public-header { height: 74px; padding-left: 24px; border-bottom-color: #e2e5ef; }

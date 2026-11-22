@@ -9,6 +9,7 @@ import tempfile
 import unittest
 
 import self_project
+import build_case
 
 
 class SelfProjectTests(unittest.TestCase):
@@ -64,6 +65,17 @@ class SelfProjectTests(unittest.TestCase):
         for path in ["../secrets", "/etc/passwd", "docs\\private.json"]:
             with self.subTest(path=path), self.assertRaises(self_project.SelfProjectError):
                 self_project.safe_path(path)
+
+    def test_public_case_and_import_candidate_trace_all_requirements_and_tasks(self) -> None:
+        revision = self_project.revision(self_project.ROOT, "HEAD")
+        public_view, package = build_case.build(revision)
+        self.assertEqual(154, public_view["counts"]["requirements"])
+        self.assertEqual(44, public_view["counts"]["tasks"])
+        self.assertEqual(154, len([item for item in package["entities"] if item["typeId"] == "Requirement"]))
+        self.assertEqual(44, len([item for item in package["entities"] if item["typeId"] == "Task"]))
+        self.assertTrue(all(source["contentHash"] for source in package["sources"]))
+        self.assertTrue(all(document["contentHash"] for document in public_view["documents"]))
+        self.assertEqual("not_ready", public_view["design"]["currentAcceptance"]["decision"])
 
 
 if __name__ == "__main__":

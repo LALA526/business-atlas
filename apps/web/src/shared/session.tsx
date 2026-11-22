@@ -1,5 +1,6 @@
 import { createContext, useContext } from 'react';
 import type { ReactNode } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { atlasApi } from './api';
 import type { Session } from './api';
@@ -13,6 +14,12 @@ export const useSession = () => {
 };
 
 export function SessionProvider({ children }: { children: ReactNode }) {
+  const location = useLocation();
+  if (location.pathname === '/' || location.pathname === '/public/self') return <>{children}</>;
+  return <AuthenticatedSession>{children}</AuthenticatedSession>;
+}
+
+function AuthenticatedSession({ children }: { children: ReactNode }) {
   const session = useQuery({ queryKey: ['session'], queryFn: atlasApi.session, retry: false, staleTime: 60_000 });
   if (session.isPending) return <main className="page-state"><LoadingState label="正在确认身份与权限" /></main>;
   if (session.isError || !session.data) return <main className="page-state"><ErrorState error={session.error} onRetry={() => session.refetch()} /></main>;

@@ -7,8 +7,9 @@ import { EmptyState } from '../../shared/states';
 import type { ProjectOutletContext } from './ProjectShell';
 import { knowledgeKindLabel } from './knowledgeLabels';
 
-const kindLabels: Record<string, string> = { ProjectProfile: '项目定位与边界', Feature: '核心业务能力', Component: '业务系统与组件', DomainTerm: '关键业务语言', BusinessRule: '重要业务规则', Rule: '重要业务规则' };
+const kindLabels: Record<string, string> = { ProjectProfile: '项目定位与边界', Feature: '核心业务能力', Component: '业务系统与组件', DomainTerm: '关键业务语言', BusinessRule: '重要业务规则', Rule: '重要业务规则', Design: '设计依据', Observation: '实际观察', Architecture: '技术架构' };
 const orderedKinds = ['ProjectProfile', 'Feature', 'Component', 'DomainTerm', 'BusinessRule', 'Rule'];
+const overviewKinds = new Set(['Feature', 'Component', 'DomainTerm', 'BusinessRule', 'Rule', 'Design', 'Observation', 'Architecture']);
 
 export function ContentBlocks({ blocks, projectId, unitTitles = new Map<string, string>() }: { blocks: Schema<'ContentBlock'>[]; projectId: string; unitTitles?: ReadonlyMap<string, string> }) {
   return <div className="content-blocks">{blocks.map(block => <div className={`content-block ${block.kind}`} key={block.blockId}>
@@ -23,7 +24,8 @@ export default function OverviewPage() {
   const { project, overview } = useOutletContext<ProjectOutletContext>();
   const { projectId = '' } = useParams();
   const session = useSession();
-  const units = useQuery({ queryKey: [session.principalId, projectId, project.policyEpoch, 'units', project.currentBaselineId, 'overview'], queryFn: () => atlasApi.units(projectId), enabled: Boolean(overview) });
+  const units = useQuery({ queryKey: [session.principalId, projectId, project.policyEpoch, 'units', project.currentBaselineId, 'overview-features'], queryFn: () => atlasApi.units(projectId, { kind: 'Feature' }), enabled: Boolean(overview) });
+  const profileUnits = useQuery({ queryKey: [session.principalId, projectId, project.policyEpoch, 'units', project.currentBaselineId, 'overview-profile'], queryFn: () => atlasApi.units(projectId, { kind: 'ProjectProfile' }), enabled: Boolean(overview) });
   const changeSets = useQuery({ queryKey: [session.principalId, projectId, project.policyEpoch, 'change-sets', 'overview'], queryFn: () => atlasApi.changeSets(projectId), enabled: Boolean(project) });
   if (!overview) return <div className="loading-state" role="status"><span className="spinner" />正在组合项目定位与核心知识</div>;
   const sections = [...overview.sections].sort((a, b) => {
@@ -31,7 +33,8 @@ export default function OverviewPage() {
     return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi);
   });
   const profile = sections.find(section => section.key === 'ProjectProfile');
-  const contentSections = sections.filter(section => section.key !== 'ProjectProfile');
+  const profileRevision = profileUnits.data?.items[0];
+  const contentSections = sections.filter(section => overviewKinds.has(section.key));
   const pendingReviews = changeSets.data?.items.filter(item => ['submitted', 'in_review', 'changes_requested'].includes(item.state)) ?? [];
   const unitTitles = new Map((units.data?.items ?? []).map(item => [item.unitId, item.title]));
   return <div className="overview-page">
@@ -39,7 +42,7 @@ export default function OverviewPage() {
     <div className="overview-start-grid">
       <section className="overview-profile" aria-labelledby="project-profile-title">
         <p className="overview-section-label">项目定位</p>
-        <div className="overview-profile-content">{profile ? <ContentBlocks blocks={profile.blocks} projectId={projectId} unitTitles={unitTitles} /> : <p className="overview-empty-copy">当前授权的已发布基线没有项目定位内容。</p>}</div>
+        <div className="overview-profile-content">{profile ? <ContentBlocks blocks={profile.blocks} projectId={projectId} unitTitles={unitTitles} /> : profileRevision ? <ContentBlocks blocks={profileRevision.blocks} projectId={projectId} unitTitles={unitTitles} /> : <p className="overview-empty-copy">当前授权的已发布基线没有项目定位内容。</p>}</div>
         {profile?.children && profile.children.length > 0 && <div className="overview-profile-links">{profile.children.slice(0, 4).map(child => <Link key={child.key} to={`/p/${projectId}/knowledge/${child.key}`}>{child.title}<span aria-hidden="true">→</span></Link>)}</div>}
         <h2 id="project-profile-title" className="sr-only">项目定位</h2>
       </section>

@@ -68,6 +68,14 @@ public static class IdentityEndpoints
             return Results.Ok(Envelope(context, result));
         }, ct));
 
+        projects.MapPost("/{projectId:guid}/archive", async (HttpContext context, Guid projectId, CancellationToken ct) => await Execute(context, async principal =>
+        {
+            RequireAdminScope(context);
+            var result = await Store(context).ArchiveProjectAsync(principal, projectId, ExpectedVersion(context), IdempotencyKey(context), RequestId(context), TraceId(context), ct);
+            context.Response.Headers.ETag = ETag(result.Version);
+            return Results.Ok(Envelope(context, result));
+        }, ct)).RequireAuthorization("AtlasAdmin");
+
         projects.MapGet("/{projectId:guid}/members", async (HttpContext context, Guid projectId, string? cursor, int? limit, CancellationToken ct) => await Execute(context, async principal =>
         {
             RequireAdminScope(context);

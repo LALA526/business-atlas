@@ -18,8 +18,10 @@ const kindLabels: Record<string, string> = {
   Architecture: '技术架构',
   Evidence: '依据与证据',
   Implementation: '实现记录',
-  Task: '工作任务',
   Milestone: '交付阶段',
+  Task: '项目任务',
+  Document: '项目文档',
+  Project: '项目记录',
 };
 
 const factLabels: Record<string, string> = {

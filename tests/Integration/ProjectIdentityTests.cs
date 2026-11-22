@@ -58,6 +58,14 @@ public sealed class ProjectIdentityTests
                 (await store.GetProjectAsync(outsider.PrincipalId, first.ProjectId, CancellationToken.None)).ProjectId);
             Assert.Single((await store.ListProjectsAsync(outsider.PrincipalId, null, 30, CancellationToken.None)).Items);
 
+            var archived = await store.ArchiveProjectAsync(owner, second.ProjectId, second.Version, "archive-second-0001", "request-archive", null, CancellationToken.None);
+            var archiveReplay = await store.ArchiveProjectAsync(owner, second.ProjectId, second.Version, "archive-second-0001", "request-replay", null, CancellationToken.None);
+            Assert.Equal(archived, archiveReplay);
+            Assert.Single((await store.ListProjectsAsync(owner.PrincipalId, null, 30, CancellationToken.None)).Items);
+            var archivedRead = await Assert.ThrowsAsync<ProjectIdentityException>(() =>
+                store.GetProjectAsync(owner.PrincipalId, second.ProjectId, CancellationToken.None));
+            Assert.Equal(404, archivedRead.StatusCode);
+
             await using var verification = new NpgsqlConnection(administrator.ConnectionString);
             await verification.OpenAsync();
             Assert.Equal(0, await ScalarAsync(verification,

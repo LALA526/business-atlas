@@ -88,6 +88,9 @@ export const atlasApi = {
   createProject: (displayName: string, slug: string) => unwrap<Project>(client.POST('/api/v1/projects', {
     params: { header: { 'Idempotency-Key': crypto.randomUUID() } }, body: { displayName, slug },
   })),
+  archiveProject: (projectId: string, version: number) => apiRequest<Project>(`/api/v1/projects/${projectId}/archive`, {
+    method: 'POST', headers: { 'Idempotency-Key': crypto.randomUUID(), 'If-Match': `"${version}"` },
+  }),
   overview: (projectId: string) => unwrap<ReadingView>(client.GET('/api/v1/projects/{projectId}/dashboard', { params: { path: { projectId }, query: { mode: 'published', purpose: 'understand' } } })),
   catalog: (projectId: string) => unwrap<CatalogNode[]>(client.GET('/api/v1/projects/{projectId}/catalog', { params: { path: { projectId }, query: { mode: 'published', purpose: 'understand' } } })),
   units: (projectId: string, query: { kind?: string; categoryKey?: string; cursor?: string } = {}) => unwrap<RevisionPage>(client.GET('/api/v1/projects/{projectId}/units', { params: { path: { projectId }, query: { ...query, limit: 100, mode: 'published', purpose: 'understand' } } })),

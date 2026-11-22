@@ -10,7 +10,7 @@ namespace ImportEvidence.Sources;
 
 public static class AkpPackageReader
 {
-    private static readonly HashSet<string> Kinds = ["ProjectProfile","DomainTerm","DomainConcept","BusinessObject","BusinessAttribute","Requirement","BusinessRule","Rule","Flow","Transition","Assertion","Design","Component","Api","API","Implementation","Observation","BusinessCase","Source","DataField","Domain","Capability","Feature","Actor","Action","Event","Behavior","State","Constraint","Decision","System","Module","DataEntity","Operation","Environment","Deployment","Test","OperationalKnowledge","EngineeringStandard","QualityRequirement","Document","Metric","Milestone","Permission","Risk","TechnicalDebt","Configuration","Exception","Compensation","Project","ProjectProfile","ArchitectureDecision","BuildPipeline","Dependency","DeploymentUnit","EngineeringConvention","Framework","Runtime","Technology","Resource","Surface","Scenario"];
+    private static readonly HashSet<string> Kinds = ["ProjectProfile","DomainTerm","DomainConcept","BusinessObject","BusinessAttribute","Requirement","BusinessRule","Rule","Flow","Transition","Assertion","Design","Component","Api","API","Implementation","Observation","BusinessCase","Source","DataField","Domain","Capability","Feature","Actor","Action","Event","Behavior","State","Constraint","Decision","System","Module","DataEntity","Operation","Environment","Deployment","Test","Task","OperationalKnowledge","EngineeringStandard","QualityRequirement","Document","Metric","Milestone","Permission","Risk","TechnicalDebt","Configuration","Exception","Compensation","Project","ProjectProfile","ArchitectureDecision","BuildPipeline","Dependency","DeploymentUnit","EngineeringConvention","Framework","Runtime","Technology","Resource","Surface","Scenario"];
     public static async Task<NormalizedPackage> ReadAsync(Stream stream, string fileName, CancellationToken ct)
     {
         JsonDocument document;
@@ -89,7 +89,19 @@ public static class AkpPackageReader
             if (!Kinds.Contains(kind)) throw ProjectIdentityException.Invalid($"Unsupported entity type '{kind}'.");
             var refs = Strings(entity, "sourceIds"); ValidateSourceRefs(refs, sourceIds, id);
             var (fact, verification) = Verification(Optional(entity, "verificationStatus"));
-            var body = Obj(new { description = Optional(entity, "description"), properties = Property(entity, "properties"), originalTypeId = Required(entity, "typeId"), sensitivity = Optional(entity, "sensitivity") ?? "internal", permissions = Property(entity, "permissions"), extra = Property(entity, "extra"), importProvenance = new { packageId, stableExternalId = id } });
+            var properties = Property(entity, "properties");
+            var body = Obj(new
+            {
+                description = Optional(entity, "description"),
+                purpose = Optional(properties, "purpose"),
+                blocks = Property(properties, "blocks", "[]"),
+                properties,
+                originalTypeId = Required(entity, "typeId"),
+                sensitivity = Optional(entity, "sensitivity") ?? "internal",
+                permissions = Property(entity, "permissions"),
+                extra = Property(entity, "extra"),
+                importProvenance = new { packageId, stableExternalId = id }
+            });
             entries.Add(new(kind, id, Required(entity, "name"), kind, fact, verification, Property(entity, "applicableContext"), body, Property(entity, "categoryAssignments", "[]"), entity.Clone(), refs));
         }
         var entityIds = entries.Where(e => e.ExternalType != "Source").Select(e => e.ExternalId).ToHashSet(StringComparer.Ordinal);

@@ -180,6 +180,30 @@ public sealed partial class PostgresProjectIdentityStore(string connectionString
         return result;
     }
 
+    public async Task<ProjectSummary> ArchiveProjectAsync(
+        AtlasPrincipal actor, Guid projectId, long expectedVersion, string idempotencyKey,
+        string requestId, string? traceId, CancellationToken cancellationToken)
+    {
+        ValidateKey(idempotencyKey);
+        var digest = Digest(new { expectedVersion });
+        await using var connection = await OpenAsync(cancellationToken);
+        await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
+        await SetContextAsync(transaction, projectId, actor.PrincipalId, cancellationToken);
+        if (actor.Kind != PrincipalKind.Human) throw ProjectIdentityException.Forbidden();
+        var (project, archived) = await RequireAdminForArchiveAsync(transaction, actor.PrincipalId, projectId, cancellationToken);
+        var replay = await FindIdempotencyAsync<ProjectSummary>(transaction, projectId, actor.PrincipalId, "archiveProject", idempotencyKey, digest, cancellationToken);
+        if (replay is not null) { await transaction.CommitAsync(cancellationToken); return replay; }
+        if (archived) throw ProjectIdentityException.NotFound();
+        if (project.Version != expectedVersion) throw ProjectIdentityException.CasMismatch();
+        var result = project with { Version = checked(project.Version + 1), PolicyEpoch = checked(project.PolicyEpoch + 1) };
+        await ExecuteAsync(transaction, "UPDATE identity.project SET archived_at=clock_timestamp(), version=version+1, policy_epoch=policy_epoch+1 WHERE project_id=@project AND version=@expected AND archived_at IS NULL;", cancellationToken,
+            ("project", projectId), ("expected", expectedVersion));
+        await SaveIdempotencyAsync(transaction, projectId, actor.PrincipalId, "archiveProject", idempotencyKey, digest, result, cancellationToken);
+        await AuditAsync(transaction, projectId, actor.PrincipalId, "archiveProject", result, requestId, traceId, cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
+        return result;
+    }
+
     public async Task<MembershipPage> ListMembersAsync(
         Guid principalId, Guid projectId, string? cursor, int limit, CancellationToken cancellationToken)
     {
@@ -305,6 +329,24 @@ public sealed partial class PostgresProjectIdentityStore(string connectionString
         var project = ReadProject(reader);
         if (!reader.GetFieldValue<string[]>(6).Contains("ProjectAdmin", StringComparer.Ordinal)) throw ProjectIdentityException.Forbidden();
         return project;
+    }
+
+    private static async Task<(ProjectSummary Project, bool Archived)> RequireAdminForArchiveAsync(
+        NpgsqlTransaction transaction, Guid principalId, Guid projectId, CancellationToken cancellationToken)
+    {
+        await using var command = transaction.CreateCommand();
+        command.CommandText = """
+            SELECT p.project_id,p.slug,p.display_name,p.version,p.policy_epoch,p.current_baseline_id,p.archived_at,m.roles
+            FROM identity.project p
+            JOIN identity.membership m ON m.project_id=p.project_id AND m.principal_id=@principal AND m.active
+            WHERE p.project_id=@project FOR UPDATE OF p;
+            """;
+        command.Parameters.AddWithValue("principal", principalId);
+        command.Parameters.AddWithValue("project", projectId);
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+        if (!await reader.ReadAsync(cancellationToken)) throw ProjectIdentityException.NotFound();
+        if (!reader.GetFieldValue<string[]>(7).Contains("ProjectAdmin", StringComparer.Ordinal)) throw ProjectIdentityException.Forbidden();
+        return (ReadProject(reader), !reader.IsDBNull(6));
     }
 
     private static async Task<Membership?> GetMembershipForUpdateAsync(NpgsqlTransaction transaction, Guid projectId, Guid principalId, CancellationToken cancellationToken)

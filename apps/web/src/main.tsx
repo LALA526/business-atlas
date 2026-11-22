@@ -13,13 +13,15 @@ import ImportWorkspace from './features/project/ImportWorkspace';
 import ReviewWorkspace from './features/review/ReviewWorkspace';
 import TaskWorkspace from './features/task/TaskWorkspace';
 import DeliveryWorkspace from './features/delivery/DeliveryWorkspace';
+import SelfProjectPage from './features/public/SelfProjectPage';
 import './styles.css';
 import './styles-workspace.css';
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: 30_000, refetchOnWindowFocus: false }, mutations: { retry: false } } });
 
 createRoot(document.getElementById('root')!).render(<StrictMode><QueryClientProvider client={queryClient}><BrowserRouter><SessionProvider><Routes>
-  <Route path="/" element={<Navigate to="/projects" replace />} />
+  <Route path="/" element={<Navigate to="/public/self" replace />} />
+  <Route path="/public/self" element={<SelfProjectPage />} />
   <Route path="/projects" element={<ProjectsPage />} />
   <Route path="/p/:projectId" element={<ProjectShell />}>
     <Route index element={<Navigate to="overview" replace />} />

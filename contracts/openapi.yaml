@@ -334,6 +334,72 @@ paths:
               required:
               - displayName
               additionalProperties: false
+  /api/v1/projects/{projectId}/archive:
+    post:
+      operationId: archiveProject
+      summary: 归档项目并从可访问列表隐藏（保留历史数据）
+      tags:
+      - M01
+      x-owner: M01
+      x-required-scope: atlas.admin
+      x-mutates-state: true
+      x-cas: true
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema: *id002
+      - name: Idempotency-Key
+        in: header
+        required: true
+        schema:
+          type: string
+          minLength: 8
+          maxLength: 128
+      - name: If-Match
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^"[0-9]+"$
+      - name: X-CSRF-Token
+        in: header
+        required: false
+        schema: *id001
+        description: 必需于浏览器session cookie写入；Bearer不需要。
+      security:
+      - bearerAuth: []
+      - sessionCookie: []
+      responses:
+        '200':
+          description: 项目已归档；资料与审计历史保留
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    const: OK
+                  requestId:
+                    type: string
+                  traceId:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/ProjectSummary'
+                required: [code, requestId, data]
+        '401':
+          $ref: '#/components/responses/HttpError401'
+        '403':
+          $ref: '#/components/responses/HttpError403'
+        '404':
+          $ref: '#/components/responses/HttpError404'
+        '409':
+          $ref: '#/components/responses/HttpError409'
+        '412':
+          $ref: '#/components/responses/HttpError412'
+        '428':
+          $ref: '#/components/responses/HttpError428'
+      x-aggregate-etag: true
   /api/v1/projects/{projectId}/members:
     get:
       operationId: listMembers

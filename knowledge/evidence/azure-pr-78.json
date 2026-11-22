@@ -1,0 +1,10 @@
+{
+  "pullRequestId": 78,
+  "title": "T33/T34: Align project workspace with V9.2/V9.3",
+  "status": "completed",
+  "sourceRefName": "refs/heads/task/T33-v92-v93-workspace",
+  "targetRefName": "refs/heads/main",
+  "sourceCommit": "bed1533d546c7383be40c96994a9de5b7ac7fbf3",
+  "mergeCommit": "f95aef5f2b183bf6c77d3d3f2dedfd28df32c3d2",
+  "url": "https://dev.azure.com/2717243207/Business%20Atlas/_git/Business%20Atlas/pullrequest/78"
+}
