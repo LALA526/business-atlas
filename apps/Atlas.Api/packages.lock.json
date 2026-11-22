@@ -120,6 +120,13 @@
           "ProjectIdentity": "[1.0.0, )"
         }
       },
+      "agentmcp": {
+        "type": "Project",
+        "dependencies": {
+          "AccessApplicability": "[1.0.0, )",
+          "ProjectIdentity": "[1.0.0, )"
+        }
+      },
       "assistant": {
         "type": "Project",
         "dependencies": {

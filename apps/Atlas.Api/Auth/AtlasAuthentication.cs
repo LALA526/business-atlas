@@ -87,7 +87,7 @@ public static class AtlasAuthentication
             options.TokenValidationParameters.AuthenticationType = CookieScheme;
             options.TokenValidationParameters.NameClaimType = "name";
             options.Scope.Clear();
-            foreach (var scope in new[] { "openid", "profile", "atlas.read", "atlas.propose", "atlas.admin", "atlas.task", "atlas.evidence", "atlas.review", "atlas.ci" }) options.Scope.Add(scope);
+            foreach (var scope in new[] { "openid", "profile", "atlas.read", "atlas.propose", "atlas.admin", "atlas.task", "atlas.evidence", "atlas.review", "atlas.ci", "atlas.agent" }) options.Scope.Add(scope);
             options.Events.OnTokenValidated = context =>
             {
                 if (context.Principal?.Identity is ClaimsIdentity identity)
@@ -126,7 +126,8 @@ public static class AtlasAuthentication
             .AddPolicy("AtlasTask", policy => policy.RequireAuthenticatedUser().RequireAssertion(context => HasScope(context.User, "atlas.task", CookieScheme)))
             .AddPolicy("AtlasEvidence", policy => policy.RequireAuthenticatedUser().RequireAssertion(context => HasScope(context.User, "atlas.evidence", CookieScheme)))
             .AddPolicy("AtlasReview", policy => policy.RequireAuthenticatedUser().RequireAssertion(context => HasScope(context.User, "atlas.review", CookieScheme)))
-            .AddPolicy("AtlasCi", policy => policy.RequireAuthenticatedUser().RequireAssertion(context => HasScope(context.User, "atlas.ci", CookieScheme)));
+            .AddPolicy("AtlasCi", policy => policy.RequireAuthenticatedUser().RequireAssertion(context => HasScope(context.User, "atlas.ci", CookieScheme)))
+            .AddPolicy("AtlasAgent", policy => policy.RequireAuthenticatedUser().RequireAssertion(context => HasScope(context.User, "atlas.agent", CookieScheme)));
         return services;
     }
 

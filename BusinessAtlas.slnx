@@ -13,6 +13,7 @@
     <Project Path="src/Modules/AccessApplicability/AccessApplicability.csproj" />
     <Project Path="src/Modules/ImportEvidence/ImportEvidence.csproj" />
     <Project Path="src/Modules/TaskCollab/TaskCollab.csproj" />
+    <Project Path="src/Modules/AgentMcp/AgentMcp.csproj" />
     <Project Path="src/Modules/Assistant/Assistant.csproj" />
   </Folder>
   <Folder Name="/tests/" />

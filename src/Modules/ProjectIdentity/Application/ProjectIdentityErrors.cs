@@ -12,6 +12,9 @@ public sealed class ProjectIdentityException(string code, string message, int st
     public static ProjectIdentityException Forbidden() =>
         new("FORBIDDEN", "The current principal cannot perform this operation.", 403);
 
+    public static ProjectIdentityException Forbidden(string message) =>
+        new("FORBIDDEN", message, 403);
+
     public static ProjectIdentityException Conflict(string message) =>
         new("CONFLICT", message, 409);
 

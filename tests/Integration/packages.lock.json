@@ -515,10 +515,29 @@
           "ProjectIdentity": "[1.0.0, )"
         }
       },
+      "agentmcp": {
+        "type": "Project",
+        "dependencies": {
+          "AccessApplicability": "[1.0.0, )",
+          "ProjectIdentity": "[1.0.0, )"
+        }
+      },
+      "assistant": {
+        "type": "Project",
+        "dependencies": {
+          "AccessApplicability": "[1.0.0, )",
+          "KnowledgeCore": "[1.0.0, )",
+          "PlatformOps": "[1.0.0, )",
+          "ProjectIdentity": "[1.0.0, )",
+          "ReadSearchExplain": "[1.0.0, )"
+        }
+      },
       "atlas.api": {
         "type": "Project",
         "dependencies": {
           "AccessApplicability": "[1.0.0, )",
+          "AgentMcp": "[1.0.0, )",
+          "Assistant": "[1.0.0, )",
           "BuildingBlocks": "[1.0.0, )",
           "ContractDelivery": "[1.0.0, )",
           "Governance": "[1.0.0, )",
