@@ -1,0 +1,55 @@
+{
+  "releaseId": "T1.0-handoff",
+  "source": {
+    "repository": "Business Atlas authorized project"
+  },
+  "schemaMigrationConfigVersions": {
+    "contracts": "contracts/manifest.json",
+    "migrations": "src/BuildingBlocks/Persistence/Migrations",
+    "publicOrigin": "https://atlas.lalapilot.com"
+  },
+  "build": {
+    "status": "host_pipeline_pending",
+    "note": "The host owns the single build and deployment; no CI result is asserted here."
+  },
+  "deployments": [
+    {
+      "environment": "Mac8 public development preview",
+      "url": "https://atlas.lalapilot.com",
+      "deployedAt": "2026-11-22",
+      "evidenceRef": "docs/release/public-preview.md"
+    }
+  ],
+  "selfProject": {
+    "case": "Business Atlas T1.0 authorized project",
+    "sourceRefs": [
+      "knowledge/baseline/self-bootstrap.akp.json",
+      "knowledge/baseline/self-change-T36.akp.json"
+    ]
+  },
+  "knowledgeBaselines": [
+    "knowledge/baseline/self-bootstrap.akp.json",
+    "knowledge/baseline/self-change-T36.akp.json"
+  ],
+  "requirements": {},
+  "gates": [
+    {
+      "gate": "G6",
+      "status": "in_progress",
+      "evidenceRefs": [
+        "docs/release/public-preview.md",
+        "deploy/ops/RUNBOOK.md",
+        "deploy/backup/README.md"
+      ],
+      "notes": "Public preview exists; complete production acceptance evidence remains required."
+    }
+  ],
+  "approvals": [],
+  "risks": [
+    {
+      "severity": "blocking",
+      "description": "Full 154-requirement, G0-G7 and human acceptance evidence has not been supplied; this handoff must not be represented as accepted final delivery.",
+      "owner": "ProductOwner"
+    }
+  ]
+}

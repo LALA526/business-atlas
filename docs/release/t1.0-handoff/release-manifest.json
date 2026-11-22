@@ -1,0 +1,4815 @@
+{
+  "schemaVersion": "1.0.0",
+  "releaseId": "T1.0-handoff",
+  "generatedAt": "2026-11-22T08:05:22.634148+00:00",
+  "source": {
+    "repository": "Business Atlas authorized project",
+    "commit": "4ccb3b624912b22d4f60cb714a35600e1e23de2f"
+  },
+  "inputs": {
+    "evidenceSha256": "35e811fc99c8cdc9436551559cac7511a765964423343283504abc5bf2bc5b64",
+    "sourceFiles": [
+      {
+        "path": "docs/baselines/T1.0/README.md",
+        "sha256": "978580cd5ff0a5db3f944c54cd30e3906cead4bb619b4ab556be5001060bd180",
+        "bytes": 6394
+      },
+      {
+        "path": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv",
+        "sha256": "6363701cd7ed5ee32030715389c3192aa747e8318759f0d045600e014a939596",
+        "bytes": 51033
+      },
+      {
+        "path": "docs/baselines/T1.0/03_开发执行/task-dag.json",
+        "sha256": "33917a5cbedfb33a5d289bad4d5cd6517bd0691c3523db3b6efb4939254b4ea1",
+        "bytes": 87364
+      },
+      {
+        "path": "docs/ui-reference/source-manifest.json",
+        "sha256": "e0aba3c8fc20c26bf505b049b993a12493ffea8a21574f5a3497cc12588a633c",
+        "bytes": 389
+      }
+    ],
+    "contracts": [
+      {
+        "path": "contracts/README.md",
+        "sha256": "e050e149fec5a0c03990b0f0733389f37b44627f00aab51944ddd7fbce630018",
+        "bytes": 5118
+      },
+      {
+        "path": "contracts/akp/atlas-proposal-v1.0.schema.json",
+        "sha256": "16f141d97548806a9a3be3ef75f976c7880f93f2a990161cb50d16c2bf769b24",
+        "bytes": 1856
+      },
+      {
+        "path": "contracts/api-catalog.csv",
+        "sha256": "bca1bc426edbaf56095869122688d8f7e951dd7f4bcb33c031ec75da8410414c",
+        "bytes": 11141
+      },
+      {
+        "path": "contracts/database.sql",
+        "sha256": "041b36843ff17da4b081d9b89a1b285de88e6a54b35ef452e55f5c9e6a12f7a7",
+        "bytes": 60247
+      },
+      {
+        "path": "contracts/examples/agent-result-v1.example.json",
+        "sha256": "be4046d1215d96516cc6caa32f4da7db32ce818b0e14d0287b786dc1f0708a5f",
+        "bytes": 1045
+      },
+      {
+        "path": "contracts/examples/agent-task.example.json",
+        "sha256": "c26d529019467e1f85a01d7c62f41b3c38d579acf4ba42cff59b5b26798cae03",
+        "bytes": 1047
+      },
+      {
+        "path": "contracts/examples/deployment-reconciliation.example.json",
+        "sha256": "fb7004f02f8d4a99f44c32559f9f1b96460fb766928bb205a33d8e5b95a8933a",
+        "bytes": 418
+      },
+      {
+        "path": "contracts/examples/domain-event.example.json",
+        "sha256": "ac51b48ba15faca3462b3627b5cb39ec0650af003cf84b457e1f81f5a79f8dee",
+        "bytes": 432
+      },
+      {
+        "path": "contracts/examples/error-pattern.example.json",
+        "sha256": "1948396219abcdcb7e01fd7586f578f355213f8fcc466059c10876c955dfc0b9",
+        "bytes": 592
+      },
+      {
+        "path": "contracts/examples/impact-v1.example.json",
+        "sha256": "9add639d0cb6c5aa1876a6978d6c294f96c8482860219d079dda6f2c37af064f",
+        "bytes": 619
+      },
+      {
+        "path": "contracts/examples/knowledge-change-proposal-v1.3.example.json",
+        "sha256": "e7e8c8499a526f4da6305f810bb652c65d39ad93f296eb3b2a9f9b8cfabc270a",
+        "bytes": 1836
+      },
+      {
+        "path": "contracts/examples/knowledge-change-proposal.example.json",
+        "sha256": "6df3e592043c064cedc7ef41565440e432a3d752eec4eeecb96e61c3b01320ff",
+        "bytes": 1881
+      },
+      {
+        "path": "contracts/examples/knowledge-delivery-manifest-v1.3.example.json",
+        "sha256": "fd00701ed24affad0bc2c870dd4a1ee57c1845383d9d343a6f768a347b868306",
+        "bytes": 1100
+      },
+      {
+        "path": "contracts/examples/knowledge-delivery-manifest.example.json",
+        "sha256": "58653f046036e5e8628ae3f5a6243ad234c5068241537d2fa631d75f6c566740",
+        "bytes": 1099
+      },
+      {
+        "path": "contracts/examples/mcp-tool-contract.example.json",
+        "sha256": "456b327555b4b5b1a4e897b94267eec6c7a87ad23dcbf96f4337239e2e85afaf",
+        "bytes": 807
+      },
+      {
+        "path": "contracts/examples/revision-v1.example.json",
+        "sha256": "f118221fccbdb42c8f11fd546f231c692d3f3824101b071fab9648f9eab744b0",
+        "bytes": 2203
+      },
+      {
+        "path": "contracts/examples/rule-v1.example.json",
+        "sha256": "5a44484568acc61590e6355d08a6e9867cecb0415139c6ad0c10c7d9841e77e2",
+        "bytes": 1612
+      },
+      {
+        "path": "contracts/examples/task-context-v1.example.json",
+        "sha256": "7ae3daed8d6dbf0eef64abfbfd806a42e3f9b1000bcb10061ba6a4cdead0d5d4",
+        "bytes": 1189
+      },
+      {
+        "path": "contracts/manifest.json",
+        "sha256": "613abcbcd26f4bbede97fd5d3eba8ed3223408be3c0078b01a8286de930e5db3",
+        "bytes": 6742
+      },
+      {
+        "path": "contracts/mcp-tools.json",
+        "sha256": "262b3fcfaedf7d6858c2721a9e7e4349ab171c12042096403fede5367a0b70ce",
+        "bytes": 390955
+      },
+      {
+        "path": "contracts/openapi.yaml",
+        "sha256": "af16e1fa6ed1f5304d7a7bed7cfe519a48401692bd4898c9b8bd7d3cd4727350",
+        "bytes": 386423
+      },
+      {
+        "path": "contracts/registry.json",
+        "sha256": "395976107db79dc189bacfc11023b786c2921033ab701e2819b6f5ff7551ff00",
+        "bytes": 23899
+      },
+      {
+        "path": "contracts/schemas/agent-result-v1.schema.json",
+        "sha256": "e7e091820e7f2c7c82e261f1551f4d86290cbbbc45d1b179d61ca11fcf796db7",
+        "bytes": 17664
+      },
+      {
+        "path": "contracts/schemas/agent-run-events-v0.1.schema.json",
+        "sha256": "30f7b500470d63a029cf61879a5c8b6e56d858fc8494b075ed6c943979cb411c",
+        "bytes": 3267
+      },
+      {
+        "path": "contracts/schemas/agent-task-v1.2.schema.json",
+        "sha256": "073b69fe70ee5ce4ea27e2825875f9f7ccbfdedb105ca291f86372275963f88e",
+        "bytes": 3416
+      },
+      {
+        "path": "contracts/schemas/akp-v0.1.schema.json",
+        "sha256": "3bece4eed5ba11313043abda9a9c6f9e633d9c3955cae18726e988f3425964db",
+        "bytes": 7140
+      },
+      {
+        "path": "contracts/schemas/deployment-reconciliation-v1.2.schema.json",
+        "sha256": "6f6a89cfa4225c5fd70eaff200781b5da0ca59e58bea5e8272b98d143b4b2271",
+        "bytes": 1299
+      },
+      {
+        "path": "contracts/schemas/domain-event-v1.2.schema.json",
+        "sha256": "ad345197350331a6e333e8cddf1eea93f8fe01c03b45d50b133cdc61e5804ba1",
+        "bytes": 1235
+      },
+      {
+        "path": "contracts/schemas/domain-v1.schema.json",
+        "sha256": "8a25bdb3b491ae33321d7eb89975813067a74779933d80fe1eb18e2c08539925",
+        "bytes": 108222
+      },
+      {
+        "path": "contracts/schemas/error-pattern-v1.2.schema.json",
+        "sha256": "4c04a7fcf875c0803ede51fc32448562664df973594996e44596d0de23b2b6be",
+        "bytes": 1403
+      },
+      {
+        "path": "contracts/schemas/impact-v1.schema.json",
+        "sha256": "ed19811ce55cd26d04ffa3e9c3a01ed92b717ff9fbfb175196d101997dbc58b3",
+        "bytes": 6427
+      },
+      {
+        "path": "contracts/schemas/knowledge-change-proposal-v1.2.schema.json",
+        "sha256": "a74201d106749f7deabf8fe3415253f5e2b3f9d73ef26449269a8d04c244ae56",
+        "bytes": 8223
+      },
+      {
+        "path": "contracts/schemas/knowledge-change-proposal-v1.3.schema.json",
+        "sha256": "ca2f0813d321cc0ca316f55720bc8840f2478160772360a0671b74f21801d060",
+        "bytes": 8137
+      },
+      {
+        "path": "contracts/schemas/knowledge-delivery-manifest-v1.2.schema.json",
+        "sha256": "94820d571ab38eb62167536207492a236659f9585134284c4f7280cb220a85fd",
+        "bytes": 3751
+      },
+      {
+        "path": "contracts/schemas/knowledge-delivery-manifest-v1.3.schema.json",
+        "sha256": "102faa8d05e6669e211311470272037c1a6543146ecd7b7187251190fc501afc",
+        "bytes": 3752
+      },
+      {
+        "path": "contracts/schemas/mcp-tool-contract-v1.2.schema.json",
+        "sha256": "89e9ae4b9695c9f96d3601cb2ff803ab42f377530ab315558e7c15c433f324a2",
+        "bytes": 1232
+      },
+      {
+        "path": "contracts/schemas/rule-v1.schema.json",
+        "sha256": "26a903bb49831614ff39520baaf16f3e13338a33ac70159aa4caf012a1f6eaca",
+        "bytes": 11335
+      },
+      {
+        "path": "contracts/schemas/task-context-v1.schema.json",
+        "sha256": "48cb3cfa3d3e208bde355b516e242498a0c876eb424af2b18c252fa7bd3643fc",
+        "bytes": 7009
+      },
+      {
+        "path": "contracts/schemas/task-dag-v1.schema.json",
+        "sha256": "02159af6415c67473c30726aa7441ba9c39a97ed47473ce55dccb577319e259d",
+        "bytes": 3275
+      }
+    ]
+  },
+  "schemaMigrationConfigVersions": {
+    "contracts": "contracts/manifest.json",
+    "migrations": "src/BuildingBlocks/Persistence/Migrations",
+    "publicOrigin": "https://atlas.lalapilot.com"
+  },
+  "build": {
+    "status": "host_pipeline_pending",
+    "note": "The host owns the single build and deployment; no CI result is asserted here."
+  },
+  "deployments": [
+    {
+      "environment": "Mac8 public development preview",
+      "url": "https://atlas.lalapilot.com",
+      "deployedAt": "2026-11-22",
+      "evidenceRef": "docs/release/public-preview.md"
+    }
+  ],
+  "selfProject": {
+    "case": "Business Atlas T1.0 authorized project",
+    "sourceRefs": [
+      "knowledge/baseline/self-bootstrap.akp.json",
+      "knowledge/baseline/self-change-T36.akp.json"
+    ]
+  },
+  "knowledge": {
+    "archive": {
+      "path": "knowledge-archive.zip",
+      "sha256": "18b8546ca9fbf91964df0bdd506e23cfcbab4d591705a7ed34bbf2ac3f100e30",
+      "bytes": 3280192
+    },
+    "baselines": [
+      "knowledge/baseline/self-bootstrap.akp.json",
+      "knowledge/baseline/self-change-T36.akp.json"
+    ]
+  },
+  "requirements": [
+    {
+      "requirementId": "BA-PRJ-001",
+      "title": "项目作为独立认知边界",
+      "priority": "P0",
+      "workpackageId": "W12",
+      "taskIds": [
+        "T05",
+        "T33"
+      ],
+      "testIds": [
+        "AT-PRJ-001",
+        "AT-T05",
+        "AT-T33"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-PRJ-002",
+      "title": "支持空白项目",
+      "priority": "P0",
+      "workpackageId": "W12",
+      "taskIds": [
+        "T05",
+        "T33"
+      ],
+      "testIds": [
+        "AT-PRJ-002",
+        "AT-T05",
+        "AT-T33"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-PRJ-003",
+      "title": "支持接管老项目",
+      "priority": "P0",
+      "workpackageId": "W12",
+      "taskIds": [
+        "T05"
+      ],
+      "testIds": [
+        "AT-PRJ-003",
+        "AT-T05"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-PRJ-004",
+      "title": "老项目事实与规范区分",
+      "priority": "P0",
+      "workpackageId": "W12",
+      "taskIds": [
+        "T05"
+      ],
+      "testIds": [
+        "AT-PRJ-004",
+        "AT-T05"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-PRJ-005",
+      "title": "项目概览一眼理解",
+      "priority": "P0",
+      "workpackageId": "W12",
+      "taskIds": [
+        "T33"
+      ],
+      "testIds": [
+        "AT-PRJ-005",
+        "AT-T33"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-PRJ-006",
+      "title": "按项目类型调整概览",
+      "priority": "P1",
+      "workpackageId": "W12",
+      "taskIds": [
+        "T05"
+      ],
+      "testIds": [
+        "AT-PRJ-006",
+        "AT-T05"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-CAT-001",
+      "title": "固定五维知识框架",
+      "priority": "P0",
+      "workpackageId": "W17",
+      "taskIds": [
+        "T07",
+        "T09",
+        "T18",
+        "T33"
+      ],
+      "testIds": [
+        "AT-CAT-001",
+        "AT-T07",
+        "AT-T09",
+        "AT-T18",
+        "AT-T33"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-CAT-002",
+      "title": "知识分类有明确身份",
+      "priority": "P0",
+      "workpackageId": "W17",
+      "taskIds": [
+        "T07",
+        "T09",
+        "T18",
+        "T33"
+      ],
+      "testIds": [
+        "AT-CAT-002",
+        "AT-T07",
+        "AT-T09",
+        "AT-T18",
+        "AT-T33"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-CAT-003",
+      "title": "允许项目自定义知识类型",
+      "priority": "P1",
+      "workpackageId": "W17",
+      "taskIds": [
+        "T07"
+      ],
+      "testIds": [
+        "AT-CAT-003",
+        "AT-T07"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-CAT-004",
+      "title": "架构及工程知识索引",
+      "priority": "P0",
+      "workpackageId": "W17",
+      "taskIds": [
+        "T09",
+        "T19"
+      ],
+      "testIds": [
+        "AT-CAT-004",
+        "AT-T09",
+        "AT-T19"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-CAT-005",
+      "title": "项目知识覆盖说明",
+      "priority": "P1",
+      "workpackageId": "W17",
+      "taskIds": [
+        "T20"
+      ],
+      "testIds": [
+        "AT-CAT-005",
+        "AT-T20"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-SEM-001",
+      "title": "稳定实体身份",
+      "priority": "P0",
+      "workpackageId": "W13",
+      "taskIds": [
+        "T08",
+        "T09"
+      ],
+      "testIds": [
+        "AT-SEM-001",
+        "AT-T08",
+        "AT-T09"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-SEM-002",
+      "title": "稳定外部身份映射",
+      "priority": "P0",
+      "workpackageId": "W13",
+      "taskIds": [
+        "T08",
+        "T09"
+      ],
+      "testIds": [
+        "AT-SEM-002",
+        "AT-T08",
+        "AT-T09"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-SEM-003",
+      "title": "知识关系结构化",
+      "priority": "P0",
+      "workpackageId": "W13",
+      "taskIds": [
+        "T09",
+        "T11"
+      ],
+      "testIds": [
+        "AT-SEM-003",
+        "AT-T09",
+        "AT-T11"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-SEM-004",
+      "title": "规则适用条件",
+      "priority": "P0",
+      "workpackageId": "W13",
+      "taskIds": [
+        "T10",
+        "T41"
+      ],
+      "testIds": [
+        "AT-SEM-004",
+        "AT-T10",
+        "AT-T41"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-SEM-005",
+      "title": "业务事件与动作",
+      "priority": "P0",
+      "workpackageId": "W13",
+      "taskIds": [
+        "T09",
+        "T11"
+      ],
+      "testIds": [
+        "AT-SEM-005",
+        "AT-T09",
+        "AT-T11"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-SEM-006",
+      "title": "决策分支及状态机",
+      "priority": "P0",
+      "workpackageId": "W13",
+      "taskIds": [
+        "T10",
+        "T11",
+        "T41"
+      ],
+      "testIds": [
+        "AT-SEM-006",
+        "AT-T10",
+        "AT-T11",
+        "AT-T41"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-SEM-007",
+      "title": "知识来源定位",
+      "priority": "P0",
+      "workpackageId": "W13",
+      "taskIds": [
+        "T08",
+        "T12",
+        "T19"
+      ],
+      "testIds": [
+        "AT-SEM-007",
+        "AT-T08",
+        "AT-T12",
+        "AT-T19"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-SEM-008",
+      "title": "事实等级多轴表示",
+      "priority": "P0",
+      "workpackageId": "W13",
+      "taskIds": [
+        "T08"
+      ],
+      "testIds": [
+        "AT-SEM-008",
+        "AT-T08"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-SEM-009",
+      "title": "系统实现与业务规范分层",
+      "priority": "P0",
+      "workpackageId": "W13",
+      "taskIds": [
+        "T08",
+        "T19",
+        "T25"
+      ],
+      "testIds": [
+        "AT-SEM-009",
+        "AT-T08",
+        "AT-T19",
+        "AT-T25"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-SEM-010",
+      "title": "技术版本与业务版本分层",
+      "priority": "P1",
+      "workpackageId": "W13",
+      "taskIds": [
+        "T15",
+        "T25",
+        "T32"
+      ],
+      "testIds": [
+        "AT-SEM-010",
+        "AT-T15",
+        "AT-T25",
+        "AT-T32"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-ACC-001",
+      "title": "统一读取上下文",
+      "priority": "P0",
+      "workpackageId": "W14",
+      "taskIds": [
+        "T05",
+        "T06",
+        "T42"
+      ],
+      "testIds": [
+        "AT-ACC-001",
+        "AT-T05",
+        "AT-T06",
+        "AT-T42"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-ACC-002",
+      "title": "端到端访问授权",
+      "priority": "P0",
+      "workpackageId": "W14",
+      "taskIds": [
+        "T05",
+        "T06",
+        "T42"
+      ],
+      "testIds": [
+        "AT-ACC-002",
+        "AT-T05",
+        "AT-T06",
+        "AT-T42"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-ACC-003",
+      "title": "关系来源侧信道保护",
+      "priority": "P0",
+      "workpackageId": "W14",
+      "taskIds": [
+        "T05",
+        "T06",
+        "T42"
+      ],
+      "testIds": [
+        "AT-ACC-003",
+        "AT-T05",
+        "AT-T06",
+        "AT-T42"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-ACC-004",
+      "title": "批准阅读与草稿隔离",
+      "priority": "P0",
+      "workpackageId": "W14",
+      "taskIds": [
+        "T06"
+      ],
+      "testIds": [
+        "AT-ACC-004",
+        "AT-T06"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-ACC-005",
+      "title": "适用性四态",
+      "priority": "P0",
+      "workpackageId": "W14",
+      "taskIds": [
+        "T06"
+      ],
+      "testIds": [
+        "AT-ACC-005",
+        "AT-T06"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-ACC-006",
+      "title": "缓存上下文隔离",
+      "priority": "P0",
+      "workpackageId": "W14",
+      "taskIds": [
+        "T05",
+        "T06",
+        "T42"
+      ],
+      "testIds": [
+        "AT-ACC-006",
+        "AT-T05",
+        "AT-T06",
+        "AT-T42"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-ACC-007",
+      "title": "正式契约二次授权",
+      "priority": "P0",
+      "workpackageId": "W14",
+      "taskIds": [
+        "T05",
+        "T06",
+        "T42"
+      ],
+      "testIds": [
+        "AT-ACC-007",
+        "AT-T05",
+        "AT-T06",
+        "AT-T42"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-IMP-001",
+      "title": "AKP/0.1 交换契约",
+      "priority": "P0",
+      "workpackageId": "W15",
+      "taskIds": [
+        "T16"
+      ],
+      "testIds": [
+        "AT-IMP-001",
+        "AT-T16"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-IMP-002",
+      "title": "输入包解析与拒绝恶意内容",
+      "priority": "P0",
+      "workpackageId": "W15",
+      "taskIds": [
+        "T16"
+      ],
+      "testIds": [
+        "AT-IMP-002",
+        "AT-T16"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-IMP-003",
+      "title": "导入差异预览",
+      "priority": "P0",
+      "workpackageId": "W15",
+      "taskIds": [
+        "T16"
+      ],
+      "testIds": [
+        "AT-IMP-003",
+        "AT-T16"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-IMP-004",
+      "title": "原子提交至草稿",
+      "priority": "P0",
+      "workpackageId": "W15",
+      "taskIds": [
+        "T16"
+      ],
+      "testIds": [
+        "AT-IMP-004",
+        "AT-T16"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-IMP-005",
+      "title": "重导幂等",
+      "priority": "P0",
+      "workpackageId": "W15",
+      "taskIds": [
+        "T16"
+      ],
+      "testIds": [
+        "AT-IMP-005",
+        "AT-T16"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-IMP-006",
+      "title": "冲突进入人工确认",
+      "priority": "P0",
+      "workpackageId": "W15",
+      "taskIds": [
+        "T16"
+      ],
+      "testIds": [
+        "AT-IMP-006",
+        "AT-T16"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-IMP-007",
+      "title": "来源与执行记录关联",
+      "priority": "P1",
+      "workpackageId": "W15",
+      "taskIds": [
+        "T16"
+      ],
+      "testIds": [
+        "AT-IMP-007",
+        "AT-T16"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-IMP-008",
+      "title": "资料接入低频入口",
+      "priority": "P1",
+      "workpackageId": "W15",
+      "taskIds": [
+        "T16"
+      ],
+      "testIds": [
+        "AT-IMP-008",
+        "AT-T16"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-IMP-009",
+      "title": "接入后形成阅读入口",
+      "priority": "P0",
+      "workpackageId": "W15",
+      "taskIds": [
+        "T16"
+      ],
+      "testIds": [
+        "AT-IMP-009",
+        "AT-T16"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-READ-001",
+      "title": "用户无需内部ID找对象",
+      "priority": "P0",
+      "workpackageId": "W18",
+      "taskIds": [
+        "T18",
+        "T19",
+        "T20",
+        "T28",
+        "T33",
+        "T34"
+      ],
+      "testIds": [
+        "AT-READ-001",
+        "AT-T18",
+        "AT-T19",
+        "AT-T20",
+        "AT-T28",
+        "AT-T33",
+        "AT-T34"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-READ-002",
+      "title": "认知任务驱动投影",
+      "priority": "P0",
+      "workpackageId": "W18",
+      "taskIds": [
+        "T19",
+        "T20",
+        "T34"
+      ],
+      "testIds": [
+        "AT-READ-002",
+        "AT-T19",
+        "AT-T20",
+        "AT-T34"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-READ-003",
+      "title": "默认解释优先",
+      "priority": "P0",
+      "workpackageId": "W18",
+      "taskIds": [
+        "T19",
+        "T20",
+        "T34"
+      ],
+      "testIds": [
+        "AT-READ-003",
+        "AT-T19",
+        "AT-T20",
+        "AT-T34"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-READ-004",
+      "title": "阅读内容按类型变更",
+      "priority": "P1",
+      "workpackageId": "W18",
+      "taskIds": [
+        "T19",
+        "T20",
+        "T34"
+      ],
+      "testIds": [
+        "AT-READ-004",
+        "AT-T19",
+        "AT-T20",
+        "AT-T34"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-READ-005",
+      "title": "流程决策引用规则可见",
+      "priority": "P0",
+      "workpackageId": "W18",
+      "taskIds": [
+        "T19",
+        "T34"
+      ],
+      "testIds": [
+        "AT-READ-005",
+        "AT-T19",
+        "AT-T34"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-READ-006",
+      "title": "只使用明确执行顺序",
+      "priority": "P0",
+      "workpackageId": "W18",
+      "taskIds": [
+        "T19"
+      ],
+      "testIds": [
+        "AT-READ-006",
+        "AT-T19"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-READ-007",
+      "title": "局部上下文优先",
+      "priority": "P0",
+      "workpackageId": "W18",
+      "taskIds": [
+        "T18",
+        "T19",
+        "T20",
+        "T28",
+        "T33",
+        "T34"
+      ],
+      "testIds": [
+        "AT-READ-007",
+        "AT-T18",
+        "AT-T19",
+        "AT-T20",
+        "AT-T28",
+        "AT-T33",
+        "AT-T34"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-READ-008",
+      "title": "按方向探索上下游",
+      "priority": "P1",
+      "workpackageId": "W18",
+      "taskIds": [
+        "T19"
+      ],
+      "testIds": [
+        "AT-READ-008",
+        "AT-T19"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-READ-009",
+      "title": "未知与冲突就地解释",
+      "priority": "P0",
+      "workpackageId": "W18",
+      "taskIds": [
+        "T20",
+        "T34"
+      ],
+      "testIds": [
+        "AT-READ-009",
+        "AT-T20",
+        "AT-T34"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-READ-010",
+      "title": "功能技术映射链",
+      "priority": "P0",
+      "workpackageId": "W18",
+      "taskIds": [
+        "T19"
+      ],
+      "testIds": [
+        "AT-READ-010",
+        "AT-T19"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-READ-011",
+      "title": "项目助手上下文提问",
+      "priority": "P1",
+      "workpackageId": "W18",
+      "taskIds": [
+        "T27",
+        "T28",
+        "T37"
+      ],
+      "testIds": [
+        "AT-READ-011",
+        "AT-T27",
+        "AT-T28",
+        "AT-T37"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-READ-012",
+      "title": "助手不确定性表达",
+      "priority": "P0",
+      "workpackageId": "W18",
+      "taskIds": [
+        "T27",
+        "T28",
+        "T37"
+      ],
+      "testIds": [
+        "AT-READ-012",
+        "AT-T27",
+        "AT-T28",
+        "AT-T37"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-READ-013",
+      "title": "关键结论可逐点追溯",
+      "priority": "P0",
+      "workpackageId": "W18",
+      "taskIds": [
+        "T18",
+        "T19",
+        "T20",
+        "T28",
+        "T33",
+        "T34"
+      ],
+      "testIds": [
+        "AT-READ-013",
+        "AT-T18",
+        "AT-T19",
+        "AT-T20",
+        "AT-T28",
+        "AT-T33",
+        "AT-T34"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-READ-014",
+      "title": "阅读连续性与返回焦点",
+      "priority": "P1",
+      "workpackageId": "W18",
+      "taskIds": [
+        "T18",
+        "T19",
+        "T20",
+        "T28",
+        "T33",
+        "T34"
+      ],
+      "testIds": [
+        "AT-READ-014",
+        "AT-T18",
+        "AT-T19",
+        "AT-T20",
+        "AT-T28",
+        "AT-T33",
+        "AT-T34"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-VIS-001",
+      "title": "局部小图解释具体判断",
+      "priority": "P0",
+      "workpackageId": "W19",
+      "taskIds": [
+        "T01",
+        "T34"
+      ],
+      "testIds": [
+        "AT-VIS-001",
+        "AT-T01",
+        "AT-T34"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-VIS-002",
+      "title": "阶段聚合不能丢信息",
+      "priority": "P0",
+      "workpackageId": "W19",
+      "taskIds": [
+        "T11",
+        "T19",
+        "T34",
+        "T41"
+      ],
+      "testIds": [
+        "AT-VIS-002",
+        "AT-T11",
+        "AT-T19",
+        "AT-T34",
+        "AT-T41"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-VIS-003",
+      "title": "边类型明确标注",
+      "priority": "P0",
+      "workpackageId": "W19",
+      "taskIds": [
+        "T09",
+        "T11",
+        "T19",
+        "T34"
+      ],
+      "testIds": [
+        "AT-VIS-003",
+        "AT-T09",
+        "AT-T11",
+        "AT-T19",
+        "AT-T34"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-VIS-004",
+      "title": "图形完整布局",
+      "priority": "P0",
+      "workpackageId": "W19",
+      "taskIds": [
+        "T01",
+        "T34"
+      ],
+      "testIds": [
+        "AT-VIS-004",
+        "AT-T01",
+        "AT-T34"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-VIS-005",
+      "title": "不同问题选不同表达",
+      "priority": "P1",
+      "workpackageId": "W19",
+      "taskIds": [
+        "T19",
+        "T34"
+      ],
+      "testIds": [
+        "AT-VIS-005",
+        "AT-T19",
+        "AT-T34"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-VIS-006",
+      "title": "图文共享焦点",
+      "priority": "P1",
+      "workpackageId": "W19",
+      "taskIds": [
+        "T19",
+        "T34"
+      ],
+      "testIds": [
+        "AT-VIS-006",
+        "AT-T19",
+        "AT-T34"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-VIS-007",
+      "title": "原型图热点关联",
+      "priority": "P2",
+      "workpackageId": "W19",
+      "taskIds": [
+        "T01",
+        "T34"
+      ],
+      "testIds": [
+        "AT-VIS-007",
+        "AT-T01",
+        "AT-T34"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-VIS-008",
+      "title": "导出图仅为派生视图",
+      "priority": "P1",
+      "workpackageId": "W19",
+      "taskIds": [
+        "T01",
+        "T18"
+      ],
+      "testIds": [
+        "AT-VIS-008",
+        "AT-T01",
+        "AT-T18"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-GOV-001",
+      "title": "草稿提交审核发布",
+      "priority": "P0",
+      "workpackageId": "W16",
+      "taskIds": [
+        "T13",
+        "T35"
+      ],
+      "testIds": [
+        "AT-GOV-001",
+        "AT-T13",
+        "AT-T35"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-GOV-002",
+      "title": "Command 失败全量回滚",
+      "priority": "P0",
+      "workpackageId": "W16",
+      "taskIds": [
+        "T13",
+        "T14",
+        "T35"
+      ],
+      "testIds": [
+        "AT-GOV-002",
+        "AT-T13",
+        "AT-T14",
+        "AT-T35"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-GOV-003",
+      "title": "历史不可变",
+      "priority": "P0",
+      "workpackageId": "W16",
+      "taskIds": [
+        "T15",
+        "T35"
+      ],
+      "testIds": [
+        "AT-GOV-003",
+        "AT-T15",
+        "AT-T35"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-GOV-004",
+      "title": "业务修改影响分析",
+      "priority": "P0",
+      "workpackageId": "W16",
+      "taskIds": [
+        "T22",
+        "T23",
+        "T24"
+      ],
+      "testIds": [
+        "AT-GOV-004",
+        "AT-T22",
+        "AT-T23",
+        "AT-T24"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-GOV-005",
+      "title": "治理差异和可审批决策",
+      "priority": "P0",
+      "workpackageId": "W16",
+      "taskIds": [
+        "T13",
+        "T14",
+        "T35"
+      ],
+      "testIds": [
+        "AT-GOV-005",
+        "AT-T13",
+        "AT-T14",
+        "AT-T35"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-GOV-006",
+      "title": "冲突可追踪",
+      "priority": "P1",
+      "workpackageId": "W16",
+      "taskIds": [
+        "T13"
+      ],
+      "testIds": [
+        "AT-GOV-006",
+        "AT-T13"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-COL-001",
+      "title": "问题和任务关联知识",
+      "priority": "P0",
+      "workpackageId": "W20",
+      "taskIds": [
+        "T21",
+        "T26",
+        "T36"
+      ],
+      "testIds": [
+        "AT-COL-001",
+        "AT-T21",
+        "AT-T26",
+        "AT-T36"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-COL-002",
+      "title": "反馈轻量提交",
+      "priority": "P1",
+      "workpackageId": "W20",
+      "taskIds": [
+        "T21",
+        "T26",
+        "T36"
+      ],
+      "testIds": [
+        "AT-COL-002",
+        "AT-T21",
+        "AT-T26",
+        "AT-T36"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-COL-003",
+      "title": "反馈分流闭环",
+      "priority": "P1",
+      "workpackageId": "W20",
+      "taskIds": [
+        "T21",
+        "T26",
+        "T36",
+        "T37"
+      ],
+      "testIds": [
+        "AT-COL-003",
+        "AT-T21",
+        "AT-T26",
+        "AT-T36",
+        "AT-T37"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-COL-004",
+      "title": "Agent 运行记录证据化",
+      "priority": "P1",
+      "workpackageId": "W20",
+      "taskIds": [
+        "T29"
+      ],
+      "testIds": [
+        "AT-COL-004",
+        "AT-T29"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-COL-005",
+      "title": "任务知识交付契约",
+      "priority": "P0",
+      "workpackageId": "W20",
+      "taskIds": [
+        "T24",
+        "T25",
+        "T31"
+      ],
+      "testIds": [
+        "AT-COL-005",
+        "AT-T24",
+        "AT-T25",
+        "AT-T31"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-COL-006",
+      "title": "契约失效与复核",
+      "priority": "P1",
+      "workpackageId": "W20",
+      "taskIds": [
+        "T24",
+        "T25"
+      ],
+      "testIds": [
+        "AT-COL-006",
+        "AT-T24",
+        "AT-T25"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-COL-007",
+      "title": "AI 反馈反哺产品设计",
+      "priority": "P1",
+      "workpackageId": "W20",
+      "taskIds": [
+        "T21",
+        "T32",
+        "T37"
+      ],
+      "testIds": [
+        "AT-COL-007",
+        "AT-T21",
+        "AT-T32",
+        "AT-T37"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-COL-008",
+      "title": "开发 Agent 错误模式沉淀",
+      "priority": "P1",
+      "workpackageId": "W20",
+      "taskIds": [
+        "T32"
+      ],
+      "testIds": [
+        "AT-COL-008",
+        "AT-T32"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-DLV-001",
+      "title": "验收以业务事实为准",
+      "priority": "P0",
+      "workpackageId": "W21",
+      "taskIds": [
+        "T25",
+        "T36",
+        "T43"
+      ],
+      "testIds": [
+        "AT-DLV-001",
+        "AT-T25",
+        "AT-T36",
+        "AT-T43"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-DLV-002",
+      "title": "交付记录可重复定位",
+      "priority": "P1",
+      "workpackageId": "W21",
+      "taskIds": [
+        "T31",
+        "T32"
+      ],
+      "testIds": [
+        "AT-DLV-002",
+        "AT-T31",
+        "AT-T32"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-QA-001",
+      "title": "权限渲染端到端测试",
+      "priority": "P0",
+      "workpackageId": "W27",
+      "taskIds": [
+        "T42"
+      ],
+      "testIds": [
+        "AT-QA-001",
+        "AT-T42"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-QA-002",
+      "title": "认知内容正确性测试",
+      "priority": "P0",
+      "workpackageId": "W27",
+      "taskIds": [
+        "T41"
+      ],
+      "testIds": [
+        "AT-QA-002",
+        "AT-T41"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-QA-003",
+      "title": "离线原型边界告知",
+      "priority": "P0",
+      "workpackageId": "W27",
+      "taskIds": [
+        "T01",
+        "T34",
+        "T44"
+      ],
+      "testIds": [
+        "AT-QA-003",
+        "AT-T01",
+        "AT-T34",
+        "AT-T44"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-QA-004",
+      "title": "真实试点理解效果衡量",
+      "priority": "P0",
+      "workpackageId": "W27",
+      "taskIds": [
+        "T43"
+      ],
+      "testIds": [
+        "AT-QA-004",
+        "AT-T43"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "BA-QA-005",
+      "title": "首次开发纵切闭环",
+      "priority": "P0",
+      "workpackageId": "W27",
+      "taskIds": [
+        "T38",
+        "T43",
+        "T44"
+      ],
+      "testIds": [
+        "AT-QA-005",
+        "AT-T38",
+        "AT-T43",
+        "AT-T44"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-ARCH-001",
+      "title": "对完整目标架构作证据式选型",
+      "priority": "P0",
+      "workpackageId": "W11",
+      "taskIds": [
+        "T01",
+        "T02",
+        "T39"
+      ],
+      "testIds": [
+        "AT-ENG-ARCH-001",
+        "AT-T01",
+        "AT-T02",
+        "AT-T39"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-ARCH-002",
+      "title": "强制模块边界与依赖方向",
+      "priority": "P0",
+      "workpackageId": "W11",
+      "taskIds": [
+        "T02",
+        "T03"
+      ],
+      "testIds": [
+        "AT-ENG-ARCH-002",
+        "AT-T02",
+        "AT-T03"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-ARCH-003",
+      "title": "服务端单一授权门面",
+      "priority": "P0",
+      "workpackageId": "W11",
+      "taskIds": [
+        "T05",
+        "T06",
+        "T42"
+      ],
+      "testIds": [
+        "AT-ENG-ARCH-003",
+        "AT-T05",
+        "AT-T06",
+        "AT-T42"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-ARCH-004",
+      "title": "数据库版本发布原子性",
+      "priority": "P0",
+      "workpackageId": "W11",
+      "taskIds": [
+        "T03",
+        "T14",
+        "T41"
+      ],
+      "testIds": [
+        "AT-ENG-ARCH-004",
+        "AT-T03",
+        "AT-T14",
+        "AT-T41"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-ARCH-005",
+      "title": "可升级的协议与版本策略",
+      "priority": "P0",
+      "workpackageId": "W11",
+      "taskIds": [
+        "T01",
+        "T07",
+        "T16",
+        "T30"
+      ],
+      "testIds": [
+        "AT-ENG-ARCH-005",
+        "AT-T01",
+        "AT-T07",
+        "AT-T16",
+        "AT-T30"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-ARCH-006",
+      "title": "可替换真实模型与工具适配器",
+      "priority": "P0",
+      "workpackageId": "W11",
+      "taskIds": [
+        "T27",
+        "T29",
+        "T30"
+      ],
+      "testIds": [
+        "AT-ENG-ARCH-006",
+        "AT-T27",
+        "AT-T29",
+        "AT-T30"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-ARCH-007",
+      "title": "系统可观测可运营",
+      "priority": "P0",
+      "workpackageId": "W11",
+      "taskIds": [
+        "T17",
+        "T40"
+      ],
+      "testIds": [
+        "AT-ENG-ARCH-007",
+        "AT-T17",
+        "AT-T40"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-ARCH-008",
+      "title": "数据迁移与恢复能复现",
+      "priority": "P0",
+      "workpackageId": "W11",
+      "taskIds": [
+        "T03",
+        "T40"
+      ],
+      "testIds": [
+        "AT-ENG-ARCH-008",
+        "AT-T03",
+        "AT-T40"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-KNW-001",
+      "title": "每个 PR 都需要知识交付",
+      "priority": "P0",
+      "workpackageId": "W25",
+      "taskIds": [
+        "T31",
+        "T32",
+        "T38"
+      ],
+      "testIds": [
+        "AT-ENG-KNW-001",
+        "AT-T31",
+        "AT-T32",
+        "AT-T38"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-KNW-002",
+      "title": "项目自举知识双层策略",
+      "priority": "P0",
+      "workpackageId": "W25",
+      "taskIds": [
+        "T31",
+        "T38"
+      ],
+      "testIds": [
+        "AT-ENG-KNW-002",
+        "AT-T31",
+        "AT-T38"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-KNW-003",
+      "title": "代码观察与业务批准分离",
+      "priority": "P0",
+      "workpackageId": "W25",
+      "taskIds": [
+        "T31"
+      ],
+      "testIds": [
+        "AT-ENG-KNW-003",
+        "AT-T31"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-KNW-004",
+      "title": "代码提交与知识来源绑定",
+      "priority": "P0",
+      "workpackageId": "W25",
+      "taskIds": [
+        "T31",
+        "T32",
+        "T38"
+      ],
+      "testIds": [
+        "AT-ENG-KNW-004",
+        "AT-T31",
+        "AT-T32",
+        "AT-T38"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-KNW-005",
+      "title": "知识变更进入同一治理工作流",
+      "priority": "P0",
+      "workpackageId": "W25",
+      "taskIds": [
+        "T31"
+      ],
+      "testIds": [
+        "AT-ENG-KNW-005",
+        "AT-T31"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-KNW-006",
+      "title": "知识欠债受控",
+      "priority": "P0",
+      "workpackageId": "W25",
+      "taskIds": [
+        "T31"
+      ],
+      "testIds": [
+        "AT-ENG-KNW-006",
+        "AT-T31"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-KNW-007",
+      "title": "知识变更与部署对账",
+      "priority": "P0",
+      "workpackageId": "W25",
+      "taskIds": [
+        "T32"
+      ],
+      "testIds": [
+        "AT-ENG-KNW-007",
+        "AT-T32"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-KNW-008",
+      "title": "错误模式库降低 Agent 重犯",
+      "priority": "P1",
+      "workpackageId": "W25",
+      "taskIds": [
+        "T32"
+      ],
+      "testIds": [
+        "AT-ENG-KNW-008",
+        "AT-T32"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-DEL-001",
+      "title": "最终目标覆盖全部能力",
+      "priority": "P0",
+      "workpackageId": "W26",
+      "taskIds": [
+        "T01",
+        "T44"
+      ],
+      "testIds": [
+        "AT-ENG-DEL-001",
+        "AT-T01",
+        "AT-T44"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-DEL-002",
+      "title": "分工明确独立评审",
+      "priority": "P0",
+      "workpackageId": "W26",
+      "taskIds": [
+        "T01",
+        "T41",
+        "T42",
+        "T43",
+        "T44"
+      ],
+      "testIds": [
+        "AT-ENG-DEL-002",
+        "AT-T01",
+        "AT-T41",
+        "AT-T42",
+        "AT-T43",
+        "AT-T44"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-DEL-003",
+      "title": "工作树分支并行与契约所有权",
+      "priority": "P0",
+      "workpackageId": "W26",
+      "taskIds": [
+        "T01",
+        "T02",
+        "T44"
+      ],
+      "testIds": [
+        "AT-ENG-DEL-003",
+        "AT-T01",
+        "AT-T02",
+        "AT-T44"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-DEL-004",
+      "title": "源码/部署/测试完整移交",
+      "priority": "P0",
+      "workpackageId": "W26",
+      "taskIds": [
+        "T39",
+        "T40",
+        "T44"
+      ],
+      "testIds": [
+        "AT-ENG-DEL-004",
+        "AT-T39",
+        "AT-T40",
+        "AT-T44"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-DEL-005",
+      "title": "已知 V9.2 阻断缺陷禁止复刻",
+      "priority": "P0",
+      "workpackageId": "W26",
+      "taskIds": [
+        "T41",
+        "T42",
+        "T43"
+      ],
+      "testIds": [
+        "AT-ENG-DEL-005",
+        "AT-T41",
+        "AT-T42",
+        "AT-T43"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-DEL-006",
+      "title": "全量接口行为与知识版本追溯",
+      "priority": "P0",
+      "workpackageId": "W26",
+      "taskIds": [
+        "T01",
+        "T24",
+        "T31",
+        "T44"
+      ],
+      "testIds": [
+        "AT-ENG-DEL-006",
+        "AT-T01",
+        "AT-T24",
+        "AT-T31",
+        "AT-T44"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-DEL-007",
+      "title": "统一自检和独立质量 Gate",
+      "priority": "P0",
+      "workpackageId": "W26",
+      "taskIds": [
+        "T41",
+        "T42",
+        "T43",
+        "T44"
+      ],
+      "testIds": [
+        "AT-ENG-DEL-007",
+        "AT-T41",
+        "AT-T42",
+        "AT-T43",
+        "AT-T44"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-DEL-008",
+      "title": "一份完整最终交付而非多次部分完成",
+      "priority": "P0",
+      "workpackageId": "W26",
+      "taskIds": [
+        "T44"
+      ],
+      "testIds": [
+        "AT-ENG-DEL-008",
+        "AT-T44"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-AI-001",
+      "title": "真实 LLM 检索生成与引用",
+      "priority": "P0",
+      "workpackageId": "W22",
+      "taskIds": [
+        "T27",
+        "T28",
+        "T29",
+        "T30",
+        "T37"
+      ],
+      "testIds": [
+        "AT-ENG-AI-001",
+        "AT-T27",
+        "AT-T28",
+        "AT-T29",
+        "AT-T30",
+        "AT-T37"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-AI-002",
+      "title": "真实 MCP 授权工具与资源",
+      "priority": "P0",
+      "workpackageId": "W22",
+      "taskIds": [
+        "T30"
+      ],
+      "testIds": [
+        "AT-ENG-AI-002",
+        "AT-T30"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-AI-003",
+      "title": "Agent Run 原始证据与推断分离",
+      "priority": "P0",
+      "workpackageId": "W22",
+      "taskIds": [
+        "T27",
+        "T29",
+        "T30",
+        "T37"
+      ],
+      "testIds": [
+        "AT-ENG-AI-003",
+        "AT-T27",
+        "AT-T29",
+        "AT-T30",
+        "AT-T37"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-AI-004",
+      "title": "工具写入仅能形成提案",
+      "priority": "P0",
+      "workpackageId": "W23",
+      "taskIds": [
+        "T17"
+      ],
+      "testIds": [
+        "AT-ENG-AI-004",
+        "AT-T17"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-AI-005",
+      "title": "长时间 Agent 任务可恢复",
+      "priority": "P1",
+      "workpackageId": "W23",
+      "taskIds": [
+        "T17",
+        "T27",
+        "T29"
+      ],
+      "testIds": [
+        "AT-ENG-AI-005",
+        "AT-T17",
+        "AT-T27",
+        "AT-T29"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-AI-006",
+      "title": "模型与工具的成本/配额/审计",
+      "priority": "P1",
+      "workpackageId": "W23",
+      "taskIds": [
+        "T17"
+      ],
+      "testIds": [
+        "AT-ENG-AI-006",
+        "AT-T17"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-OPS-001",
+      "title": "真实双用户协作与并发控制",
+      "priority": "P0",
+      "workpackageId": "W24",
+      "taskIds": [
+        "T04"
+      ],
+      "testIds": [
+        "AT-ENG-OPS-001",
+        "AT-T04"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-OPS-002",
+      "title": "项目数据安全与来源存储",
+      "priority": "P0",
+      "workpackageId": "W24",
+      "taskIds": [
+        "T04",
+        "T12",
+        "T42"
+      ],
+      "testIds": [
+        "AT-ENG-OPS-002",
+        "AT-T04",
+        "AT-T12",
+        "AT-T42"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-OPS-003",
+      "title": "生产级故障可恢复",
+      "priority": "P0",
+      "workpackageId": "W24",
+      "taskIds": [
+        "T04",
+        "T17",
+        "T26",
+        "T39",
+        "T40",
+        "T42"
+      ],
+      "testIds": [
+        "AT-ENG-OPS-003",
+        "AT-T04",
+        "AT-T17",
+        "AT-T26",
+        "AT-T39",
+        "AT-T40",
+        "AT-T42"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-OPS-004",
+      "title": "部署模板与运行检查",
+      "priority": "P0",
+      "workpackageId": "W26",
+      "taskIds": [
+        "T39"
+      ],
+      "testIds": [
+        "AT-ENG-OPS-004",
+        "AT-T39"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-OPS-005",
+      "title": "完整供应链/依赖安全审查",
+      "priority": "P1",
+      "workpackageId": "W26",
+      "taskIds": [
+        "T42"
+      ],
+      "testIds": [
+        "AT-ENG-OPS-005",
+        "AT-T42"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "ENG-OPS-006",
+      "title": "无知时诚实表达且能反馈",
+      "priority": "P0",
+      "workpackageId": "W26",
+      "taskIds": [
+        "T20",
+        "T27",
+        "T28",
+        "T37"
+      ],
+      "testIds": [
+        "AT-ENG-OPS-006",
+        "AT-T20",
+        "AT-T27",
+        "AT-T28",
+        "AT-T37"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-01",
+      "title": "多项目独立认知、范围、权限与历史；可空项目创建",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T05",
+        "T16",
+        "T33"
+      ],
+      "testIds": [
+        "AT-P13",
+        "AT-T05",
+        "AT-T16",
+        "AT-T33"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-02",
+      "title": "五维骨架及项目实际领域语言",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T07",
+        "T09",
+        "T18",
+        "T33"
+      ],
+      "testIds": [
+        "AT-P03",
+        "AT-T07",
+        "AT-T09",
+        "AT-T18",
+        "AT-T33"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-03",
+      "title": "业务概念/属性与技术字段独立身份、修订映射",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T08",
+        "T09",
+        "T34",
+        "T41"
+      ],
+      "testIds": [
+        "AT-P03",
+        "AT-T08",
+        "AT-T09",
+        "AT-T34",
+        "AT-T41"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-04",
+      "title": "知识类型/关系可扩展并有兼容规则",
+      "priority": "配套",
+      "workpackageId": "",
+      "taskIds": [
+        "T07"
+      ],
+      "testIds": [
+        "AT-P07",
+        "AT-T07"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-05",
+      "title": "稳定知识身份、细化/复用、不同视图同一事实",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T08",
+        "T09",
+        "T16",
+        "T41"
+      ],
+      "testIds": [
+        "AT-P07",
+        "AT-T08",
+        "AT-T09",
+        "AT-T16",
+        "AT-T41"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-06",
+      "title": "语义明确的双向追溯，关系带证据与适用性",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T09",
+        "T11",
+        "T19",
+        "T22"
+      ],
+      "testIds": [
+        "AT-P03",
+        "AT-T09",
+        "AT-T11",
+        "AT-T19",
+        "AT-T22"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-07",
+      "title": "需求、规则、应然/实际行为、设计与实现区分",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T08",
+        "T10",
+        "T19",
+        "T34",
+        "T41"
+      ],
+      "testIds": [
+        "AT-P02",
+        "AT-T08",
+        "AT-T10",
+        "AT-T19",
+        "AT-T34",
+        "AT-T41"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-08",
+      "title": "规则完整表达条件、依据、结果、默认与异常",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T10",
+        "T20",
+        "T34",
+        "T41"
+      ],
+      "testIds": [
+        "AT-P01",
+        "AT-T10",
+        "AT-T20",
+        "AT-T34",
+        "AT-T41"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-09",
+      "title": "完整流程语义及规则引用，文字优先",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T11",
+        "T19",
+        "T34",
+        "T41"
+      ],
+      "testIds": [
+        "AT-P11",
+        "AT-T11",
+        "AT-T19",
+        "AT-T34",
+        "AT-T41"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-10",
+      "title": "内容表达契约和按类型展示",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T07",
+        "T19",
+        "T20",
+        "T34"
+      ],
+      "testIds": [
+        "AT-P01",
+        "AT-T07",
+        "AT-T19",
+        "AT-T20",
+        "AT-T34"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-11",
+      "title": "AI 内容检查识别混写、缺语义、无依据",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T10",
+        "T20",
+        "T27",
+        "T34",
+        "T41"
+      ],
+      "testIds": [
+        "AT-P01",
+        "AT-T10",
+        "AT-T20",
+        "AT-T27",
+        "AT-T34",
+        "AT-T41"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-12",
+      "title": "读者可快速理解并深入证据",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T12",
+        "T18",
+        "T19",
+        "T20",
+        "T28",
+        "T33",
+        "T34",
+        "T43"
+      ],
+      "testIds": [
+        "AT-P12",
+        "AT-T12",
+        "AT-T18",
+        "AT-T19",
+        "AT-T20",
+        "AT-T28",
+        "AT-T33",
+        "AT-T34",
+        "AT-T43"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-13",
+      "title": "人轻量提出需求/反馈并审核 AI 成果",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T21",
+        "T26",
+        "T35",
+        "T36",
+        "T43"
+      ],
+      "testIds": [
+        "AT-P12",
+        "AT-T21",
+        "AT-T26",
+        "AT-T35",
+        "AT-T36",
+        "AT-T43"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-14",
+      "title": "知识提案与正式事实隔离",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T06",
+        "T13",
+        "T35",
+        "T41"
+      ],
+      "testIds": [
+        "AT-P07",
+        "AT-T06",
+        "AT-T13",
+        "AT-T35",
+        "AT-T41"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-15",
+      "title": "多轴事实等级、核验、治理、适用性及实现状态",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T06",
+        "T08",
+        "T41"
+      ],
+      "testIds": [
+        "AT-P02",
+        "AT-T06",
+        "AT-T08",
+        "AT-T41"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-16",
+      "title": "决策权、审核批准范围与变更差异",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T13",
+        "T14",
+        "T26",
+        "T35"
+      ],
+      "testIds": [
+        "AT-P07",
+        "AT-T13",
+        "AT-T14",
+        "AT-T26",
+        "AT-T35"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-17",
+      "title": "重新提交、并发审批与基线原子发布",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T03",
+        "T04",
+        "T13",
+        "T14",
+        "T35",
+        "T41"
+      ],
+      "testIds": [
+        "AT-P07",
+        "AT-T03",
+        "AT-T04",
+        "AT-T13",
+        "AT-T14",
+        "AT-T35",
+        "AT-T41"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-18",
+      "title": "历史、适用性、模式兼容与知识回退",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T03",
+        "T08",
+        "T15",
+        "T35",
+        "T40",
+        "T41"
+      ],
+      "testIds": [
+        "AT-P07",
+        "AT-T03",
+        "AT-T08",
+        "AT-T15",
+        "AT-T35",
+        "AT-T40",
+        "AT-T41"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-19",
+      "title": "符合性必须绑定规范、观察、版本与证据",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T15",
+        "T25",
+        "T32",
+        "T41"
+      ],
+      "testIds": [
+        "AT-P08",
+        "AT-T15",
+        "AT-T25",
+        "AT-T32",
+        "AT-T41"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-20",
+      "title": "统一读写授权、导出/历史/契约重授权、来源约束",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T03",
+        "T04",
+        "T05",
+        "T06",
+        "T12",
+        "T14",
+        "T18",
+        "T24",
+        "T30",
+        "T42"
+      ],
+      "testIds": [
+        "AT-P09",
+        "AT-T03",
+        "AT-T04",
+        "AT-T05",
+        "AT-T06",
+        "AT-T12",
+        "AT-T14",
+        "AT-T18",
+        "AT-T24",
+        "AT-T30",
+        "AT-T42"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-21",
+      "title": "资料/AKP 接入、原子草稿、差异和幂等",
+      "priority": "配套",
+      "workpackageId": "",
+      "taskIds": [
+        "T12",
+        "T16",
+        "T35",
+        "T41"
+      ],
+      "testIds": [
+        "AT-P13",
+        "AT-T12",
+        "AT-T16",
+        "AT-T35",
+        "AT-T41"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-22",
+      "title": "Task 语义合同区分现状、目标、保持、未知",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T21",
+        "T24",
+        "T36"
+      ],
+      "testIds": [
+        "AT-P04",
+        "AT-T21",
+        "AT-T24",
+        "AT-T36"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-23",
+      "title": "有语义的影响候选，不以图遍历冒充调查",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T22",
+        "T36"
+      ],
+      "testIds": [
+        "AT-P03",
+        "AT-T22",
+        "AT-T36"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-24",
+      "title": "实际调查与证据处置、完整调用链",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T22",
+        "T23",
+        "T29",
+        "T36",
+        "T43"
+      ],
+      "testIds": [
+        "AT-P05",
+        "AT-T22",
+        "AT-T23",
+        "AT-T29",
+        "AT-T36",
+        "AT-T43"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-25",
+      "title": "变更传播的五类语义与业务闭合",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T13",
+        "T23",
+        "T25",
+        "T36",
+        "T41"
+      ],
+      "testIds": [
+        "AT-P03",
+        "AT-T13",
+        "AT-T23",
+        "AT-T25",
+        "AT-T36",
+        "AT-T41"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-26",
+      "title": "保持不变量、业务语义和设计职责",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T23",
+        "T24",
+        "T25",
+        "T36"
+      ],
+      "testIds": [
+        "AT-P06",
+        "AT-T23",
+        "AT-T24",
+        "AT-T25",
+        "AT-T36"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-27",
+      "title": "Agent 在授权内主动工程收敛、决策留痕",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T23",
+        "T36"
+      ],
+      "testIds": [
+        "AT-P06",
+        "AT-T23",
+        "AT-T36"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-28",
+      "title": "任务上下文按基线/权限/目的封装，过期可复核",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T06",
+        "T15",
+        "T24",
+        "T36",
+        "T42"
+      ],
+      "testIds": [
+        "AT-P04",
+        "AT-T06",
+        "AT-T15",
+        "AT-T24",
+        "AT-T36",
+        "AT-T42"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-29",
+      "title": "AI 认知服务可供人/外部 Agent 组合调用",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T17",
+        "T27",
+        "T28",
+        "T29",
+        "T30",
+        "T37",
+        "T43"
+      ],
+      "testIds": [
+        "AT-P05",
+        "AT-T17",
+        "AT-T27",
+        "AT-T28",
+        "AT-T29",
+        "AT-T30",
+        "AT-T37",
+        "AT-T43"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-30",
+      "title": "AI 生成内容及证据进入同一治理",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T12",
+        "T16",
+        "T27",
+        "T29",
+        "T30",
+        "T31",
+        "T37",
+        "T43"
+      ],
+      "testIds": [
+        "AT-P10",
+        "AT-T12",
+        "AT-T16",
+        "AT-T27",
+        "AT-T29",
+        "AT-T30",
+        "AT-T31",
+        "AT-T37",
+        "AT-T43"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-31",
+      "title": "完整任务验收以目标与保持约束、影响处置、证据为准",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T25",
+        "T36",
+        "T41",
+        "T43"
+      ],
+      "testIds": [
+        "AT-P10",
+        "AT-T25",
+        "AT-T36",
+        "AT-T41",
+        "AT-T43"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-32",
+      "title": "开发知识同步提交、合并后 Manifest、发布与部署对账",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T31",
+        "T32",
+        "T36",
+        "T38",
+        "T39",
+        "T43"
+      ],
+      "testIds": [
+        "AT-P10",
+        "AT-T31",
+        "AT-T32",
+        "AT-T36",
+        "AT-T38",
+        "AT-T39",
+        "AT-T43"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-33",
+      "title": "Self Project 的真实知识资产与开发持续更新",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T31",
+        "T38",
+        "T43"
+      ],
+      "testIds": [
+        "AT-P14",
+        "AT-T31",
+        "AT-T38",
+        "AT-T43"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-34",
+      "title": "反馈/问题/助手按上下文和权限读取与治理",
+      "priority": "配套",
+      "workpackageId": "",
+      "taskIds": [
+        "T21",
+        "T26",
+        "T27",
+        "T28",
+        "T36",
+        "T37",
+        "T43"
+      ],
+      "testIds": [
+        "AT-P12",
+        "AT-T21",
+        "AT-T26",
+        "AT-T27",
+        "AT-T28",
+        "AT-T36",
+        "AT-T37",
+        "AT-T43"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-35",
+      "title": "记录 Agent 错误模式并在后续相关 Task 预防",
+      "priority": "配套",
+      "workpackageId": "",
+      "taskIds": [
+        "T32"
+      ],
+      "testIds": [
+        "AT-P06",
+        "AT-T32"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-36",
+      "title": "认知呈现按需扩展、文字表格和案例优先",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T01",
+        "T11",
+        "T18",
+        "T19",
+        "T33",
+        "T34",
+        "T36",
+        "T37"
+      ],
+      "testIds": [
+        "AT-P11",
+        "AT-T01",
+        "AT-T11",
+        "AT-T18",
+        "AT-T19",
+        "AT-T33",
+        "AT-T34",
+        "AT-T36",
+        "AT-T37"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-37",
+      "title": "完整正式产品的安全、多人协作、恢复、运维",
+      "priority": "配套",
+      "workpackageId": "",
+      "taskIds": [
+        "T01",
+        "T02",
+        "T03",
+        "T04",
+        "T05",
+        "T17",
+        "T26",
+        "T27",
+        "T29",
+        "T32",
+        "T39",
+        "T40",
+        "T42",
+        "T44"
+      ],
+      "testIds": [
+        "G6",
+        "AT-T01",
+        "AT-T02",
+        "AT-T03",
+        "AT-T04",
+        "AT-T05",
+        "AT-T17",
+        "AT-T26",
+        "AT-T27",
+        "AT-T29",
+        "AT-T32",
+        "AT-T39",
+        "AT-T40",
+        "AT-T42",
+        "AT-T44"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    },
+    {
+      "requirementId": "PD-38",
+      "title": "全部产品旅程与知识资产真实可用",
+      "priority": "核心",
+      "workpackageId": "",
+      "taskIds": [
+        "T01",
+        "T38",
+        "T39",
+        "T40",
+        "T41",
+        "T42",
+        "T43",
+        "T44"
+      ],
+      "testIds": [
+        "AT-P01..14",
+        "G7",
+        "AT-T01",
+        "AT-T38",
+        "AT-T39",
+        "AT-T40",
+        "AT-T41",
+        "AT-T42",
+        "AT-T43",
+        "AT-T44"
+      ],
+      "status": "not_started",
+      "evidence": {
+        "implementationRefs": [],
+        "operationIds": [],
+        "databaseRefs": [],
+        "eventRefs": [],
+        "testRefs": [],
+        "knowledgeDeliveryRefs": [],
+        "deploymentRefs": []
+      },
+      "notes": "",
+      "ownerDecisionRef": null
+    }
+  ],
+  "gates": [
+    {
+      "gate": "G0",
+      "status": "not_started",
+      "evidenceRefs": [],
+      "notes": ""
+    },
+    {
+      "gate": "G1",
+      "status": "not_started",
+      "evidenceRefs": [],
+      "notes": ""
+    },
+    {
+      "gate": "G2",
+      "status": "not_started",
+      "evidenceRefs": [],
+      "notes": ""
+    },
+    {
+      "gate": "G3",
+      "status": "not_started",
+      "evidenceRefs": [],
+      "notes": ""
+    },
+    {
+      "gate": "G4",
+      "status": "not_started",
+      "evidenceRefs": [],
+      "notes": ""
+    },
+    {
+      "gate": "G5",
+      "status": "not_started",
+      "evidenceRefs": [],
+      "notes": ""
+    },
+    {
+      "gate": "G6",
+      "status": "in_progress",
+      "evidenceRefs": [
+        "docs/release/public-preview.md",
+        "deploy/ops/RUNBOOK.md",
+        "deploy/backup/README.md"
+      ],
+      "notes": "Public preview exists; complete production acceptance evidence remains required."
+    },
+    {
+      "gate": "G7",
+      "status": "not_started",
+      "evidenceRefs": [],
+      "notes": ""
+    }
+  ],
+  "approvals": [],
+  "risks": [
+    {
+      "severity": "blocking",
+      "description": "Full 154-requirement, G0-G7 and human acceptance evidence has not been supplied; this handoff must not be represented as accepted final delivery.",
+      "owner": "ProductOwner"
+    }
+  ],
+  "checkout": {
+    "decision": "not_ready",
+    "blockerCount": 1,
+    "unacceptedCount": 154,
+    "requiredHumanRoles": [
+      "BA",
+      "Leader",
+      "ProductOwner",
+      "QA"
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "knowledge-archive.zip",
+      "sha256": "18b8546ca9fbf91964df0bdd506e23cfcbab4d591705a7ed34bbf2ac3f100e30",
+      "bytes": 3280192
+    }
+  ]
+}
