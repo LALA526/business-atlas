@@ -1,11 +1,5039 @@
 {
-  "project": {"name": "Business Atlas Self Project", "purpose": "", "audience": "", "boundaries": []},
-  "counts": {"requirements": 0, "tasks": 0, "features": 0},
-  "requirements": [],
-  "tasks": [],
-  "features": [],
-  "design": {"productEvolution": [], "releaseHistory": [], "currentAcceptance": {"decision": "not_ready", "sourcePath": ""}},
-  "documents": [],
-  "sources": [],
-  "provenance": {"sourceRevision": "", "generatedAt": "", "sourceScope": ""}
+  "project": {
+    "name": "Business Atlas Self Project",
+    "purpose": "管理软件项目知识，建立人与 AI 可共同引用、理解、判断和修订的项目认知空间。",
+    "audience": "参与软件项目的业务负责人、产品/工程团队、审阅者和授权 Agent。",
+    "boundaries": [
+      "项目知识与权限隔离；需求、规范、观察、实现和证据保持不同语义。",
+      "导入、审核、批准、发布和部署是不同事件；本候选不冒充批准基线。",
+      "完整 T1.0 验收状态以 handoff 为准，目前尚未完成。"
+    ],
+    "sourcePaths": [
+      "docs/baselines/T1.0/05_原始基线/P1.0/BusinessAtlas_Product_Design_Baseline/01_概念体系/01_产品宪章与边界.md",
+      "docs/baselines/T1.0/05_原始基线/P1.0/BusinessAtlas_Product_Design_Baseline/README.md",
+      "docs/release/t1.0-handoff/HANDOFF.md"
+    ]
+  },
+  "counts": {
+    "requirements": 154,
+    "tasks": 44,
+    "features": 5
+  },
+  "requirements": [
+    {
+      "id": "BA-PRJ-001",
+      "title": "项目作为独立认知边界",
+      "priority": "P0",
+      "behavior": "创建唯一 Project；全部知识、任务与来源绑定该项目",
+      "acceptance": "不同项目同名对象仍拥有独立身份与权限",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T05",
+        "T33"
+      ],
+      "plannedTests": [
+        "AT-PRJ-001",
+        "AT-T05",
+        "AT-T33"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-PRJ-002",
+      "title": "支持空白项目",
+      "priority": "P0",
+      "behavior": "建立可编辑的最小知识工作空间与稳定目录",
+      "acceptance": "空项目可创建知识且不产生伪业务数据",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T05",
+        "T33"
+      ],
+      "plannedTests": [
+        "AT-PRJ-002",
+        "AT-T05",
+        "AT-T33"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-PRJ-003",
+      "title": "支持接管老项目",
+      "priority": "P0",
+      "behavior": "进入导入/核验/草稿流程，形成项目认知",
+      "acceptance": "可在不启用仓库抓取器前提下导入外部整理包",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T05"
+      ],
+      "plannedTests": [
+        "AT-PRJ-003",
+        "AT-T05"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-PRJ-004",
+      "title": "老项目事实与规范区分",
+      "priority": "P0",
+      "behavior": "明确区分 observed 与 approved specification",
+      "acceptance": "相冲突观察可并存待确认而不覆盖批准规范",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T05"
+      ],
+      "plannedTests": [
+        "AT-PRJ-004",
+        "AT-T05"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-PRJ-005",
+      "title": "项目概览一眼理解",
+      "priority": "P0",
+      "behavior": "展示定位、主要能力/系统、理解入口和重大未知",
+      "acceptance": "新成员无需知识 ID 可进入至少一项核心能力",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T33"
+      ],
+      "plannedTests": [
+        "AT-PRJ-005",
+        "AT-T33"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-PRJ-006",
+      "title": "按项目类型调整概览",
+      "priority": "P1",
+      "behavior": "根据业务/技术主轴选择摘要内容并保留标准目录",
+      "acceptance": "技术项目优先显示组件，业务项目优先显示业务主线",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T05"
+      ],
+      "plannedTests": [
+        "AT-PRJ-006",
+        "AT-T05"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-CAT-001",
+      "title": "固定五维知识框架",
+      "priority": "P0",
+      "behavior": "提供通用维度、可展开子类和覆盖视图",
+      "acceptance": "五维目录可浏览且空类与权限不混淆",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T07",
+        "T09",
+        "T18",
+        "T33"
+      ],
+      "plannedTests": [
+        "AT-CAT-001",
+        "AT-T07",
+        "AT-T09",
+        "AT-T18",
+        "AT-T33"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-CAT-002",
+      "title": "知识分类有明确身份",
+      "priority": "P0",
+      "behavior": "结构化归类且允许一项知识多分类",
+      "acceptance": "从原始需求分类创建后改名仍留在该分类",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T07",
+        "T09",
+        "T18",
+        "T33"
+      ],
+      "plannedTests": [
+        "AT-CAT-002",
+        "AT-T07",
+        "AT-T09",
+        "AT-T18",
+        "AT-T33"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-CAT-003",
+      "title": "允许项目自定义知识类型",
+      "priority": "P1",
+      "behavior": "Schema Registry 注册新类型并通过通用操作编辑",
+      "acceptance": "新建未知行业类型后能创建关联并查询",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T07"
+      ],
+      "plannedTests": [
+        "AT-CAT-003",
+        "AT-T07"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-CAT-004",
+      "title": "架构及工程知识索引",
+      "priority": "P0",
+      "behavior": "目录呈现系统边界、技术栈、数据、部署和工程约束",
+      "acceptance": "从 Feature 可导航到 Component、API、ADR、源码依据",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T09",
+        "T19"
+      ],
+      "plannedTests": [
+        "AT-CAT-004",
+        "AT-T09",
+        "AT-T19"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-CAT-005",
+      "title": "项目知识覆盖说明",
+      "priority": "P1",
+      "behavior": "说明已满足、缺失、未知、冲突和不适用",
+      "acceptance": "没有已调查范围时显示未知而非 100%",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T20"
+      ],
+      "plannedTests": [
+        "AT-CAT-005",
+        "AT-T20"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-SEM-001",
+      "title": "稳定实体身份",
+      "priority": "P0",
+      "behavior": "保持 ID 不变并支持名字调整",
+      "acceptance": "重命名后历史引用和关系不断裂",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T08",
+        "T09"
+      ],
+      "plannedTests": [
+        "AT-SEM-001",
+        "AT-T08",
+        "AT-T09"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-SEM-002",
+      "title": "稳定外部身份映射",
+      "priority": "P0",
+      "behavior": "映射同一知识身份，判定新增/变化/重复",
+      "acceptance": "重复导入相同包不会增加相同对象",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T08",
+        "T09"
+      ],
+      "plannedTests": [
+        "AT-SEM-002",
+        "AT-T08",
+        "AT-T09"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-SEM-003",
+      "title": "知识关系结构化",
+      "priority": "P0",
+      "behavior": "生成可追溯 Assertion，校验端点及谓词",
+      "acceptance": "不同关系类型可在图和文字中明确区分",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T09",
+        "T11"
+      ],
+      "plannedTests": [
+        "AT-SEM-003",
+        "AT-T09",
+        "AT-T11"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-SEM-004",
+      "title": "规则适用条件",
+      "priority": "P0",
+      "behavior": "附加结构化 qualifiers，由统一适用性判断",
+      "acceptance": "生产专用配置在测试环境不被当作生效事实",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T10",
+        "T41"
+      ],
+      "plannedTests": [
+        "AT-SEM-004",
+        "AT-T10",
+        "AT-T41"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-SEM-005",
+      "title": "业务事件与动作",
+      "priority": "P0",
+      "behavior": "显式表示事件、参与者和动作关系",
+      "acceptance": "功能能解释触发者、动作和结果",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T09",
+        "T11"
+      ],
+      "plannedTests": [
+        "AT-SEM-005",
+        "AT-T09",
+        "AT-T11"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-SEM-006",
+      "title": "决策分支及状态机",
+      "priority": "P0",
+      "behavior": "保存可核验的决策与显式转移",
+      "acceptance": "流程呈现真实判断及异常回流而不补造路径",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T10",
+        "T11",
+        "T41"
+      ],
+      "plannedTests": [
+        "AT-SEM-006",
+        "AT-T10",
+        "AT-T11",
+        "AT-T41"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-SEM-007",
+      "title": "知识来源定位",
+      "priority": "P0",
+      "behavior": "每条关键断言可追溯到来源",
+      "acceptance": "点击结论可定位到原资料及版本",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T08",
+        "T12",
+        "T19"
+      ],
+      "plannedTests": [
+        "AT-SEM-007",
+        "AT-T08",
+        "AT-T12",
+        "AT-T19"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-SEM-008",
+      "title": "事实等级多轴表示",
+      "priority": "P0",
+      "behavior": "治理、事实核验、适用性、覆盖互不替代",
+      "acceptance": "已批准但无实际证据时仍可显示证据不足",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T08"
+      ],
+      "plannedTests": [
+        "AT-SEM-008",
+        "AT-T08"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-SEM-009",
+      "title": "系统实现与业务规范分层",
+      "priority": "P0",
+      "behavior": "技术关系可追溯，但不自动推导批准规范",
+      "acceptance": "技术依赖升级不自动修改业务规则",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T08",
+        "T19",
+        "T25"
+      ],
+      "plannedTests": [
+        "AT-SEM-009",
+        "AT-T08",
+        "AT-T19",
+        "AT-T25"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-SEM-010",
+      "title": "技术版本与业务版本分层",
+      "priority": "P1",
+      "behavior": "保留相互独立的版本层和影响关联",
+      "acceptance": "只调整界面图位置时业务基线哈希不变",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T15",
+        "T25",
+        "T32"
+      ],
+      "plannedTests": [
+        "AT-SEM-010",
+        "AT-T15",
+        "AT-T25",
+        "AT-T32"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-ACC-001",
+      "title": "统一读取上下文",
+      "priority": "P0",
+      "behavior": "全部读取使用显式上下文，禁止混入其他版本",
+      "acceptance": "同 ID 在历史/批准/草稿阅读内容正确区分",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T05",
+        "T06",
+        "T42"
+      ],
+      "plannedTests": [
+        "AT-ACC-001",
+        "AT-T05",
+        "AT-T06",
+        "AT-T42"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-ACC-002",
+      "title": "端到端访问授权",
+      "priority": "P0",
+      "behavior": "所有公开查询经授权的 ViewModel 返回",
+      "acceptance": "外部角色在 DOM、导出及对象选择器均看不到受限标题",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T05",
+        "T06",
+        "T42"
+      ],
+      "plannedTests": [
+        "AT-ACC-002",
+        "AT-T05",
+        "AT-T06",
+        "AT-T42"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-ACC-003",
+      "title": "关系来源侧信道保护",
+      "priority": "P0",
+      "behavior": "关系端点和统计遵从授权边界",
+      "acceptance": "列表不可见对象不能经计数或引用泄露",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T05",
+        "T06",
+        "T42"
+      ],
+      "plannedTests": [
+        "AT-ACC-003",
+        "AT-T05",
+        "AT-T06",
+        "AT-T42"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-ACC-004",
+      "title": "批准阅读与草稿隔离",
+      "priority": "P0",
+      "behavior": "批准视图所有标题、简介、图和问答仅用批准快照",
+      "acceptance": "创建未发布项目说明后已批准首页不变",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T06"
+      ],
+      "plannedTests": [
+        "AT-ACC-004",
+        "AT-T06"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-ACC-005",
+      "title": "适用性四态",
+      "priority": "P0",
+      "behavior": "applicable/not_applicable/unknown/conflict 可解释",
+      "acceptance": "不提供必要环境时显示无法判断",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T06"
+      ],
+      "plannedTests": [
+        "AT-ACC-005",
+        "AT-T06"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-ACC-006",
+      "title": "缓存上下文隔离",
+      "priority": "P0",
+      "behavior": "相关视图按事件失效重新读取",
+      "acceptance": "创建 Issue 后目录无手动清缓存即可更新",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T05",
+        "T06",
+        "T42"
+      ],
+      "plannedTests": [
+        "AT-ACC-006",
+        "AT-T05",
+        "AT-T06",
+        "AT-T42"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-ACC-007",
+      "title": "正式契约二次授权",
+      "priority": "P0",
+      "behavior": "原始快照不变，输出经授权的访问视图",
+      "acceptance": "管理员契约普通用户不可越权阅读全文",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T05",
+        "T06",
+        "T42"
+      ],
+      "plannedTests": [
+        "AT-ACC-007",
+        "AT-T05",
+        "AT-T06",
+        "AT-T42"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-IMP-001",
+      "title": "AKP/0.1 交换契约",
+      "priority": "P0",
+      "behavior": "生成可校验可携带来源的标准包",
+      "acceptance": "有效示例能被 V9.2 包校验器解析",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T16"
+      ],
+      "plannedTests": [
+        "AT-IMP-001",
+        "AT-T16"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-IMP-002",
+      "title": "输入包解析与拒绝恶意内容",
+      "priority": "P0",
+      "behavior": "校验大小、格式、结构、引用及危险内容",
+      "acceptance": "含无效引用/脚本注入的包被拒且无数据变化",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T16"
+      ],
+      "plannedTests": [
+        "AT-IMP-002",
+        "AT-T16"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-IMP-003",
+      "title": "导入差异预览",
+      "priority": "P0",
+      "behavior": "先预览后确认，展示来源与问题",
+      "acceptance": "取消预览前后业务草稿一致",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T16"
+      ],
+      "plannedTests": [
+        "AT-IMP-003",
+        "AT-T16"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-IMP-004",
+      "title": "原子提交至草稿",
+      "priority": "P0",
+      "behavior": "一次性提交至导入 ChangeSet",
+      "acceptance": "模拟最后一步失败，项目业务状态完全不变",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T16"
+      ],
+      "plannedTests": [
+        "AT-IMP-004",
+        "AT-T16"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-IMP-005",
+      "title": "重导幂等",
+      "priority": "P0",
+      "behavior": "相同内容不重复创建实体或空基线",
+      "acceptance": "重复两次导入数量不变",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T16"
+      ],
+      "plannedTests": [
+        "AT-IMP-005",
+        "AT-T16"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-IMP-006",
+      "title": "冲突进入人工确认",
+      "priority": "P0",
+      "behavior": "保留冲突双方并建立问题",
+      "acceptance": "冲突导入后不会覆盖旧批准断言",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T16"
+      ],
+      "plannedTests": [
+        "AT-IMP-006",
+        "AT-T16"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-IMP-007",
+      "title": "来源与执行记录关联",
+      "priority": "P1",
+      "behavior": "可追溯某条知识由哪些材料与执行产生",
+      "acceptance": "提案能展开实际来源，标识事件性质",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T16"
+      ],
+      "plannedTests": [
+        "AT-IMP-007",
+        "AT-T16"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-IMP-008",
+      "title": "资料接入低频入口",
+      "priority": "P1",
+      "behavior": "从项目列表或项目菜单进入接入、历史和设置",
+      "acceptance": "六项主导航保持不变且可实际找到导入",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T16"
+      ],
+      "plannedTests": [
+        "AT-IMP-008",
+        "AT-T16"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-IMP-009",
+      "title": "接入后形成阅读入口",
+      "priority": "P0",
+      "behavior": "从项目首页进入可理解的已导入知识",
+      "acceptance": "Self 实例发布后可点进核心组件",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T16"
+      ],
+      "plannedTests": [
+        "AT-IMP-009",
+        "AT-T16"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-READ-001",
+      "title": "用户无需内部ID找对象",
+      "priority": "P0",
+      "behavior": "以项目概览、目录和业务系统入口提供推荐起点",
+      "acceptance": "新人能找到质量异常登记而不输入 FEAT 编号",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T18",
+        "T19",
+        "T20",
+        "T28",
+        "T33",
+        "T34"
+      ],
+      "plannedTests": [
+        "AT-READ-001",
+        "AT-T18",
+        "AT-T19",
+        "AT-T20",
+        "AT-T28",
+        "AT-T33",
+        "AT-T34"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-READ-002",
+      "title": "认知任务驱动投影",
+      "priority": "P0",
+      "behavior": "Understand/Implement/Change/Verify 使用不同事实优先级",
+      "acceptance": "切换模式只改变组织方式不改知识版本",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T19",
+        "T20",
+        "T34"
+      ],
+      "plannedTests": [
+        "AT-READ-002",
+        "AT-T19",
+        "AT-T20",
+        "AT-T34"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-READ-003",
+      "title": "默认解释优先",
+      "priority": "P0",
+      "behavior": "先说明做什么、怎么运行，再显示规则、实现、异常、来源",
+      "acceptance": "1440x900 首屏看到主要行为与关键条件",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T19",
+        "T20",
+        "T34"
+      ],
+      "plannedTests": [
+        "AT-READ-003",
+        "AT-T19",
+        "AT-T20",
+        "AT-T34"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-READ-004",
+      "title": "阅读内容按类型变更",
+      "priority": "P1",
+      "behavior": "Rule 显示条件结果；API 显示调用和错误；Component 显示职责依赖",
+      "acceptance": "打开不同类型首屏信息结构有可解释差别",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T19",
+        "T20",
+        "T34"
+      ],
+      "plannedTests": [
+        "AT-READ-004",
+        "AT-T19",
+        "AT-T20",
+        "AT-T34"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-READ-005",
+      "title": "流程决策引用规则可见",
+      "priority": "P0",
+      "behavior": "将流程中的规则纳入场景阅读与依据列表",
+      "acceptance": "制造场景两个决策节点均可追溯 RULE-M001",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T19",
+        "T34"
+      ],
+      "plannedTests": [
+        "AT-READ-005",
+        "AT-T19",
+        "AT-T34"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-READ-006",
+      "title": "只使用明确执行顺序",
+      "priority": "P0",
+      "behavior": "按实际条件和连接组织行为顺序",
+      "acceptance": "制造流程的回流只来自显式条件边",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T19"
+      ],
+      "plannedTests": [
+        "AT-READ-006",
+        "AT-T19"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-READ-007",
+      "title": "局部上下文优先",
+      "priority": "P0",
+      "behavior": "默认只显示必要相关规则、动作、数据和 API",
+      "acceptance": "质量登记不默认展示全部项目组件",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T18",
+        "T19",
+        "T20",
+        "T28",
+        "T33",
+        "T34"
+      ],
+      "plannedTests": [
+        "AT-READ-007",
+        "AT-T18",
+        "AT-T19",
+        "AT-T20",
+        "AT-T28",
+        "AT-T33",
+        "AT-T34"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-READ-008",
+      "title": "按方向探索上下游",
+      "priority": "P1",
+      "behavior": "支持上游触发、下游影响、实现与规则的有向扩展",
+      "acceptance": "展开后的新事实能回到完整出处",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T19"
+      ],
+      "plannedTests": [
+        "AT-READ-008",
+        "AT-T19"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-READ-009",
+      "title": "未知与冲突就地解释",
+      "priority": "P0",
+      "behavior": "区分“未记录”“当前不适用”“无权查看”",
+      "acceptance": "缺少实例状态时不能回答具体失败原因",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T20",
+        "T34"
+      ],
+      "plannedTests": [
+        "AT-READ-009",
+        "AT-T20",
+        "AT-T34"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-READ-010",
+      "title": "功能技术映射链",
+      "priority": "P0",
+      "behavior": "支持逐层追踪含业务约束和实现依据",
+      "acceptance": "可从保存操作定位到 API/数据/来源",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T19"
+      ],
+      "plannedTests": [
+        "AT-READ-010",
+        "AT-T19"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-READ-011",
+      "title": "项目助手上下文提问",
+      "priority": "P1",
+      "behavior": "会话面板直接问答、引用可打开、追问不丢",
+      "acceptance": "售前从规则页提问后可点击引用返回继续问",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T27",
+        "T28",
+        "T37"
+      ],
+      "plannedTests": [
+        "AT-READ-011",
+        "AT-T27",
+        "AT-T28",
+        "AT-T37"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-READ-012",
+      "title": "助手不确定性表达",
+      "priority": "P0",
+      "behavior": "说出不支持/未知/条件限制，建议补充材料",
+      "acceptance": "未实现的自动逆向询问返回目前不支持",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T27",
+        "T28",
+        "T37"
+      ],
+      "plannedTests": [
+        "AT-READ-012",
+        "AT-T27",
+        "AT-T28",
+        "AT-T37"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-READ-013",
+      "title": "关键结论可逐点追溯",
+      "priority": "P0",
+      "behavior": "显示结论对应证据和当前适用范围",
+      "acceptance": "答案中的关键判断可打开出处",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T18",
+        "T19",
+        "T20",
+        "T28",
+        "T33",
+        "T34"
+      ],
+      "plannedTests": [
+        "AT-READ-013",
+        "AT-T18",
+        "AT-T19",
+        "AT-T20",
+        "AT-T28",
+        "AT-T33",
+        "AT-T34"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-READ-014",
+      "title": "阅读连续性与返回焦点",
+      "priority": "P1",
+      "behavior": "阅读位置与上下文保持",
+      "acceptance": "从问答打开 Rule 再返回助手仍保留历史",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T18",
+        "T19",
+        "T20",
+        "T28",
+        "T33",
+        "T34"
+      ],
+      "plannedTests": [
+        "AT-READ-014",
+        "AT-T18",
+        "AT-T19",
+        "AT-T20",
+        "AT-T28",
+        "AT-T33",
+        "AT-T34"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-VIS-001",
+      "title": "局部小图解释具体判断",
+      "priority": "P0",
+      "behavior": "在解释段落旁显示 3-8 节点简图/决策表",
+      "acceptance": "同一判断的两个结果在首屏清楚可读",
+      "source": "V1.2",
+      "status": "pending_owner_scope_approval",
+      "implementationTasks": [
+        "T01",
+        "T34"
+      ],
+      "plannedTests": [
+        "AT-VIS-001",
+        "AT-T01",
+        "AT-T34"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-VIS-002",
+      "title": "阶段聚合不能丢信息",
+      "priority": "P0",
+      "behavior": "阶段聚合保留身份、阶段数、连接和分支",
+      "acceptance": "制造七阶段阅读图保留七个可进入阶段",
+      "source": "V1.2",
+      "status": "pending_owner_scope_approval",
+      "implementationTasks": [
+        "T11",
+        "T19",
+        "T34",
+        "T41"
+      ],
+      "plannedTests": [
+        "AT-VIS-002",
+        "AT-T11",
+        "AT-T19",
+        "AT-T34",
+        "AT-T41"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-VIS-003",
+      "title": "边类型明确标注",
+      "priority": "P0",
+      "behavior": "约束、实现、读写、触发各有可解释标签",
+      "acceptance": "审阅图可指出每条边的真实语义",
+      "source": "V1.2",
+      "status": "pending_owner_scope_approval",
+      "implementationTasks": [
+        "T09",
+        "T11",
+        "T19",
+        "T34"
+      ],
+      "plannedTests": [
+        "AT-VIS-003",
+        "AT-T09",
+        "AT-T11",
+        "AT-T19",
+        "AT-T34"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-VIS-004",
+      "title": "图形完整布局",
+      "priority": "P0",
+      "behavior": "节点在边界内、不遮挡、关键边可读",
+      "acceptance": "11节点12边示例无重叠与越界",
+      "source": "V1.2",
+      "status": "pending_owner_scope_approval",
+      "implementationTasks": [
+        "T01",
+        "T34"
+      ],
+      "plannedTests": [
+        "AT-VIS-004",
+        "AT-T01",
+        "AT-T34"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-VIS-005",
+      "title": "不同问题选不同表达",
+      "priority": "P1",
+      "behavior": "条件表/小流程/状态转移/数据读写各用适合方式",
+      "acceptance": "多条件 Rule 使用决策表而非全图",
+      "source": "V1.2",
+      "status": "pending_owner_scope_approval",
+      "implementationTasks": [
+        "T19",
+        "T34"
+      ],
+      "plannedTests": [
+        "AT-VIS-005",
+        "AT-T19",
+        "AT-T34"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-VIS-006",
+      "title": "图文共享焦点",
+      "priority": "P1",
+      "behavior": "侧边解释与引用定位到同一知识",
+      "acceptance": "点击节点可查看同版本规则与来源",
+      "source": "V1.2",
+      "status": "pending_owner_scope_approval",
+      "implementationTasks": [
+        "T19",
+        "T34"
+      ],
+      "plannedTests": [
+        "AT-VIS-006",
+        "AT-T19",
+        "AT-T34"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-VIS-007",
+      "title": "原型图热点关联",
+      "priority": "P2",
+      "behavior": "热点链接业务动作和实现",
+      "acceptance": "点击保存按钮热点进入该操作剖面",
+      "source": "V1.2",
+      "status": "pending_owner_scope_approval",
+      "implementationTasks": [
+        "T01",
+        "T34"
+      ],
+      "plannedTests": [
+        "AT-VIS-007",
+        "AT-T01",
+        "AT-T34"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-VIS-008",
+      "title": "导出图仅为派生视图",
+      "priority": "P1",
+      "behavior": "导出结构化说明，不改变断言",
+      "acceptance": "改图布局后批准基线哈希不变",
+      "source": "V1.2",
+      "status": "pending_owner_scope_approval",
+      "implementationTasks": [
+        "T01",
+        "T18"
+      ],
+      "plannedTests": [
+        "AT-VIS-008",
+        "AT-T01",
+        "AT-T18"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-GOV-001",
+      "title": "草稿提交审核发布",
+      "priority": "P0",
+      "behavior": "草稿→提案→人工审核→原子发布→新基线",
+      "acceptance": "新基线可查、旧基线内容摘要不变",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T13",
+        "T35"
+      ],
+      "plannedTests": [
+        "AT-GOV-001",
+        "AT-T13",
+        "AT-T35"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-GOV-002",
+      "title": "Command 失败全量回滚",
+      "priority": "P0",
+      "behavior": "实体、断言、操作日志和 ID 状态全部回滚",
+      "acceptance": "模拟最后一步异常时快照完全一致",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T13",
+        "T14",
+        "T35"
+      ],
+      "plannedTests": [
+        "AT-GOV-002",
+        "AT-T13",
+        "AT-T14",
+        "AT-T35"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-GOV-003",
+      "title": "历史不可变",
+      "priority": "P0",
+      "behavior": "旧版知识不随新导入/修复改变",
+      "acceptance": "B1/B2 发布前后 B1 hash 不变",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T15",
+        "T35"
+      ],
+      "plannedTests": [
+        "AT-GOV-003",
+        "AT-T15",
+        "AT-T35"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-GOV-004",
+      "title": "业务修改影响分析",
+      "priority": "P0",
+      "behavior": "区分明确依赖、潜在影响和未知范围",
+      "acceptance": "影响列表给出关系依据与待复核范围",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T22",
+        "T23",
+        "T24"
+      ],
+      "plannedTests": [
+        "AT-GOV-004",
+        "AT-T22",
+        "AT-T23",
+        "AT-T24"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-GOV-005",
+      "title": "治理差异和可审批决策",
+      "priority": "P0",
+      "behavior": "呈现具体差异与需确认项，可批准/退回",
+      "acceptance": "审核人可判断规则变化后果再批准",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T13",
+        "T14",
+        "T35"
+      ],
+      "plannedTests": [
+        "AT-GOV-005",
+        "AT-T13",
+        "AT-T14",
+        "AT-T35"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-GOV-006",
+      "title": "冲突可追踪",
+      "priority": "P1",
+      "behavior": "建立问题与解决记录，必要时推动变更",
+      "acceptance": "历史冲突在新基线后仍可审计",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T13"
+      ],
+      "plannedTests": [
+        "AT-GOV-006",
+        "AT-T13"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-COL-001",
+      "title": "问题和任务关联知识",
+      "priority": "P0",
+      "behavior": "建立关联、责任和状态，回到原知识",
+      "acceptance": "从规则提出问题，可在任务中追溯规则",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T21",
+        "T26",
+        "T36"
+      ],
+      "plannedTests": [
+        "AT-COL-001",
+        "AT-T21",
+        "AT-T26",
+        "AT-T36"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-COL-002",
+      "title": "反馈轻量提交",
+      "priority": "P1",
+      "behavior": "保持当前页面，生成可追踪反馈记录",
+      "acceptance": "从规则页反馈后 scroll 和 focus 不丢",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T21",
+        "T26",
+        "T36"
+      ],
+      "plannedTests": [
+        "AT-COL-002",
+        "AT-T21",
+        "AT-T26",
+        "AT-T36"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-COL-003",
+      "title": "反馈分流闭环",
+      "priority": "P1",
+      "behavior": "分流、处理、验证、关闭并回链结果",
+      "acceptance": "一条纠错反馈最终可追溯至解决基线",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T21",
+        "T26",
+        "T36",
+        "T37"
+      ],
+      "plannedTests": [
+        "AT-COL-003",
+        "AT-T21",
+        "AT-T26",
+        "AT-T36",
+        "AT-T37"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-COL-004",
+      "title": "Agent 运行记录证据化",
+      "priority": "P1",
+      "behavior": "展示来源、推断和知识提案，不自动批准",
+      "acceptance": "每条提案可展开原始/重建证据性质",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T29"
+      ],
+      "plannedTests": [
+        "AT-COL-004",
+        "AT-T29"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-COL-005",
+      "title": "任务知识交付契约",
+      "priority": "P0",
+      "behavior": "生成版本绑定、来源可追踪的任务契约",
+      "acceptance": "换权限重读契约不泄露必要受限内容",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T24",
+        "T25",
+        "T31"
+      ],
+      "plannedTests": [
+        "AT-COL-005",
+        "AT-T24",
+        "AT-T25",
+        "AT-T31"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-COL-006",
+      "title": "契约失效与复核",
+      "priority": "P1",
+      "behavior": "识别契约所依赖的修订变化，标记需复核",
+      "acceptance": "旧契约仍可还原，新任务需要更新契约",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T24",
+        "T25"
+      ],
+      "plannedTests": [
+        "AT-COL-006",
+        "AT-T24",
+        "AT-T25"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-COL-007",
+      "title": "AI 反馈反哺产品设计",
+      "priority": "P1",
+      "behavior": "提交可追踪反馈进入需求决策和改版",
+      "acceptance": "开发执行错误可形成可复用规避约束",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T21",
+        "T32",
+        "T37"
+      ],
+      "plannedTests": [
+        "AT-COL-007",
+        "AT-T21",
+        "AT-T32",
+        "AT-T37"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-COL-008",
+      "title": "开发 Agent 错误模式沉淀",
+      "priority": "P1",
+      "behavior": "形成可检索错误模式、预防措施和相关测试",
+      "acceptance": "新任务契约能引用已批准防错约束",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T32"
+      ],
+      "plannedTests": [
+        "AT-COL-008",
+        "AT-T32"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-DLV-001",
+      "title": "验收以业务事实为准",
+      "priority": "P0",
+      "behavior": "验收案例逐条关联业务需求与知识依据",
+      "acceptance": "条件分支、回流、角色权限均有用例",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T25",
+        "T36",
+        "T43"
+      ],
+      "plannedTests": [
+        "AT-DLV-001",
+        "AT-T25",
+        "AT-T36",
+        "AT-T43"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-DLV-002",
+      "title": "交付记录可重复定位",
+      "priority": "P1",
+      "behavior": "保留可追溯的任务实施与验收成果引用",
+      "acceptance": "实际任务有明确可核对的产物字段",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T31",
+        "T32"
+      ],
+      "plannedTests": [
+        "AT-DLV-002",
+        "AT-T31",
+        "AT-T32"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-QA-001",
+      "title": "权限渲染端到端测试",
+      "priority": "P0",
+      "behavior": "最终渲染不出现受限知识",
+      "acceptance": "外部角色任务页不显示 Q-00218 受限标题",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T42"
+      ],
+      "plannedTests": [
+        "AT-QA-001",
+        "AT-T42"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-QA-002",
+      "title": "认知内容正确性测试",
+      "priority": "P0",
+      "behavior": "测试关键路径、规则、异常均可见且无错误因果",
+      "acceptance": "七阶段十四边不会被压缩为一节点零边",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T41"
+      ],
+      "plannedTests": [
+        "AT-QA-002",
+        "AT-T41"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-QA-003",
+      "title": "离线原型边界告知",
+      "priority": "P0",
+      "behavior": "声明仅离线试点、localStorage 容量和数据备份",
+      "acceptance": "启动说明明确非生产就绪与导出备份需求",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T01",
+        "T34",
+        "T44"
+      ],
+      "plannedTests": [
+        "AT-QA-003",
+        "AT-T01",
+        "AT-T34",
+        "AT-T44"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-QA-004",
+      "title": "真实试点理解效果衡量",
+      "priority": "P0",
+      "behavior": "记录正确复述、误解、完成任务、修订成本",
+      "acceptance": "试点报告区分产品数据与人工观察",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T43"
+      ],
+      "plannedTests": [
+        "AT-QA-004",
+        "AT-T43"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "BA-QA-005",
+      "title": "首次开发纵切闭环",
+      "priority": "P0",
+      "behavior": "一次做出真实纵向可运行闭环，保留后续扩展边界",
+      "acceptance": "从创建项目到发布再反馈变更能端到端执行",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T38",
+        "T43",
+        "T44"
+      ],
+      "plannedTests": [
+        "AT-QA-005",
+        "AT-T38",
+        "AT-T43",
+        "AT-T44"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-ARCH-001",
+      "title": "对完整目标架构作证据式选型",
+      "priority": "P0",
+      "behavior": "先核对官方开源项目和许可证，出 ADR、可复现实验和回退理由",
+      "acceptance": "核心选型有证据/备选/POC/许可证清单",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T01",
+        "T02",
+        "T39"
+      ],
+      "plannedTests": [
+        "AT-ENG-ARCH-001",
+        "AT-T01",
+        "AT-T02",
+        "AT-T39"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-ARCH-002",
+      "title": "强制模块边界与依赖方向",
+      "priority": "P0",
+      "behavior": "接口分层、模块 API、禁止跨模块 Repository/DB 直读、架构测试进入 CI",
+      "acceptance": "依赖扫描阻止跨模块内部耦合",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T02",
+        "T03"
+      ],
+      "plannedTests": [
+        "AT-ENG-ARCH-002",
+        "AT-T02",
+        "AT-T03"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-ARCH-003",
+      "title": "服务端单一授权门面",
+      "priority": "P0",
+      "behavior": "OIDC 派生 principal，PolicyService 端点/字段/导出/MCP 全面授权",
+      "acceptance": "外部角色 API/DOM/导出/MCP 全零受限内容",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T05",
+        "T06",
+        "T42"
+      ],
+      "plannedTests": [
+        "AT-ENG-ARCH-003",
+        "AT-T05",
+        "AT-T06",
+        "AT-T42"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-ARCH-004",
+      "title": "数据库版本发布原子性",
+      "priority": "P0",
+      "behavior": "用 DB 事务、CAS、append-only revision/outbox 发布",
+      "acceptance": "并发发布/崩溃恢复 B1/B2 hash 与指针一致",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T03",
+        "T14",
+        "T41"
+      ],
+      "plannedTests": [
+        "AT-ENG-ARCH-004",
+        "AT-T03",
+        "AT-T14",
+        "AT-T41"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-ARCH-005",
+      "title": "可升级的协议与版本策略",
+      "priority": "P0",
+      "behavior": "OpenAPI/AKP/Run/DomainEvent/KnowledgeChange 明确版本与迁移策略",
+      "acceptance": "兼容性检查拒绝非预期 breaking changes",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T01",
+        "T07",
+        "T16",
+        "T30"
+      ],
+      "plannedTests": [
+        "AT-ENG-ARCH-005",
+        "AT-T01",
+        "AT-T07",
+        "AT-T16",
+        "AT-T30"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-ARCH-006",
+      "title": "可替换真实模型与工具适配器",
+      "priority": "P0",
+      "behavior": "LLM Provider 与 MCP 协议作为端口，真实工具能力与知识领域隔离",
+      "acceptance": "替换模型不需要修改 KnowledgeCore",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T27",
+        "T29",
+        "T30"
+      ],
+      "plannedTests": [
+        "AT-ENG-ARCH-006",
+        "AT-T27",
+        "AT-T29",
+        "AT-T30"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-ARCH-007",
+      "title": "系统可观测可运营",
+      "priority": "P0",
+      "behavior": "OpenTelemetry Trace/Metric/Log 与领域审计分离，跨 API/Worker/MCP 关联",
+      "acceptance": "从错误 UI 提示可回溯 trace 和 Job",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T17",
+        "T40"
+      ],
+      "plannedTests": [
+        "AT-ENG-ARCH-007",
+        "AT-T17",
+        "AT-T40"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-ARCH-008",
+      "title": "数据迁移与恢复能复现",
+      "priority": "P0",
+      "behavior": "数据库迁移、Blob 哈希、备份恢复、回滚和一致性对账",
+      "acceptance": "新环境还原并核对所有旧版 Baseline",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T03",
+        "T40"
+      ],
+      "plannedTests": [
+        "AT-ENG-ARCH-008",
+        "AT-T03",
+        "AT-T40"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-KNW-001",
+      "title": "每个 PR 都需要知识交付",
+      "priority": "P0",
+      "behavior": "PR 包含 KnowledgeChange+API/数据/源/测试映射且 CI 检查",
+      "acceptance": "无知识变更或明确无影响证明的 PR 被拒",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T31",
+        "T32",
+        "T38"
+      ],
+      "plannedTests": [
+        "AT-ENG-KNW-001",
+        "AT-T31",
+        "AT-T32",
+        "AT-T38"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-KNW-002",
+      "title": "项目自举知识双层策略",
+      "priority": "P0",
+      "behavior": "Git bootstrap AKP→正式 Self Project 迁移→双向对账",
+      "acceptance": "Self 项目从真实当前源码初始化并核对 hash",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T31",
+        "T38"
+      ],
+      "plannedTests": [
+        "AT-ENG-KNW-002",
+        "AT-T31",
+        "AT-T38"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-KNW-003",
+      "title": "代码观察与业务批准分离",
+      "priority": "P0",
+      "behavior": "Observed/DocumentedIntent/Inferred/Unknown/Conflicting 与 Published 独立",
+      "acceptance": "未经业务审核的 Agent 观察不可成为正式规则",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T31"
+      ],
+      "plannedTests": [
+        "AT-ENG-KNW-003",
+        "AT-T31"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-KNW-004",
+      "title": "代码提交与知识来源绑定",
+      "priority": "P0",
+      "behavior": "Source anchor 包含 commitSha/path/locator，校验存在与哈希",
+      "acceptance": "修改 API 时在平台可跳到对应代码提交",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T31",
+        "T32",
+        "T38"
+      ],
+      "plannedTests": [
+        "AT-ENG-KNW-004",
+        "AT-T31",
+        "AT-T32",
+        "AT-T38"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-KNW-005",
+      "title": "知识变更进入同一治理工作流",
+      "priority": "P0",
+      "behavior": "KnowledgeChange 经映射器形成 AKP Proposal/ChangeSet，BA 审核后发布",
+      "acceptance": "代码合并不会自动修改已批准基线",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T31"
+      ],
+      "plannedTests": [
+        "AT-ENG-KNW-005",
+        "AT-T31"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-KNW-006",
+      "title": "知识欠债受控",
+      "priority": "P0",
+      "behavior": "紧急代码变更产生 KnowledgeDebt, owner, due, 阻断最终验收",
+      "acceptance": "最终发布前所有必需知识欠债关闭",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T31"
+      ],
+      "plannedTests": [
+        "AT-ENG-KNW-006",
+        "AT-T31"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-KNW-007",
+      "title": "知识变更与部署对账",
+      "priority": "P0",
+      "behavior": "每次部署记录 buildId/deployVersion/commit/Baseline/KnowledgeDelivery",
+      "acceptance": "从已部署 API 可追溯对应 Self 知识版本",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T32"
+      ],
+      "plannedTests": [
+        "AT-ENG-KNW-007",
+        "AT-T32"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-KNW-008",
+      "title": "错误模式库降低 Agent 重犯",
+      "priority": "P1",
+      "behavior": "记录 pattern、证据、检测器、修正、回归；评审后激活",
+      "acceptance": "相同错误类在新任务触发 preflight 检测",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T32"
+      ],
+      "plannedTests": [
+        "AT-ENG-KNW-008",
+        "AT-T32"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-DEL-001",
+      "title": "最终目标覆盖全部能力",
+      "priority": "P0",
+      "behavior": "全部 BA+ENG 需求映射代码/API/UI/测试/部署/知识",
+      "acceptance": "任何目标范围能力缺席则不得宣称完整交付",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T01",
+        "T44"
+      ],
+      "plannedTests": [
+        "AT-ENG-DEL-001",
+        "AT-T01",
+        "AT-T44"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-DEL-002",
+      "title": "分工明确独立评审",
+      "priority": "P0",
+      "behavior": "Leader 设计/评审，Dev 实施，QA 独立验证，BA 核验业务",
+      "acceptance": "每个 Task 有角色、输入、输出、验收与评审证据",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T01",
+        "T41",
+        "T42",
+        "T43",
+        "T44"
+      ],
+      "plannedTests": [
+        "AT-ENG-DEL-002",
+        "AT-T01",
+        "AT-T41",
+        "AT-T42",
+        "AT-T43",
+        "AT-T44"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-DEL-003",
+      "title": "工作树分支并行与契约所有权",
+      "priority": "P0",
+      "behavior": "worktree/branch per task，单 owner 管理共享 OpenAPI/DB migration",
+      "acceptance": "冲突必须被 Leader 解决且不丢任何成果",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T01",
+        "T02",
+        "T44"
+      ],
+      "plannedTests": [
+        "AT-ENG-DEL-003",
+        "AT-T01",
+        "AT-T02",
+        "AT-T44"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-DEL-004",
+      "title": "源码/部署/测试完整移交",
+      "priority": "P0",
+      "behavior": "可重复构建、迁移、部署、备份、权限、AI/MCP、UI 全部实现",
+      "acceptance": "干净机器一键启动并完成全量 E2E",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T39",
+        "T40",
+        "T44"
+      ],
+      "plannedTests": [
+        "AT-ENG-DEL-004",
+        "AT-T39",
+        "AT-T40",
+        "AT-T44"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-DEL-005",
+      "title": "已知 V9.2 阻断缺陷禁止复刻",
+      "priority": "P0",
+      "behavior": "DEF001-008 进入黄金语义/DOM 安全回归",
+      "acceptance": "7阶段12节点14边、RuleRefs/权限/草稿全通过",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T41",
+        "T42",
+        "T43"
+      ],
+      "plannedTests": [
+        "AT-ENG-DEL-005",
+        "AT-T41",
+        "AT-T42",
+        "AT-T43"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-DEL-006",
+      "title": "全量接口行为与知识版本追溯",
+      "priority": "P0",
+      "behavior": "BA-ID→operationId→Db→Event→test→knowledgeDelivery",
+      "acceptance": "随机抽样任何目标 API 可完整追溯",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T01",
+        "T24",
+        "T31",
+        "T44"
+      ],
+      "plannedTests": [
+        "AT-ENG-DEL-006",
+        "AT-T01",
+        "AT-T24",
+        "AT-T31",
+        "AT-T44"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-DEL-007",
+      "title": "统一自检和独立质量 Gate",
+      "priority": "P0",
+      "behavior": "CI 单元/集成/金样本/E2E/安全/备份/真实工具",
+      "acceptance": "缺任何关键证据不得签出 Done",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T41",
+        "T42",
+        "T43",
+        "T44"
+      ],
+      "plannedTests": [
+        "AT-ENG-DEL-007",
+        "AT-T41",
+        "AT-T42",
+        "AT-T43",
+        "AT-T44"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-DEL-008",
+      "title": "一份完整最终交付而非多次部分完成",
+      "priority": "P0",
+      "behavior": "依赖顺序执行，全部模块集成后唯一最终签出",
+      "acceptance": "最终交付含真实运行和完整代码、手册、知识",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T44"
+      ],
+      "plannedTests": [
+        "AT-ENG-DEL-008",
+        "AT-T44"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-AI-001",
+      "title": "真实 LLM 检索生成与引用",
+      "priority": "P0",
+      "behavior": "模型真实调用，经权限过滤的 CitationBundle，未知降级、追问和流式",
+      "acceptance": "在无证据/越权问题上不捏造来源",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T27",
+        "T28",
+        "T29",
+        "T30",
+        "T37"
+      ],
+      "plannedTests": [
+        "AT-ENG-AI-001",
+        "AT-T27",
+        "AT-T28",
+        "AT-T29",
+        "AT-T30",
+        "AT-T37"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-AI-002",
+      "title": "真实 MCP 授权工具与资源",
+      "priority": "P0",
+      "behavior": "按官方 MCP 协议、scoped token、资源/工具契约、可审计",
+      "acceptance": "按 ID/列表/契约/提案执行真实协议一致性测试",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T30"
+      ],
+      "plannedTests": [
+        "AT-ENG-AI-002",
+        "AT-T30"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-AI-003",
+      "title": "Agent Run 原始证据与推断分离",
+      "priority": "P0",
+      "behavior": "Raw captured/Script verified/Reconstructed/Proposed 类型清楚、秘密脱敏",
+      "acceptance": "不能用合成事件冒充真实工具日志",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T27",
+        "T29",
+        "T30",
+        "T37"
+      ],
+      "plannedTests": [
+        "AT-ENG-AI-003",
+        "AT-T27",
+        "AT-T29",
+        "AT-T30",
+        "AT-T37"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-AI-004",
+      "title": "工具写入仅能形成提案",
+      "priority": "P0",
+      "behavior": "工具只能 Proposal/Issue，发布必须权限和人工审核",
+      "acceptance": "攻击 Agent 直写/越权发布拒绝",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T17"
+      ],
+      "plannedTests": [
+        "AT-ENG-AI-004",
+        "AT-T17"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-AI-005",
+      "title": "长时间 Agent 任务可恢复",
+      "priority": "P1",
+      "behavior": "可取消、重试、幂等，故障恢复由可靠 Worker/Workflow 提供",
+      "acceptance": "Worker crash 后任务能安全恢复且不重写知识",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T17",
+        "T27",
+        "T29"
+      ],
+      "plannedTests": [
+        "AT-ENG-AI-005",
+        "AT-T17",
+        "AT-T27",
+        "AT-T29"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-AI-006",
+      "title": "模型与工具的成本/配额/审计",
+      "priority": "P1",
+      "behavior": "Provider 配置、每项目限额、脱敏追踪、取消/超时",
+      "acceptance": "达到配额返回明确限制而非未知系统错误",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T17"
+      ],
+      "plannedTests": [
+        "AT-ENG-AI-006",
+        "AT-T17"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-OPS-001",
+      "title": "真实双用户协作与并发控制",
+      "priority": "P0",
+      "behavior": "独立成员登录评论/任务/在线通知；结构化 CAS",
+      "acceptance": "双人并发修改不静默覆盖，权限撤销生效",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T04"
+      ],
+      "plannedTests": [
+        "AT-ENG-OPS-001",
+        "AT-T04"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-OPS-002",
+      "title": "项目数据安全与来源存储",
+      "priority": "P0",
+      "behavior": "私有 Blob、访问重新授权、上传校验、secret scan、保留策略",
+      "acceptance": "源码来源地址不能被匿名永久访问",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T04",
+        "T12",
+        "T42"
+      ],
+      "plannedTests": [
+        "AT-ENG-OPS-002",
+        "AT-T04",
+        "AT-T12",
+        "AT-T42"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-OPS-003",
+      "title": "生产级故障可恢复",
+      "priority": "P0",
+      "behavior": "DB+Blob 备份、恢复/核对演练、Runbook",
+      "acceptance": "恢复后历史 Baseline/Source hash 保持",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T04",
+        "T17",
+        "T26",
+        "T39",
+        "T40",
+        "T42"
+      ],
+      "plannedTests": [
+        "AT-ENG-OPS-003",
+        "AT-T04",
+        "AT-T17",
+        "AT-T26",
+        "AT-T39",
+        "AT-T40",
+        "AT-T42"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-OPS-004",
+      "title": "部署模板与运行检查",
+      "priority": "P0",
+      "behavior": "Docker/配置模板/迁移/健康/监控/rollback脚本",
+      "acceptance": "全新测试环境可部署运行，健康检查真失败",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T39"
+      ],
+      "plannedTests": [
+        "AT-ENG-OPS-004",
+        "AT-T39"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-OPS-005",
+      "title": "完整供应链/依赖安全审查",
+      "priority": "P1",
+      "behavior": "SBOM/CVE/许可证/版本锁定/签名/ADR",
+      "acceptance": "高危漏洞与违规许可证阻断 release",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T42"
+      ],
+      "plannedTests": [
+        "AT-ENG-OPS-005",
+        "AT-T42"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "ENG-OPS-006",
+      "title": "无知时诚实表达且能反馈",
+      "priority": "P0",
+      "behavior": "unknown/conflicting 且断言可追踪，界面无错误因果",
+      "acceptance": "金样本和真实试点中的错误推断计数为阻断",
+      "source": "V1.2",
+      "status": "planned",
+      "implementationTasks": [
+        "T20",
+        "T27",
+        "T28",
+        "T37"
+      ],
+      "plannedTests": [
+        "AT-ENG-OPS-006",
+        "AT-T20",
+        "AT-T27",
+        "AT-T28",
+        "AT-T37"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-01",
+      "title": "多项目独立认知、范围、权限与历史；可空项目创建",
+      "priority": "核心",
+      "behavior": "多项目独立认知、范围、权限与历史；可空项目创建",
+      "acceptance": "两个项目同名对象不互通；空项目无伪造业务",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T05",
+        "T16",
+        "T33"
+      ],
+      "plannedTests": [
+        "AT-P13",
+        "AT-T05",
+        "AT-T16",
+        "AT-T33"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-02",
+      "title": "五维骨架及项目实际领域语言",
+      "priority": "核心",
+      "behavior": "五维骨架及项目实际领域语言",
+      "acceptance": "不新增功能页面也能表达、搜索及维护一个领域术语，明确上下文与含义",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T07",
+        "T09",
+        "T18",
+        "T33"
+      ],
+      "plannedTests": [
+        "AT-P03",
+        "AT-T07",
+        "AT-T09",
+        "AT-T18",
+        "AT-T33"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-03",
+      "title": "业务概念/属性与技术字段独立身份、修订映射",
+      "priority": "核心",
+      "behavior": "业务概念/属性与技术字段独立身份、修订映射",
+      "acceptance": "改名/搬迁字段不自动删除业务概念，能反查规则",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T08",
+        "T09",
+        "T34",
+        "T41"
+      ],
+      "plannedTests": [
+        "AT-P03",
+        "AT-T08",
+        "AT-T09",
+        "AT-T34",
+        "AT-T41"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-04",
+      "title": "知识类型/关系可扩展并有兼容规则",
+      "priority": "配套",
+      "behavior": "知识类型/关系可扩展并有兼容规则",
+      "acceptance": "新增项目领域类型不破坏历史；同义谓词治理、旧 Schema 可读取",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T07"
+      ],
+      "plannedTests": [
+        "AT-P07",
+        "AT-T07"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-05",
+      "title": "稳定知识身份、细化/复用、不同视图同一事实",
+      "priority": "核心",
+      "behavior": "稳定知识身份、细化/复用、不同视图同一事实",
+      "acceptance": "两功能引用同一规则；一项修订发布后两个视图一致，旧版本保持",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T08",
+        "T09",
+        "T16",
+        "T41"
+      ],
+      "plannedTests": [
+        "AT-P07",
+        "AT-T08",
+        "AT-T09",
+        "AT-T16",
+        "AT-T41"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-06",
+      "title": "语义明确的双向追溯，关系带证据与适用性",
+      "priority": "核心",
+      "behavior": "语义明确的双向追溯，关系带证据与适用性",
+      "acceptance": "从数据字段定位多个规则及上层目标，又能追溯实现/验收；依赖不得当执行",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T09",
+        "T11",
+        "T19",
+        "T22"
+      ],
+      "plannedTests": [
+        "AT-P03",
+        "AT-T09",
+        "AT-T11",
+        "AT-T19",
+        "AT-T22"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-07",
+      "title": "需求、规则、应然/实际行为、设计与实现区分",
+      "priority": "核心",
+      "behavior": "需求、规则、应然/实际行为、设计与实现区分",
+      "acceptance": "搜索案例同时保留目标未知及实际观察，不因技术实现批准规则",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T08",
+        "T10",
+        "T19",
+        "T34",
+        "T41"
+      ],
+      "plannedTests": [
+        "AT-P02",
+        "AT-T08",
+        "AT-T10",
+        "AT-T19",
+        "AT-T34",
+        "AT-T41"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-08",
+      "title": "规则完整表达条件、依据、结果、默认与异常",
+      "priority": "核心",
+      "behavior": "规则完整表达条件、依据、结果、默认与异常",
+      "acceptance": "A 的十个预期可由阅读规则独立得出；缺必要事实不能猜结果",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T10",
+        "T20",
+        "T34",
+        "T41"
+      ],
+      "plannedTests": [
+        "AT-P01",
+        "AT-T10",
+        "AT-T20",
+        "AT-T34",
+        "AT-T41"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-09",
+      "title": "完整流程语义及规则引用，文字优先",
+      "priority": "核心",
+      "behavior": "完整流程语义及规则引用，文字优先",
+      "acceptance": "7阶段/12节点/14边及关键 guard、回流/规则引用可追溯；阅读不漏条件",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T11",
+        "T19",
+        "T34",
+        "T41"
+      ],
+      "plannedTests": [
+        "AT-P11",
+        "AT-T11",
+        "AT-T19",
+        "AT-T34",
+        "AT-T41"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-10",
+      "title": "内容表达契约和按类型展示",
+      "priority": "核心",
+      "behavior": "内容表达契约和按类型展示",
+      "acceptance": "需求、规则、组件分别符合适用轮廓；组件不强制填写三 Tab",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T07",
+        "T19",
+        "T20",
+        "T34"
+      ],
+      "plannedTests": [
+        "AT-P01",
+        "AT-T07",
+        "AT-T19",
+        "AT-T20",
+        "AT-T34"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-11",
+      "title": "AI 内容检查识别混写、缺语义、无依据",
+      "priority": "核心",
+      "behavior": "AI 内容检查识别混写、缺语义、无依据",
+      "acceptance": "“一致则应用”产生缺少比较依据问题，不仅检查字段非空",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T10",
+        "T20",
+        "T27",
+        "T34",
+        "T41"
+      ],
+      "plannedTests": [
+        "AT-P01",
+        "AT-T10",
+        "AT-T20",
+        "AT-T27",
+        "AT-T34",
+        "AT-T41"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-12",
+      "title": "读者可快速理解并深入证据",
+      "priority": "核心",
+      "behavior": "读者可快速理解并深入证据",
+      "acceptance": "不输入 ID 可找到功能、判断新例并追踪来源；不重复摘要、条件列",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T12",
+        "T18",
+        "T19",
+        "T20",
+        "T28",
+        "T33",
+        "T34",
+        "T43"
+      ],
+      "plannedTests": [
+        "AT-P12",
+        "AT-T12",
+        "AT-T18",
+        "AT-T19",
+        "AT-T20",
+        "AT-T28",
+        "AT-T33",
+        "AT-T34",
+        "AT-T43"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-13",
+      "title": "人轻量提出需求/反馈并审核 AI 成果",
+      "priority": "核心",
+      "behavior": "人轻量提出需求/反馈并审核 AI 成果",
+      "acceptance": "空输入不生成完整合同；真实意图可触发调查，人在成果上评论而非录入关系",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T21",
+        "T26",
+        "T35",
+        "T36",
+        "T43"
+      ],
+      "plannedTests": [
+        "AT-P12",
+        "AT-T21",
+        "AT-T26",
+        "AT-T35",
+        "AT-T36",
+        "AT-T43"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-14",
+      "title": "知识提案与正式事实隔离",
+      "priority": "核心",
+      "behavior": "知识提案与正式事实隔离",
+      "acceptance": "新规则提案不改变发布阅读，明确草稿模式，未批准规范不得进入正式 Task",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T06",
+        "T13",
+        "T35",
+        "T41"
+      ],
+      "plannedTests": [
+        "AT-P07",
+        "AT-T06",
+        "AT-T13",
+        "AT-T35",
+        "AT-T41"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-15",
+      "title": "多轴事实等级、核验、治理、适用性及实现状态",
+      "priority": "核心",
+      "behavior": "多轴事实等级、核验、治理、适用性及实现状态",
+      "acceptance": "已核验代码观察与已批准规范矛盾可共存，显示差异",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T06",
+        "T08",
+        "T41"
+      ],
+      "plannedTests": [
+        "AT-P02",
+        "AT-T06",
+        "AT-T08",
+        "AT-T41"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-16",
+      "title": "决策权、审核批准范围与变更差异",
+      "priority": "核心",
+      "behavior": "决策权、审核批准范围与变更差异",
+      "acceptance": "有权者批准明确修订、依赖组；用户新意见与旧规范冲突须新决议",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T13",
+        "T14",
+        "T26",
+        "T35"
+      ],
+      "plannedTests": [
+        "AT-P07",
+        "AT-T13",
+        "AT-T14",
+        "AT-T26",
+        "AT-T35"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-17",
+      "title": "重新提交、并发审批与基线原子发布",
+      "priority": "核心",
+      "behavior": "重新提交、并发审批与基线原子发布",
+      "acceptance": "候选实质变化需再审；同基线冲突不可覆盖；错误无半发布",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T03",
+        "T04",
+        "T13",
+        "T14",
+        "T35",
+        "T41"
+      ],
+      "plannedTests": [
+        "AT-P07",
+        "AT-T03",
+        "AT-T04",
+        "AT-T13",
+        "AT-T14",
+        "AT-T35",
+        "AT-T41"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-18",
+      "title": "历史、适用性、模式兼容与知识回退",
+      "priority": "核心",
+      "behavior": "历史、适用性、模式兼容与知识回退",
+      "acceptance": "B1、B2可独立读；历史模式不可回退最新；回退发布新基线",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T03",
+        "T08",
+        "T15",
+        "T35",
+        "T40",
+        "T41"
+      ],
+      "plannedTests": [
+        "AT-P07",
+        "AT-T03",
+        "AT-T08",
+        "AT-T15",
+        "AT-T35",
+        "AT-T40",
+        "AT-T41"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-19",
+      "title": "符合性必须绑定规范、观察、版本与证据",
+      "priority": "核心",
+      "behavior": "符合性必须绑定规范、观察、版本与证据",
+      "acceptance": "相反观察使旧符合性记录失效；重新核验，不能只读取旧标签",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T15",
+        "T25",
+        "T32",
+        "T41"
+      ],
+      "plannedTests": [
+        "AT-P08",
+        "AT-T15",
+        "AT-T25",
+        "AT-T32",
+        "AT-T41"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-20",
+      "title": "统一读写授权、导出/历史/契约重授权、来源约束",
+      "priority": "核心",
+      "behavior": "统一读写授权、导出/历史/契约重授权、来源约束",
+      "acceptance": "Reader 创建任务失败；撤权不从旧缓存、受限关系或导出泄露",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T03",
+        "T04",
+        "T05",
+        "T06",
+        "T12",
+        "T14",
+        "T18",
+        "T24",
+        "T30",
+        "T42"
+      ],
+      "plannedTests": [
+        "AT-P09",
+        "AT-T03",
+        "AT-T04",
+        "AT-T05",
+        "AT-T06",
+        "AT-T12",
+        "AT-T14",
+        "AT-T18",
+        "AT-T24",
+        "AT-T30",
+        "AT-T42"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-21",
+      "title": "资料/AKP 接入、原子草稿、差异和幂等",
+      "priority": "配套",
+      "behavior": "资料/AKP 接入、原子草稿、差异和幂等",
+      "acceptance": "同一包重导无重复；矛盾不覆盖；损坏输入和部分失败无半包",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T12",
+        "T16",
+        "T35",
+        "T41"
+      ],
+      "plannedTests": [
+        "AT-P13",
+        "AT-T12",
+        "AT-T16",
+        "AT-T35",
+        "AT-T41"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-22",
+      "title": "Task 语义合同区分现状、目标、保持、未知",
+      "priority": "核心",
+      "behavior": "Task 语义合同区分现状、目标、保持、未知",
+      "acceptance": "字段删除不能默认删除业务判断；搜索需求不得直接用 SQL 作为目标",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T21",
+        "T24",
+        "T36"
+      ],
+      "plannedTests": [
+        "AT-P04",
+        "AT-T21",
+        "AT-T24",
+        "AT-T36"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-23",
+      "title": "有语义的影响候选，不以图遍历冒充调查",
+      "priority": "核心",
+      "behavior": "有语义的影响候选，不以图遍历冒充调查",
+      "acceptance": "显示真实关系路径、缺失覆盖范围，无源码时仅候选",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T22",
+        "T36"
+      ],
+      "plannedTests": [
+        "AT-P03",
+        "AT-T22",
+        "AT-T36"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-24",
+      "title": "实际调查与证据处置、完整调用链",
+      "priority": "核心",
+      "behavior": "实际调查与证据处置、完整调用链",
+      "acceptance": "提供授权源码后能追查实际入口、旧路径、参数、数据、兼容等；无权/未查标未知",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T22",
+        "T23",
+        "T29",
+        "T36",
+        "T43"
+      ],
+      "plannedTests": [
+        "AT-P05",
+        "AT-T22",
+        "AT-T23",
+        "AT-T29",
+        "AT-T36",
+        "AT-T43"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-25",
+      "title": "变更传播的五类语义与业务闭合",
+      "priority": "核心",
+      "behavior": "变更传播的五类语义与业务闭合",
+      "acceptance": "C 的替换映射保持规则，重新核验多个依赖；业务语义改变则整组审批",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T13",
+        "T23",
+        "T25",
+        "T36",
+        "T41"
+      ],
+      "plannedTests": [
+        "AT-P03",
+        "AT-T13",
+        "AT-T23",
+        "AT-T25",
+        "AT-T36",
+        "AT-T41"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-26",
+      "title": "保持不变量、业务语义和设计职责",
+      "priority": "核心",
+      "behavior": "保持不变量、业务语义和设计职责",
+      "acceptance": "新用户意见不覆盖批准约束；局部实现不得移除服务端权威校验",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T23",
+        "T24",
+        "T25",
+        "T36"
+      ],
+      "plannedTests": [
+        "AT-P06",
+        "AT-T23",
+        "AT-T24",
+        "AT-T25",
+        "AT-T36"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-27",
+      "title": "Agent 在授权内主动工程收敛、决策留痕",
+      "priority": "核心",
+      "behavior": "Agent 在授权内主动工程收敛、决策留痕",
+      "acceptance": "区分集合等价与 SQL 语义，证明后清理；需业务决定时给推荐及风险",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T23",
+        "T36"
+      ],
+      "plannedTests": [
+        "AT-P06",
+        "AT-T23",
+        "AT-T36"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-28",
+      "title": "任务上下文按基线/权限/目的封装，过期可复核",
+      "priority": "核心",
+      "behavior": "任务上下文按基线/权限/目的封装，过期可复核",
+      "acceptance": "关联修订变化触发适用上下文 stale；不会把全部项目塞给 Agent",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T06",
+        "T15",
+        "T24",
+        "T36",
+        "T42"
+      ],
+      "plannedTests": [
+        "AT-P04",
+        "AT-T06",
+        "AT-T15",
+        "AT-T24",
+        "AT-T36",
+        "AT-T42"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-29",
+      "title": "AI 认知服务可供人/外部 Agent 组合调用",
+      "priority": "核心",
+      "behavior": "AI 认知服务可供人/外部 Agent 组合调用",
+      "acceptance": "逻辑 CS-01~15 能交付明确输出、版本和失败状态；MCP/API/Skill 不越权",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T17",
+        "T27",
+        "T28",
+        "T29",
+        "T30",
+        "T37",
+        "T43"
+      ],
+      "plannedTests": [
+        "AT-P05",
+        "AT-T17",
+        "AT-T27",
+        "AT-T28",
+        "AT-T29",
+        "AT-T30",
+        "AT-T37",
+        "AT-T43"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-30",
+      "title": "AI 生成内容及证据进入同一治理",
+      "priority": "核心",
+      "behavior": "AI 生成内容及证据进入同一治理",
+      "acceptance": "Agent 只能提交提案；真实工具记录与重建摘要分离",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T12",
+        "T16",
+        "T27",
+        "T29",
+        "T30",
+        "T31",
+        "T37",
+        "T43"
+      ],
+      "plannedTests": [
+        "AT-P10",
+        "AT-T12",
+        "AT-T16",
+        "AT-T27",
+        "AT-T29",
+        "AT-T30",
+        "AT-T31",
+        "AT-T37",
+        "AT-T43"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-31",
+      "title": "完整任务验收以目标与保持约束、影响处置、证据为准",
+      "priority": "核心",
+      "behavior": "完整任务验收以目标与保持约束、影响处置、证据为准",
+      "acceptance": "代码编译或 Task done 字段不能通过缺少业务审批/测试/关键调查的验收",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T25",
+        "T36",
+        "T41",
+        "T43"
+      ],
+      "plannedTests": [
+        "AT-P10",
+        "AT-T25",
+        "AT-T36",
+        "AT-T41",
+        "AT-T43"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-32",
+      "title": "开发知识同步提交、合并后 Manifest、发布与部署对账",
+      "priority": "核心",
+      "behavior": "开发知识同步提交、合并后 Manifest、发布与部署对账",
+      "acceptance": "真实 PR 候选不含未来 SHA，合并后准确绑定；各状态独立可核验",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T31",
+        "T32",
+        "T36",
+        "T38",
+        "T39",
+        "T43"
+      ],
+      "plannedTests": [
+        "AT-P10",
+        "AT-T31",
+        "AT-T32",
+        "AT-T36",
+        "AT-T38",
+        "AT-T39",
+        "AT-T43"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-33",
+      "title": "Self Project 的真实知识资产与开发持续更新",
+      "priority": "核心",
+      "behavior": "Self Project 的真实知识资产与开发持续更新",
+      "acceptance": "系统内展示自身真实功能、规范、实现、版本、决议、来源，不是固定演示资料",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T31",
+        "T38",
+        "T43"
+      ],
+      "plannedTests": [
+        "AT-P14",
+        "AT-T31",
+        "AT-T38",
+        "AT-T43"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-34",
+      "title": "反馈/问题/助手按上下文和权限读取与治理",
+      "priority": "配套",
+      "behavior": "反馈/问题/助手按上下文和权限读取与治理",
+      "acceptance": "从某段规则反馈至修订；售前问题不泄露内部事实、不夸大支持",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T21",
+        "T26",
+        "T27",
+        "T28",
+        "T36",
+        "T37",
+        "T43"
+      ],
+      "plannedTests": [
+        "AT-P12",
+        "AT-T21",
+        "AT-T26",
+        "AT-T27",
+        "AT-T28",
+        "AT-T36",
+        "AT-T37",
+        "AT-T43"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-35",
+      "title": "记录 Agent 错误模式并在后续相关 Task 预防",
+      "priority": "配套",
+      "behavior": "记录 Agent 错误模式并在后续相关 Task 预防",
+      "acceptance": "职责漂移等错误有适用条件、证据、检查规则和防再犯样本",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T32"
+      ],
+      "plannedTests": [
+        "AT-P06",
+        "AT-T32"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-36",
+      "title": "认知呈现按需扩展、文字表格和案例优先",
+      "priority": "核心",
+      "behavior": "认知呈现按需扩展、文字表格和案例优先",
+      "acceptance": "主工作区不会默认铺开所有概念；原型无自动绘图/布局/图形导出",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T01",
+        "T11",
+        "T18",
+        "T19",
+        "T33",
+        "T34",
+        "T36",
+        "T37"
+      ],
+      "plannedTests": [
+        "AT-P11",
+        "AT-T01",
+        "AT-T11",
+        "AT-T18",
+        "AT-T19",
+        "AT-T33",
+        "AT-T34",
+        "AT-T36",
+        "AT-T37"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-37",
+      "title": "完整正式产品的安全、多人协作、恢复、运维",
+      "priority": "配套",
+      "behavior": "完整正式产品的安全、多人协作、恢复、运维",
+      "acceptance": "满足既有 V1.2 G0–G7 中相应生产质量门槛，非原型假数据",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T01",
+        "T02",
+        "T03",
+        "T04",
+        "T05",
+        "T17",
+        "T26",
+        "T27",
+        "T29",
+        "T32",
+        "T39",
+        "T40",
+        "T42",
+        "T44"
+      ],
+      "plannedTests": [
+        "G6",
+        "AT-T01",
+        "AT-T02",
+        "AT-T03",
+        "AT-T04",
+        "AT-T05",
+        "AT-T17",
+        "AT-T26",
+        "AT-T27",
+        "AT-T29",
+        "AT-T32",
+        "AT-T39",
+        "AT-T40",
+        "AT-T42",
+        "AT-T44"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "id": "PD-38",
+      "title": "全部产品旅程与知识资产真实可用",
+      "priority": "核心",
+      "behavior": "全部产品旅程与知识资产真实可用",
+      "acceptance": "下述认知任务、真实变更、端到端审批和交付通过；保留明确未达标项",
+      "source": "P1.0",
+      "status": "planned",
+      "implementationTasks": [
+        "T01",
+        "T38",
+        "T39",
+        "T40",
+        "T41",
+        "T42",
+        "T43",
+        "T44"
+      ],
+      "plannedTests": [
+        "AT-P01..14",
+        "G7",
+        "AT-T01",
+        "AT-T38",
+        "AT-T39",
+        "AT-T40",
+        "AT-T41",
+        "AT-T42",
+        "AT-T43",
+        "AT-T44"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "T01",
+      "title": "范围及合同冻结",
+      "status": "planned",
+      "ownerRole": "Leader",
+      "modules": [
+        "ALL"
+      ],
+      "dependsOn": [],
+      "implementation": "核对原始基线、决定图形范围与协议版本、确定实际机器/账号/批准者、冻结公共合同digest及目录",
+      "acceptance": "范围签署、ADR测试计划、机器合同lint；保留未批准事项及阻断范围",
+      "requirementIds": [
+        "BA-VIS-001",
+        "BA-VIS-004",
+        "BA-VIS-007",
+        "BA-VIS-008",
+        "BA-QA-003",
+        "ENG-ARCH-001",
+        "ENG-ARCH-005",
+        "ENG-DEL-001",
+        "ENG-DEL-002",
+        "ENG-DEL-003",
+        "ENG-DEL-006",
+        "PD-36",
+        "PD-37",
+        "PD-38"
+      ],
+      "testIds": [
+        "AT-T01"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T02",
+      "title": "解决方案与构建",
+      "status": "planned",
+      "ownerRole": "PlatformDev",
+      "modules": [
+        "M12"
+      ],
+      "dependsOn": [
+        "T01"
+      ],
+      "implementation": "创建解决方案与模块引用限制、依赖锁、健康端点、测试项目、跨平台干净构建；初始化首个PR的知识候选Git账本、PR/merge CI最小门禁与真实manifest脚本（可移植旧V1.2的参考校验器并支持v1.3），T02自身首次提交记录真实原始证据；T31后续实现服务摄入和完整对账，不等待T31才写知识",
+      "acceptance": "CI build、架构引用测试、SDK及ARM64镜像可用性；下一条真实PR缺知识候选被CI阻断，合并后绑定实际SHA并保存Manifest；首个启动PR的候选/真实合并证据保留于Git/CI制品",
+      "requirementIds": [
+        "ENG-ARCH-001",
+        "ENG-ARCH-002",
+        "ENG-DEL-003",
+        "PD-37"
+      ],
+      "testIds": [
+        "AT-T02"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T03",
+      "title": "数据库基座与迁移",
+      "status": "planned",
+      "ownerRole": "SchemaOwner",
+      "modules": [
+        "ALL"
+      ],
+      "dependsOn": [
+        "T02"
+      ],
+      "implementation": "按DDL落地EF映射与顺序迁移、运行用户/RLS、事务和封闭触发器、迁移历史",
+      "acceptance": "PG真实执行空库升级及FK/RLS/封闭负例；迁移单Owner",
+      "requirementIds": [
+        "ENG-ARCH-002",
+        "ENG-ARCH-004",
+        "ENG-ARCH-008",
+        "PD-17",
+        "PD-18",
+        "PD-20",
+        "PD-37"
+      ],
+      "testIds": [
+        "AT-T03"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T04",
+      "title": "命令审计与幂等",
+      "status": "planned",
+      "ownerRole": "PlatformDev",
+      "modules": [
+        "M12"
+      ],
+      "dependsOn": [
+        "T02",
+        "T03"
+      ],
+      "implementation": "命令pipeline、请求hash/幂等键、CAS、事务审计、错误响应、outbox与事务钩子",
+      "acceptance": "重放同键同请求相同结果；冲突/失败全回滚",
+      "requirementIds": [
+        "ENG-OPS-001",
+        "ENG-OPS-002",
+        "ENG-OPS-003",
+        "PD-17",
+        "PD-20",
+        "PD-37"
+      ],
+      "testIds": [
+        "AT-T04"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T05",
+      "title": "OIDC与多项目身份",
+      "status": "planned",
+      "ownerRole": "IdentityDev",
+      "modules": [
+        "M01"
+      ],
+      "dependsOn": [
+        "T03",
+        "T04"
+      ],
+      "implementation": "BFF及Bearer、主体映射、成员/角色管理、项目创建及空基线、独立profile与政策版本；实现浏览器登录、session/CSRF、OIDC callback、logout认证控制面，按机器合同README附录",
+      "acceptance": "双项目、无成员、过期audience拒绝；首次项目无伪知识",
+      "requirementIds": [
+        "BA-PRJ-001",
+        "BA-PRJ-002",
+        "BA-PRJ-003",
+        "BA-PRJ-004",
+        "BA-PRJ-006",
+        "BA-ACC-001",
+        "BA-ACC-002",
+        "BA-ACC-003",
+        "BA-ACC-006",
+        "BA-ACC-007",
+        "ENG-ARCH-003",
+        "PD-01",
+        "PD-20",
+        "PD-37"
+      ],
+      "testIds": [
+        "AT-T05"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T06",
+      "title": "统一授权读取与适用性",
+      "status": "planned",
+      "ownerRole": "SecurityDev",
+      "modules": [
+        "M04"
+      ],
+      "dependsOn": [
+        "T05"
+      ],
+      "implementation": "权限门面、角色/资源/字段/source和关系端点读写复核、baseline上下文、policy epoch、适用性四态",
+      "acceptance": "Reader写入、藏端点、历史/缓存撤权均拒绝；缺上下文不猜true",
+      "requirementIds": [
+        "BA-ACC-001",
+        "BA-ACC-002",
+        "BA-ACC-003",
+        "BA-ACC-004",
+        "BA-ACC-005",
+        "BA-ACC-006",
+        "BA-ACC-007",
+        "ENG-ARCH-003",
+        "PD-14",
+        "PD-15",
+        "PD-20",
+        "PD-28"
+      ],
+      "testIds": [
+        "AT-T06"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T07",
+      "title": "注册表和五维目录",
+      "status": "planned",
+      "ownerRole": "KnowledgeDev",
+      "modules": [
+        "M02"
+      ],
+      "dependsOn": [
+        "T03",
+        "T06"
+      ],
+      "implementation": "版本化type/predicate/content profile、项目扩展提案及兼容、禁止同义谓词乱建",
+      "acceptance": "扩展类型历史可读，Schema冲突可解释、五维目录可用",
+      "requirementIds": [
+        "BA-CAT-001",
+        "BA-CAT-002",
+        "BA-CAT-003",
+        "ENG-ARCH-005",
+        "PD-02",
+        "PD-04",
+        "PD-10"
+      ],
+      "testIds": [
+        "AT-T07"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T08",
+      "title": "稳定知识身份与修订",
+      "status": "planned",
+      "ownerRole": "KnowledgeDev",
+      "modules": [
+        "M03"
+      ],
+      "dependsOn": [
+        "T06",
+        "T07"
+      ],
+      "implementation": "unit/revision/ref/evidence、外部identity、canonical hash、不可变封闭、规范观察多轴",
+      "acceptance": "相同身份不同版本；跨项目同名不混；修订/引用写后不可变",
+      "requirementIds": [
+        "BA-SEM-001",
+        "BA-SEM-002",
+        "BA-SEM-007",
+        "BA-SEM-008",
+        "BA-SEM-009",
+        "PD-03",
+        "PD-05",
+        "PD-07",
+        "PD-15",
+        "PD-18"
+      ],
+      "testIds": [
+        "AT-T08"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T09",
+      "title": "领域术语与字段映射",
+      "status": "planned",
+      "ownerRole": "KnowledgeDev",
+      "modules": [
+        "M03"
+      ],
+      "dependsOn": [
+        "T08"
+      ],
+      "implementation": "术语语境/别名、业务属性独立、数据字段映射、有类型的双向关系及适用证据",
+      "acceptance": "字段改名不删除业务语义；从字段找多条规则且无泄露",
+      "requirementIds": [
+        "BA-CAT-001",
+        "BA-CAT-002",
+        "BA-CAT-004",
+        "BA-SEM-001",
+        "BA-SEM-002",
+        "BA-SEM-003",
+        "BA-SEM-005",
+        "BA-VIS-003",
+        "PD-02",
+        "PD-03",
+        "PD-05",
+        "PD-06"
+      ],
+      "testIds": [
+        "AT-T09"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T10",
+      "title": "规则语义与确定性判断",
+      "status": "planned",
+      "ownerRole": "KnowledgeDev",
+      "modules": [
+        "M03"
+      ],
+      "dependsOn": [
+        "T08",
+        "T09"
+      ],
+      "implementation": "条件AST、多值逻辑、缺键/null、比较口径、优先级冲突/默认、案例与未知",
+      "acceptance": "黄金A独立判断；unknown、冲突、无依据默认负例；不得猜业务",
+      "requirementIds": [
+        "BA-SEM-004",
+        "BA-SEM-006",
+        "PD-07",
+        "PD-08",
+        "PD-11"
+      ],
+      "testIds": [
+        "AT-T10"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T11",
+      "title": "流程状态与关系语义",
+      "status": "planned",
+      "ownerRole": "KnowledgeDev",
+      "modules": [
+        "M03"
+      ],
+      "dependsOn": [
+        "T08",
+        "T09",
+        "T10"
+      ],
+      "implementation": "阶段/节点/边/guard/转移验证、语义守恒、合法引用、回流、非执行关系",
+      "acceptance": "制造7阶段12节点14边可还原；guard引用不漏；无虚构时序",
+      "requirementIds": [
+        "BA-SEM-003",
+        "BA-SEM-005",
+        "BA-SEM-006",
+        "BA-VIS-002",
+        "BA-VIS-003",
+        "PD-06",
+        "PD-09",
+        "PD-36"
+      ],
+      "testIds": [
+        "AT-T11"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T12",
+      "title": "资料来源与私有Blob",
+      "status": "planned",
+      "ownerRole": "IntakeDev",
+      "modules": [
+        "M06"
+      ],
+      "dependsOn": [
+        "T04",
+        "T06",
+        "T08"
+      ],
+      "implementation": "文件扫描/hash、私有路径、上传下载二次授权、source修订和定位",
+      "acceptance": "未扫描拒绝、跨项目下载拒绝、异常重试及hash一致、权威事实未污染",
+      "requirementIds": [
+        "BA-SEM-007",
+        "ENG-OPS-002",
+        "PD-12",
+        "PD-20",
+        "PD-21",
+        "PD-30"
+      ],
+      "testIds": [
+        "AT-T12"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T13",
+      "title": "变更草稿和提交",
+      "status": "planned",
+      "ownerRole": "GovernanceDev",
+      "modules": [
+        "M05"
+      ],
+      "dependsOn": [
+        "T08",
+        "T10",
+        "T11",
+        "T12"
+      ],
+      "implementation": "change set、候选修订依赖组、校验与diff、提交冻结digest、草稿隔离",
+      "acceptance": "草稿不污染批准/搜索/Task；修改重新提交失效旧审批",
+      "requirementIds": [
+        "BA-GOV-001",
+        "BA-GOV-002",
+        "BA-GOV-005",
+        "BA-GOV-006",
+        "PD-14",
+        "PD-16",
+        "PD-17",
+        "PD-25"
+      ],
+      "testIds": [
+        "AT-T13"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T14",
+      "title": "审批授权与原子发布",
+      "status": "planned",
+      "ownerRole": "GovernanceDev",
+      "modules": [
+        "M05"
+      ],
+      "dependsOn": [
+        "T13",
+        "T06"
+      ],
+      "implementation": "审批slot、拒绝与重审、依赖权限、并发base CAS、一次事务发布+outbox",
+      "acceptance": "双审批并发冲突、故障全回滚、未经授权/自批拒绝、新基线canonical SHA-256 hash",
+      "requirementIds": [
+        "BA-GOV-002",
+        "BA-GOV-005",
+        "ENG-ARCH-004",
+        "PD-16",
+        "PD-17",
+        "PD-20"
+      ],
+      "testIds": [
+        "AT-T14"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T15",
+      "title": "历史比较与回退",
+      "status": "planned",
+      "ownerRole": "GovernanceDev",
+      "modules": [
+        "M05"
+      ],
+      "dependsOn": [
+        "T14"
+      ],
+      "implementation": "按基线历史读取、差分、旧schema解析、回退作为新提案、复核过期通知",
+      "acceptance": "历史B1不污染；不隐式latest；回退新B3需审批",
+      "requirementIds": [
+        "BA-SEM-010",
+        "BA-GOV-003",
+        "PD-18",
+        "PD-19",
+        "PD-28"
+      ],
+      "testIds": [
+        "AT-T15"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T16",
+      "title": "AKP导入兼容",
+      "status": "planned",
+      "ownerRole": "IntakeDev",
+      "modules": [
+        "M06"
+      ],
+      "dependsOn": [
+        "T12",
+        "T13",
+        "T14"
+      ],
+      "implementation": "0.1 adapter、native提案、验证/预览/冲突/原子stage/幂等、旧source映射",
+      "acceptance": "旧真实样本、损坏、同ID异hash、取消、失败无半包；只写候选",
+      "requirementIds": [
+        "BA-IMP-001",
+        "BA-IMP-002",
+        "BA-IMP-003",
+        "BA-IMP-004",
+        "BA-IMP-005",
+        "BA-IMP-006",
+        "BA-IMP-007",
+        "BA-IMP-008",
+        "BA-IMP-009",
+        "ENG-ARCH-005",
+        "PD-01",
+        "PD-05",
+        "PD-21",
+        "PD-30"
+      ],
+      "testIds": [
+        "AT-T16"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T17",
+      "title": "持久Job与事件",
+      "status": "planned",
+      "ownerRole": "PlatformDev",
+      "modules": [
+        "M12"
+      ],
+      "dependsOn": [
+        "T03",
+        "T04",
+        "T06"
+      ],
+      "implementation": "SKIP LOCKED租约/fence、checkpoint、inbox/outbox、重试取消、预算、事件投递",
+      "acceptance": "kill/restart、重复事件、租约争抢、取消、checkpoint恢复",
+      "requirementIds": [
+        "ENG-ARCH-007",
+        "ENG-AI-004",
+        "ENG-AI-005",
+        "ENG-AI-006",
+        "ENG-OPS-003",
+        "PD-29",
+        "PD-37"
+      ],
+      "testIds": [
+        "AT-T17"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T18",
+      "title": "搜索与内容授权导出",
+      "status": "planned",
+      "ownerRole": "ReadDev",
+      "modules": [
+        "M07"
+      ],
+      "dependsOn": [
+        "T09",
+        "T12",
+        "T14",
+        "T17"
+      ],
+      "implementation": "PG中文/别名搜索、按权限筛选及重验、基线索引、导出job/private下载",
+      "acceptance": "不输入ID定位；同名语境；旧缓存、导出撤权无泄漏",
+      "requirementIds": [
+        "BA-CAT-001",
+        "BA-CAT-002",
+        "BA-READ-001",
+        "BA-READ-007",
+        "BA-READ-013",
+        "BA-READ-014",
+        "BA-VIS-008",
+        "PD-02",
+        "PD-12",
+        "PD-20",
+        "PD-36"
+      ],
+      "testIds": [
+        "AT-T18"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T19",
+      "title": "认知阅读组合投影",
+      "status": "planned",
+      "ownerRole": "ReadDev",
+      "modules": [
+        "M07"
+      ],
+      "dependsOn": [
+        "T11",
+        "T14",
+        "T18"
+      ],
+      "implementation": "按目的有界投影、需求/规则/设计三Tab、实际观察分离、来源与焦点返回、覆盖缺口",
+      "acceptance": "复杂流程文字守恒；条件与比较不重复；不给无依据总结",
+      "requirementIds": [
+        "BA-CAT-004",
+        "BA-SEM-007",
+        "BA-SEM-009",
+        "BA-READ-001",
+        "BA-READ-002",
+        "BA-READ-003",
+        "BA-READ-004",
+        "BA-READ-005",
+        "BA-READ-006",
+        "BA-READ-007",
+        "BA-READ-008",
+        "BA-READ-010",
+        "BA-READ-013",
+        "BA-READ-014",
+        "BA-VIS-002",
+        "BA-VIS-003",
+        "BA-VIS-005",
+        "BA-VIS-006",
+        "PD-06",
+        "PD-07",
+        "PD-09",
+        "PD-10",
+        "PD-12",
+        "PD-36"
+      ],
+      "testIds": [
+        "AT-T19"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T20",
+      "title": "内容检查与规则质量",
+      "status": "planned",
+      "ownerRole": "ReadDev",
+      "modules": [
+        "M07"
+      ],
+      "dependsOn": [
+        "T10",
+        "T19"
+      ],
+      "implementation": "类型轮廓验证、业务语义缺失、混写/证据冲突；确定性+模型解释插件",
+      "acceptance": "一致则应用产生缺比较依据；缺证据为未知；非必填堆叠",
+      "requirementIds": [
+        "BA-CAT-005",
+        "BA-READ-001",
+        "BA-READ-002",
+        "BA-READ-003",
+        "BA-READ-004",
+        "BA-READ-007",
+        "BA-READ-009",
+        "BA-READ-013",
+        "BA-READ-014",
+        "ENG-OPS-006",
+        "PD-08",
+        "PD-10",
+        "PD-11",
+        "PD-12"
+      ],
+      "testIds": [
+        "AT-T20"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T21",
+      "title": "任务、问题与反馈",
+      "status": "planned",
+      "ownerRole": "TaskDev",
+      "modules": [
+        "M08"
+      ],
+      "dependsOn": [
+        "T14",
+        "T19"
+      ],
+      "implementation": "最小意图创建、Task版本、现状/目标/保持/未知、问题归属及反馈转proposal",
+      "acceptance": "空泛描述不能构造READY合同；Reader不能创建；反馈可闭合",
+      "requirementIds": [
+        "BA-COL-001",
+        "BA-COL-002",
+        "BA-COL-003",
+        "BA-COL-007",
+        "PD-13",
+        "PD-22",
+        "PD-34"
+      ],
+      "testIds": [
+        "AT-T21"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T22",
+      "title": "影响候选与关系遍历",
+      "status": "planned",
+      "ownerRole": "TaskDev",
+      "modules": [
+        "M08"
+      ],
+      "dependsOn": [
+        "T09",
+        "T19",
+        "T21"
+      ],
+      "implementation": "语义方向、范围/预算、证据路径、blind spots与候选状态，禁无界遍历",
+      "acceptance": "字段反查三规则及需求；非执行边不误判；缺代码标候选",
+      "requirementIds": [
+        "BA-GOV-004",
+        "PD-06",
+        "PD-23",
+        "PD-24"
+      ],
+      "testIds": [
+        "AT-T22"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T23",
+      "title": "真实调查与变更计划",
+      "status": "planned",
+      "ownerRole": "TaskDev",
+      "modules": [
+        "M08"
+      ],
+      "dependsOn": [
+        "T22",
+        "T17",
+        "T21"
+      ],
+      "implementation": "调查证据、范围排除/未查项、处置五类、依赖组、保持约束、主动消冗建议",
+      "acceptance": "真实代码已知入口/旧路径识别；无权限不假查；证据不足禁止no_change",
+      "requirementIds": [
+        "BA-GOV-004",
+        "PD-24",
+        "PD-25",
+        "PD-26",
+        "PD-27"
+      ],
+      "testIds": [
+        "AT-T23"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T24",
+      "title": "任务上下文与失效",
+      "status": "planned",
+      "ownerRole": "DeliveryDev",
+      "modules": [
+        "M09"
+      ],
+      "dependsOn": [
+        "T14",
+        "T15",
+        "T22",
+        "T23"
+      ],
+      "implementation": "按基线/主体/权限/阶段/任务冻结上下文依赖、重授权、变更失效/复核",
+      "acceptance": "read-only上下文可读但不写；变更相关revision或policy使stale",
+      "requirementIds": [
+        "BA-GOV-004",
+        "BA-COL-005",
+        "BA-COL-006",
+        "ENG-DEL-006",
+        "PD-20",
+        "PD-22",
+        "PD-26",
+        "PD-28"
+      ],
+      "testIds": [
+        "AT-T24"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T25",
+      "title": "符合性与验收闭合",
+      "status": "planned",
+      "ownerRole": "DeliveryDev",
+      "modules": [
+        "M09"
+      ],
+      "dependsOn": [
+        "T10",
+        "T23",
+        "T24"
+      ],
+      "implementation": "绑定规则/观察/证据/版本、反向观察失效、实际验收、真实知识和部署要求",
+      "acceptance": "反向观察旧结论失效；缺批准/影响/测试/交付不得completed",
+      "requirementIds": [
+        "BA-SEM-009",
+        "BA-SEM-010",
+        "BA-COL-005",
+        "BA-COL-006",
+        "BA-DLV-001",
+        "PD-19",
+        "PD-25",
+        "PD-26",
+        "PD-31"
+      ],
+      "testIds": [
+        "AT-T25"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T26",
+      "title": "多人评论与实时通知",
+      "status": "planned",
+      "ownerRole": "TaskDev",
+      "modules": [
+        "M08"
+      ],
+      "dependsOn": [
+        "T14",
+        "T17",
+        "T21"
+      ],
+      "implementation": "锚点评论、评论解决、版本通知、SignalR授权再读、CAS冲突",
+      "acceptance": "双人并发、撤权后只opaque通知、实际评论反馈流程",
+      "requirementIds": [
+        "BA-COL-001",
+        "BA-COL-002",
+        "BA-COL-003",
+        "ENG-OPS-003",
+        "PD-13",
+        "PD-16",
+        "PD-34",
+        "PD-37"
+      ],
+      "testIds": [
+        "AT-T26"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T27",
+      "title": "真实模型适配与服务调用",
+      "status": "planned",
+      "ownerRole": "AiDev",
+      "modules": [
+        "M10"
+      ],
+      "dependsOn": [
+        "T17",
+        "T19",
+        "T20",
+        "T24"
+      ],
+      "implementation": "真实OpenAI兼容provider、配置密钥引用、检索/上下文/生成/引用验证/不确定性、预算取消",
+      "acceptance": "实际模型请求、错误超时/cancel、引用可点、注入不越权",
+      "requirementIds": [
+        "BA-READ-011",
+        "BA-READ-012",
+        "ENG-ARCH-006",
+        "ENG-AI-001",
+        "ENG-AI-003",
+        "ENG-AI-005",
+        "ENG-OPS-006",
+        "PD-11",
+        "PD-29",
+        "PD-30",
+        "PD-34",
+        "PD-37"
+      ],
+      "testIds": [
+        "AT-T27"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T28",
+      "title": "项目助手与对话持久化",
+      "status": "planned",
+      "ownerRole": "AiDev",
+      "modules": [
+        "M10"
+      ],
+      "dependsOn": [
+        "T27",
+        "T26"
+      ],
+      "implementation": "对象上下文、消息/引用/流式、失败恢复、售前可见范围、反馈提案",
+      "acceptance": "真实问答不越权，无证据不肯定；重开可读历史且重授权",
+      "requirementIds": [
+        "BA-READ-001",
+        "BA-READ-007",
+        "BA-READ-011",
+        "BA-READ-012",
+        "BA-READ-013",
+        "BA-READ-014",
+        "ENG-AI-001",
+        "ENG-OPS-006",
+        "PD-12",
+        "PD-29",
+        "PD-34"
+      ],
+      "testIds": [
+        "AT-T28"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T29",
+      "title": "外部Agent运行和工作协议",
+      "status": "planned",
+      "ownerRole": "AgentDev",
+      "modules": [
+        "M11"
+      ],
+      "dependsOn": [
+        "T17",
+        "T23",
+        "T24"
+      ],
+      "implementation": "work请求/领取/fence/续租/结果、真实事件与重建区分、repo证据授权、状态恢复",
+      "acceptance": "外部执行真实repo调查、失败恢复/旧fence拒绝、禁止自动批准",
+      "requirementIds": [
+        "BA-COL-004",
+        "ENG-ARCH-006",
+        "ENG-AI-001",
+        "ENG-AI-003",
+        "ENG-AI-005",
+        "PD-24",
+        "PD-29",
+        "PD-30",
+        "PD-37"
+      ],
+      "testIds": [
+        "AT-T29"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T30",
+      "title": "MCP实际服务和Skill",
+      "status": "planned",
+      "ownerRole": "AgentDev",
+      "modules": [
+        "M11"
+      ],
+      "dependsOn": [
+        "T27",
+        "T29",
+        "T25"
+      ],
+      "implementation": "Streamable HTTP注册35工具、scope/参数/错误合同、资源重授权、CS-01~15组合Skill",
+      "acceptance": "真实客户端握手/调用，token scope负例、无approve/publish工具",
+      "requirementIds": [
+        "ENG-ARCH-005",
+        "ENG-ARCH-006",
+        "ENG-AI-001",
+        "ENG-AI-002",
+        "ENG-AI-003",
+        "PD-20",
+        "PD-29",
+        "PD-30"
+      ],
+      "testIds": [
+        "AT-T30"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T31",
+      "title": "PR知识候选提交与CI",
+      "status": "planned",
+      "ownerRole": "DeliveryDev",
+      "modules": [
+        "M09"
+      ],
+      "dependsOn": [
+        "T24",
+        "T25",
+        "T03"
+      ],
+      "implementation": "版本协议1.2/1.3、真实差异/blob验、外部manifest生成、可信CI证据；接续T02从首个PR建立的账本，不能推迟早期知识交付；对接真实后端导入及历史回放",
+      "acceptance": "真实PR squash/rebase 后SHA正确；重复/伪造manifest拒绝",
+      "requirementIds": [
+        "BA-COL-005",
+        "BA-DLV-002",
+        "ENG-KNW-001",
+        "ENG-KNW-002",
+        "ENG-KNW-003",
+        "ENG-KNW-004",
+        "ENG-KNW-005",
+        "ENG-KNW-006",
+        "ENG-DEL-006",
+        "PD-30",
+        "PD-32",
+        "PD-33"
+      ],
+      "testIds": [
+        "AT-T31"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T32",
+      "title": "部署对账和错误模式",
+      "status": "planned",
+      "ownerRole": "DeliveryDev",
+      "modules": [
+        "M09",
+        "M12"
+      ],
+      "dependsOn": [
+        "T25",
+        "T31",
+        "T17"
+      ],
+      "implementation": "部署事实、对账、回滚/知识债、错误模式候选审核和Task预检",
+      "acceptance": "不同部署显示分歧、回滚后复核；错误模式在后续任务命中",
+      "requirementIds": [
+        "BA-SEM-010",
+        "BA-COL-007",
+        "BA-COL-008",
+        "BA-DLV-002",
+        "ENG-KNW-001",
+        "ENG-KNW-004",
+        "ENG-KNW-007",
+        "ENG-KNW-008",
+        "PD-19",
+        "PD-32",
+        "PD-35",
+        "PD-37"
+      ],
+      "testIds": [
+        "AT-T32"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T33",
+      "title": "Web骨架与项目概览",
+      "status": "planned",
+      "ownerRole": "FrontendDev",
+      "modules": [
+        "WEB"
+      ],
+      "dependsOn": [
+        "T02",
+        "T05",
+        "T18",
+        "T19"
+      ],
+      "implementation": "六入口及项目切换、真实客户端/auth、概览/目录/搜索、空/错误状态、资源深链",
+      "acceptance": "双项目切换无缓存污染、首页陌生用户可定位业务",
+      "requirementIds": [
+        "BA-PRJ-001",
+        "BA-PRJ-002",
+        "BA-PRJ-005",
+        "BA-CAT-001",
+        "BA-CAT-002",
+        "BA-READ-001",
+        "BA-READ-007",
+        "BA-READ-013",
+        "BA-READ-014",
+        "PD-01",
+        "PD-02",
+        "PD-12",
+        "PD-36"
+      ],
+      "testIds": [
+        "AT-T33"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T34",
+      "title": "业务阅读及编辑UI",
+      "status": "planned",
+      "ownerRole": "FrontendDev",
+      "modules": [
+        "WEB"
+      ],
+      "dependsOn": [
+        "T33",
+        "T10",
+        "T19",
+        "T20"
+      ],
+      "implementation": "默认三Tab、领域术语、规则案例、flow文字、observed/design差异、证据按需、编辑候选",
+      "acceptance": "用户从业务案例判断，条件非重复，历史focus返回，无图引擎",
+      "requirementIds": [
+        "BA-READ-001",
+        "BA-READ-002",
+        "BA-READ-003",
+        "BA-READ-004",
+        "BA-READ-005",
+        "BA-READ-007",
+        "BA-READ-009",
+        "BA-READ-013",
+        "BA-READ-014",
+        "BA-VIS-001",
+        "BA-VIS-002",
+        "BA-VIS-003",
+        "BA-VIS-004",
+        "BA-VIS-005",
+        "BA-VIS-006",
+        "BA-VIS-007",
+        "BA-QA-003",
+        "PD-03",
+        "PD-07",
+        "PD-08",
+        "PD-09",
+        "PD-10",
+        "PD-11",
+        "PD-12",
+        "PD-36"
+      ],
+      "testIds": [
+        "AT-T34"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T35",
+      "title": "资料接入与审核UI",
+      "status": "planned",
+      "ownerRole": "FrontendDev2",
+      "modules": [
+        "WEB"
+      ],
+      "dependsOn": [
+        "T33",
+        "T16",
+        "T14",
+        "T15",
+        "T26"
+      ],
+      "implementation": "低频接入、预览、冲突、批注、批准差异/拒绝/发布、历史及权限变化",
+      "acceptance": "人审核成果非底层记录；完整成功/拒绝/重审/并发链路",
+      "requirementIds": [
+        "BA-GOV-001",
+        "BA-GOV-002",
+        "BA-GOV-003",
+        "BA-GOV-005",
+        "PD-13",
+        "PD-14",
+        "PD-16",
+        "PD-17",
+        "PD-18",
+        "PD-21"
+      ],
+      "testIds": [
+        "AT-T35"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T36",
+      "title": "任务问题与验收UI",
+      "status": "planned",
+      "ownerRole": "FrontendDev3",
+      "modules": [
+        "WEB"
+      ],
+      "dependsOn": [
+        "T33",
+        "T25",
+        "T26",
+        "T23",
+        "T32"
+      ],
+      "implementation": "轻量任务输入、四块默认摘要、调查/决策/保持、审批与知识交付、验收证据对账",
+      "acceptance": "目标/未知可读、从提出至完成、缺证据阻断，不默认十五类手填",
+      "requirementIds": [
+        "BA-COL-001",
+        "BA-COL-002",
+        "BA-COL-003",
+        "BA-DLV-001",
+        "PD-13",
+        "PD-22",
+        "PD-23",
+        "PD-24",
+        "PD-25",
+        "PD-26",
+        "PD-27",
+        "PD-28",
+        "PD-31",
+        "PD-32",
+        "PD-34",
+        "PD-36"
+      ],
+      "testIds": [
+        "AT-T36"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T37",
+      "title": "助手入口与协作UI",
+      "status": "planned",
+      "ownerRole": "FrontendDev4",
+      "modules": [
+        "WEB"
+      ],
+      "dependsOn": [
+        "T33",
+        "T28",
+        "T30",
+        "T26"
+      ],
+      "implementation": "右下上下文助手，授权提案/反馈、引用、真实运行/等待/错误状态、无一级助手页",
+      "acceptance": "不编造工具运行，阅读时上下文与焦点保留，反馈回知识",
+      "requirementIds": [
+        "BA-READ-011",
+        "BA-READ-012",
+        "BA-COL-003",
+        "BA-COL-007",
+        "ENG-AI-001",
+        "ENG-AI-003",
+        "ENG-OPS-006",
+        "PD-29",
+        "PD-30",
+        "PD-34",
+        "PD-36"
+      ],
+      "testIds": [
+        "AT-T37"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T38",
+      "title": "真实Self Project导入与发布",
+      "status": "planned",
+      "ownerRole": "DeliveryDev",
+      "modules": [
+        "M09",
+        "ALL"
+      ],
+      "dependsOn": [
+        "T31",
+        "T35",
+        "T36",
+        "T37"
+      ],
+      "implementation": "从真实仓库PR/source构建自我知识，经过人审核发布，第二次真需求变更回写",
+      "acceptance": "真实源码、PR、测试、审批、版本可追溯；非原型假数据",
+      "requirementIds": [
+        "BA-QA-005",
+        "ENG-KNW-001",
+        "ENG-KNW-002",
+        "ENG-KNW-004",
+        "PD-32",
+        "PD-33",
+        "PD-38"
+      ],
+      "testIds": [
+        "AT-T38"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T39",
+      "title": "部署流水线与运行配置",
+      "status": "planned",
+      "ownerRole": "ReleaseOwner",
+      "modules": [
+        "OPS"
+      ],
+      "dependsOn": [
+        "T02",
+        "T03",
+        "T17",
+        "T31",
+        "T33",
+        "T34",
+        "T35",
+        "T36",
+        "T37"
+      ],
+      "implementation": "实际ARM64镜像、TLS、OIDC、专用角色、迁移、secret模板、自动化部署和健康检查",
+      "acceptance": "macOS目标实际安装；发布与失败回退可追踪；资源实测",
+      "requirementIds": [
+        "ENG-ARCH-001",
+        "ENG-DEL-004",
+        "ENG-OPS-003",
+        "ENG-OPS-004",
+        "PD-32",
+        "PD-37",
+        "PD-38"
+      ],
+      "testIds": [
+        "AT-T39"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T40",
+      "title": "备份恢复与运行监控",
+      "status": "planned",
+      "ownerRole": "OpsDev",
+      "modules": [
+        "OPS"
+      ],
+      "dependsOn": [
+        "T39",
+        "T32"
+      ],
+      "implementation": "一致DB/blob备份、WAL/PITR、隔离恢复、日志指标、告警、容量/升级运行手册",
+      "acceptance": "灾难恢复演练、备份校验、告警触发/可定位、租约恢复",
+      "requirementIds": [
+        "ENG-ARCH-007",
+        "ENG-ARCH-008",
+        "ENG-DEL-004",
+        "ENG-OPS-003",
+        "PD-18",
+        "PD-37",
+        "PD-38"
+      ],
+      "testIds": [
+        "AT-T40"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T41",
+      "title": "独立领域与合同验收",
+      "status": "planned",
+      "ownerRole": "IndependentQA",
+      "modules": [
+        "QA"
+      ],
+      "dependsOn": [
+        "T14",
+        "T15",
+        "T16",
+        "T20",
+        "T25",
+        "T30"
+      ],
+      "implementation": "独立对照INV、真实PG事务、协议、黄金规则/流程、旧AKP、符合性与Task负例",
+      "acceptance": "关键不变量与已知缺陷100%通过；独立预期及证据",
+      "requirementIds": [
+        "BA-SEM-004",
+        "BA-SEM-006",
+        "BA-VIS-002",
+        "BA-QA-002",
+        "ENG-ARCH-004",
+        "ENG-DEL-002",
+        "ENG-DEL-005",
+        "ENG-DEL-007",
+        "PD-03",
+        "PD-05",
+        "PD-07",
+        "PD-08",
+        "PD-09",
+        "PD-11",
+        "PD-14",
+        "PD-15",
+        "PD-17",
+        "PD-18",
+        "PD-19",
+        "PD-21",
+        "PD-25",
+        "PD-31",
+        "PD-38"
+      ],
+      "testIds": [
+        "AT-T41"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T42",
+      "title": "独立安全与性能验收",
+      "status": "planned",
+      "ownerRole": "SecurityQA",
+      "modules": [
+        "QA"
+      ],
+      "dependsOn": [
+        "T39",
+        "T40",
+        "T30",
+        "T18",
+        "T26"
+      ],
+      "implementation": "真实双项目读写/field/source/缓存/MCP/导出及供应链、并发容量与Mac资源",
+      "acceptance": "零越权；关键性能目标实测；秘密/依赖扫描及恢复",
+      "requirementIds": [
+        "BA-ACC-001",
+        "BA-ACC-002",
+        "BA-ACC-003",
+        "BA-ACC-006",
+        "BA-ACC-007",
+        "BA-QA-001",
+        "ENG-ARCH-003",
+        "ENG-DEL-002",
+        "ENG-DEL-005",
+        "ENG-DEL-007",
+        "ENG-OPS-002",
+        "ENG-OPS-003",
+        "ENG-OPS-005",
+        "PD-20",
+        "PD-28",
+        "PD-37",
+        "PD-38"
+      ],
+      "testIds": [
+        "AT-T42"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T43",
+      "title": "真实用户与Agent端到端",
+      "status": "planned",
+      "ownerRole": "IndependentQA",
+      "modules": [
+        "QA"
+      ],
+      "dependsOn": [
+        "T38",
+        "T39",
+        "T40",
+        "T41",
+        "T42"
+      ],
+      "implementation": "真实CPQ或授权真实业务、Self二次变更、盲测规则、人工审批与完整交付、真实模型评估",
+      "acceptance": "AT-P01~14及J1~J9全链路证据，真实资料缺失显式阻断",
+      "requirementIds": [
+        "BA-DLV-001",
+        "BA-QA-004",
+        "BA-QA-005",
+        "ENG-DEL-002",
+        "ENG-DEL-005",
+        "ENG-DEL-007",
+        "PD-12",
+        "PD-13",
+        "PD-24",
+        "PD-29",
+        "PD-30",
+        "PD-31",
+        "PD-32",
+        "PD-33",
+        "PD-34",
+        "PD-38"
+      ],
+      "testIds": [
+        "AT-T43"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "id": "T44",
+      "title": "完整签出与移交",
+      "status": "planned",
+      "ownerRole": "Leader,ReleaseOwner,QA,BA",
+      "modules": [
+        "ALL"
+      ],
+      "dependsOn": [
+        "T01",
+        "T38",
+        "T39",
+        "T40",
+        "T41",
+        "T42",
+        "T43"
+      ],
+      "implementation": "154条追溯实际回填、G0-G7、批准范围、全部PR/部署/知识基线、未完风险；用户验收",
+      "acceptance": "全量已确认范围实际完成，阻断项0，真实部署与知产归档",
+      "requirementIds": [
+        "BA-QA-003",
+        "BA-QA-005",
+        "ENG-DEL-001",
+        "ENG-DEL-002",
+        "ENG-DEL-003",
+        "ENG-DEL-004",
+        "ENG-DEL-006",
+        "ENG-DEL-007",
+        "ENG-DEL-008",
+        "PD-37",
+        "PD-38"
+      ],
+      "testIds": [
+        "AT-T44"
+      ],
+      "sourcePath": "docs/baselines/T1.0/03_开发执行/task-dag.json"
+    }
+  ],
+  "features": [
+    {
+      "id": "FEATURE-COGNITION",
+      "title": "统一项目认知",
+      "requirementId": "PD-01",
+      "summary": "业务与技术知识共享项目、身份、版本和证据边界。",
+      "factKind": "documented_intent",
+      "sourcePaths": [
+        "docs/baselines/T1.0/05_原始基线/P1.0/BusinessAtlas_Product_Design_Baseline/01_概念体系/01_产品宪章与边界.md",
+        "docs/baselines/T1.0/05_原始基线/P1.0/BusinessAtlas_Product_Design_Baseline/README.md",
+        "docs/baselines/T1.0/05_原始基线/V9.3原评审报告.md",
+        "docs/baselines/T1.0/01_技术实施/08_导入与工程知识交付.md"
+      ]
+    },
+    {
+      "id": "FEATURE-READING",
+      "title": "业务阅读与判断",
+      "requirementId": "PD-08",
+      "summary": "按目的阅读业务功能、规则、案例、实际观察和实现，不将观察误作规范。",
+      "factKind": "documented_intent",
+      "sourcePaths": [
+        "docs/baselines/T1.0/05_原始基线/P1.0/BusinessAtlas_Product_Design_Baseline/01_概念体系/01_产品宪章与边界.md",
+        "docs/baselines/T1.0/05_原始基线/P1.0/BusinessAtlas_Product_Design_Baseline/README.md",
+        "docs/baselines/T1.0/05_原始基线/V9.3原评审报告.md",
+        "docs/baselines/T1.0/01_技术实施/08_导入与工程知识交付.md"
+      ]
+    },
+    {
+      "id": "FEATURE-GOVERNANCE",
+      "title": "知识治理与发布",
+      "requirementId": "PD-21",
+      "summary": "导入形成候选，经差异、审核和发布后才成为权威基线。",
+      "factKind": "documented_intent",
+      "sourcePaths": [
+        "docs/baselines/T1.0/05_原始基线/P1.0/BusinessAtlas_Product_Design_Baseline/01_概念体系/01_产品宪章与边界.md",
+        "docs/baselines/T1.0/05_原始基线/P1.0/BusinessAtlas_Product_Design_Baseline/README.md",
+        "docs/baselines/T1.0/05_原始基线/V9.3原评审报告.md",
+        "docs/baselines/T1.0/01_技术实施/08_导入与工程知识交付.md"
+      ]
+    },
+    {
+      "id": "FEATURE-COLLABORATION",
+      "title": "任务、影响与交付",
+      "requirementId": "PD-25",
+      "summary": "围绕目标、保留约束、影响、验证和知识交付追踪真实工作。",
+      "factKind": "documented_intent",
+      "sourcePaths": [
+        "docs/baselines/T1.0/05_原始基线/P1.0/BusinessAtlas_Product_Design_Baseline/01_概念体系/01_产品宪章与边界.md",
+        "docs/baselines/T1.0/05_原始基线/P1.0/BusinessAtlas_Product_Design_Baseline/README.md",
+        "docs/baselines/T1.0/05_原始基线/V9.3原评审报告.md",
+        "docs/baselines/T1.0/01_技术实施/08_导入与工程知识交付.md"
+      ]
+    },
+    {
+      "id": "FEATURE-SELF",
+      "title": "Self Project 自举",
+      "requirementId": "PD-33",
+      "summary": "以真实文档、代码、PR、测试和部署证据维护产品自身知识。",
+      "factKind": "documented_intent",
+      "sourcePaths": [
+        "docs/baselines/T1.0/05_原始基线/P1.0/BusinessAtlas_Product_Design_Baseline/01_概念体系/01_产品宪章与边界.md",
+        "docs/baselines/T1.0/05_原始基线/P1.0/BusinessAtlas_Product_Design_Baseline/README.md",
+        "docs/baselines/T1.0/05_原始基线/V9.3原评审报告.md",
+        "docs/baselines/T1.0/01_技术实施/08_导入与工程知识交付.md"
+      ]
+    }
+  ],
+  "design": {
+    "productEvolution": [
+      {
+        "title": "V9.2：项目工作空间与 Self Knowledge 原型",
+        "sourcePath": "docs/baselines/T1.0/05_原始基线/V9.3原评审报告.md",
+        "factKind": "documented_intent"
+      },
+      {
+        "title": "V9.3：业务阅读、规则案例和任务语义修订",
+        "sourcePath": "docs/baselines/T1.0/05_原始基线/V9.3原评审报告.md",
+        "factKind": "documented_intent"
+      }
+    ],
+    "releaseHistory": [
+      {
+        "title": "PR #78 合并",
+        "sourcePath": "knowledge/evidence/azure-pr-78.json",
+        "factKind": "observed"
+      },
+      {
+        "title": "Build 103 / DeployMac8 成功",
+        "sourcePath": "knowledge/evidence/azure-build-103.json",
+        "factKind": "observed"
+      }
+    ],
+    "currentAcceptance": {
+      "decision": "not_ready",
+      "sourcePath": "docs/release/t1.0-handoff/HANDOFF.md",
+      "factKind": "observed"
+    }
+  },
+  "documents": [
+    {
+      "path": "docs/baselines/T1.0/05_原始基线/P1.0/BusinessAtlas_Product_Design_Baseline/01_概念体系/01_产品宪章与边界.md",
+      "content": "# 01｜产品宪章、八套核心机制与边界\n\n状态：P1.0 候选；用户意图标 U，独立设计推荐标 R。概念定义以 02 为准；操作约束见 03–07。\n\n## 1. 产品定义与需要解决的现实问题\n\nBusiness Atlas 是管理软件项目知识的产品。管理不是简单归档，而是建立和维护一个人与 AI 可以共同引用、理解、判断和修订的项目认知空间。它所管理的对象包括正在开发的其他业务项目，也包括 Business Atlas 自身；每个项目有独立范围、领域语言、权威知识和历史。\n\n研发团队的认知问题通常不是缺少写代码能力。一项需求从业务意图到规则到设计与实现的传递中，信息被省略、混入错误层次、在聊天中失真；成员知道局部却不知道自己不知道什么。接手老项目的人要靠老员工解释，Agent 每个会话重新探索同一逻辑，修改字段时只查直接引用而忽略隐含业务判断，最新一句话覆盖旧规则。最终形成半新半旧的实现，人的注意力耗在纠正细节和维护关系上。\n\n本产品要改变的是工作分工与信息质量：人提出意图、阅读具有判断价值的产出并反馈/审批；AI 调查、形成有根据的候选知识、组织影响、独立提出技术建议；系统保存事实和约束、执行确定性治理，向人展示结果，而不是把复杂性转交给人。\n\n## 2. 正式产品原则（U）\n\n| ID | 原则 | 可观察的产品要求 | 反例 |\n|---|---|---|---|\n| P-01 | 人的注意力最小化 | 默认只阅读结论、实质差异、需要人决策的事项；证据可深入 | 让人手填几十项关系和状态 |\n| P-02 | 一眼理解、不失深度 | 对目的、判断、结果的解释先出现，技术与证据随后可到达 | 先展示对象ID和全部关系 |\n| P-03 | 语义层次明确 | 需求、业务规则、实际行为、技术设计不互相冒充 | SQL查询方式充当业务需求 |\n| P-04 | 统一认知语法 | 类似业务在不同项目用相同基本语义组织，允许领域特化 | 每个项目一套不相容页面 |\n| P-05 | 统一权威事实 | 同一规则有稳定身份，审核后的规范可被人和 Agent 引用 | 每个 Task 复制规则后独立修改 |\n| P-06 | 保持历史与不确定性 | 规范、观察、推断、未知、冲突分别可见；旧版本不被覆盖 | 没找到证据就默认不存在 |\n| P-07 | 开发即交付知识 | 代码成果与知识成果共同进入验收，持续形成 Self Project | 开发结束再补全项目文档 |\n| P-08 | 系统变化的完整影响 | 以目标行为界定任务；主动找旧入口、兼容、职责约束等 | 只动用户点名的两个参数 |\n| P-09 | 工程自主、业务授权 | Agent 可在授权内选择等价实现；业务语义和高风险变更由有权人员决策 | 所有技术小事都请示或擅改业务 |\n| P-10 | 表达优先于绘图 | 当前原型不实现绘图引擎；文字、表格、案例可完整解释业务 | 因图小而删除分支和规则 |\n| P-11 | 同一机制覆盖生命周期 | 老项目反向认知、新项目构建、持续迭代共用模型 | 新老项目各自维护事实库 |\n| P-12 | 完整交付不等于一次编码 | 按真实依赖实施，最终覆盖确定范围，不用局部演示替代完成 | 先做一个局部MVP便宣称产品完成 |\n\n## 3. 八套概念机制（R：保持之前的八项，深化其边界）\n\n八项是对设计问题的划分，不是八个物理模块或一级菜单。领域语义是 M1、M2 的重点独立子体系；认知呈现是 M3 的面向用户结果。认知服务是对 M1–M8 的统一能力出口。共同数据、访问、证据及治理规则不可被各自重新定义。\n\n| 机制 | 关键概念 | 输入 | 产物 | 与其他机制关系 |\n|---|---|---|---|---|\n| M1 知识本体 | 领域知识、认知维度、术语、类型、语义原语 | 软件工程实践、项目对象、领域语言 | 通用类型及领域扩展约定 | M2 使用类型组织；M3 选表达契约 |\n| M2 知识组织 | 稳定身份、认知粒度、知识组合、目录与视角 | 独立知识、关联、项目边界 | 项目知识空间、任务/功能的阅读投影 | M5 连接跨层；M4 管理修订 |\n| M3 知识表达 | Content Contract、表达轮廓、阅读视角、渐进披露 | 目标问题、事实、内容类型 | 可读且可检查的业务与技术成果 | M8 评价真实性与可用性 |\n| M4 知识治理 | 权威事实、提案、核验、批准、发布、基线 | 人/AI候选、证据、决策责任 | 可引用的规范版本、审计及冲突 | M6 决定变更包；M7 受批准事实约束 |\n| M5 语义追溯 | 明确关系、双向追溯、字段业务含义映射 | 需求、规则、行为、实现、测试与来源 | 有语义的影响路径与实现映射 | 为 M6、M7 提供可调查依据 |\n| M6 变更影响分析 | 变更语义、传播、闭合、需保持 | 变更意图、基线、代码/文档证据 | 影响处置、保留约束、验收计划 | M4 批准变更；M7 使用影响合同 |\n| M7 AI 认知治理 | 任务认知上下文、角色授权、漂移防护、回写 | 任务、权限、基线、工具证据 | 候选成果、评审差异、交付知识 | 调用其余机制，不自行定义第二套事实 |\n| M8 认知质量 | 正确、充分、可判定、可读、可追溯、完整性 | 事实、表达、行为与用户认知任务 | 缺口与验收结果；错误模式防再犯 | 反馈到所有机制而不是以数量打分 |\n\n### 三个相互配合的产品体系\n\n知识体系（M1/M2/M3/M5）决定「知道什么、怎样解释」，治理体系（M4/M6/M8）决定「为什么可信、怎样修订、何时完成」，认知服务体系（M7 串联其他机制）决定「怎样为人和 Agent 提供可用结果」。每个机制的行为和边界在对应文件展开。\n\n## 4. 用户、工作与项目生命周期\n\n产品负责人/BA/领域专家审核目标和业务语义；架构/技术负责人审核职责、约束和技术设计；开发人员从已有知识获取目标行为、实现约束、影响和验收；测试从业务判断构造独立案例、核对实现；售前售后在授权下获得准确解释；外部 Agent 读取上下文、提交证据和提案；知识负责人治理身份、冲突与版本。一个人可以担任多个职责，小团队无需为了审批增加岗位；关键高风险决策不能由未经授权的 Agent 自批。\n\n三类工作：认识项目（项目及业务/技术全貌）；建构知识（接入与整理、核验与发布）；使项目演进（需求→调查→决策→开发→测试→知识回写）。项目创建时允许完全空白，没有内容比假数据更诚实。老项目先承认事实缺失；新项目从目标规范和设计开始，产生实现观察后持续对账。\n\n## 5. 产品范围与非目标（R）\n\n必须有：多项目隔离、项目介绍、标准认知框架与领域词汇、知识阅读/编写/引用、导入及冲突、检索/助手、证据、适用性、版本/审核发布、反馈/问题、Task 认知与影响、验收、Agent 入口、知识回写、权限与审计。正式产品要求真实持久化、多人协作、安全与可运维（工程 V1.2）；本稿只确定产品语义，不指定数据库、UI 技术或生产选型。\n\n不是：通用知识图谱编辑器、画图软件、替代 Git/IDE/CI/Azure Boards 的工程执行系统、对所有源码万能自动逆向的承诺、替代业务专家的审批者、任意项目数据的中央无限复制仓。可以连接这些工具，知识资产仍由本项目治理。MCP/API/Skill 是承载方式不是产品菜单。原型要做减法，正式产品也不应在没有认知价值证据时扩展绘图；是否未来可选图表见 DEC-07。\n\n## 6. 衡量成功\n\n采用真实工作任务衡量而不是知识数量：陌生开发读完后能预测业务正反例；业务负责人能基于输出评审而不用手工填模型；Agent 能正确区分约束与变更，并提交有证据的闭合报告；同一事实在多处解释一致；未确认或冲突的事实不会冒充权威；代码、测试、部署与知识版本可核对。具体对照实验与阻断标准见 11。\n",
+      "contentHash": "c8d2a7177af85d68df9374d8fce1545a46ef7322ed47cdcb12b91e7f473278fe"
+    },
+    {
+      "path": "docs/baselines/T1.0/05_原始基线/P1.0/BusinessAtlas_Product_Design_Baseline/README.md",
+      "content": "# Business Atlas｜产品研究与设计基线 P1.0（待审）\n\n**编制日期：2026-11-19 · 性质：产品定义与语义治理设计候选稿 · 适用对象：产品负责人、BA、架构与技术设计 Leader、开发/验证 Agent。**\n\n这不是 V9.5 原型，也不是生产实现。它是从用户提出的产品意图出发、结合 V1.0–V1.2 已有交付和 V9.3 发现的问题，对业务知识如何组织、定义、审核、使用、变更和呈现所做的完整产品层设计。此处版本 P1.0 独立于工程版本 V1.2，避免混淆。\n\n## 先审什么\n\nBusiness Atlas 是面向软件项目的共同认知与持续知识治理平台。它将项目中的领域语言、需求、业务规则、行为、实现、约束及证据组织为可持续演进的知识资产。AI 与平台负责复杂的调查、解构、组合、传播、校验和版本维护；人主要阅读、评审、确认和验收有意义的业务与工程成果。\n\n**关键取舍：底层重，入口轻；事实一套，表达多样；开发与知识共同演进。** 不是一个由几十种对象页面组成的百科，不是工作流图软件，不是独立编程 Agent 调度器。优先证明读者能理解真实业务判断、Agent 能用已确认的知识工作、变更后不会破坏其他业务规则。\n\n## 文件阅读入口\n\n| 顺序 | 文件 | 审阅或使用目的 |\n|---|---|---|\n| 1 | [01 产品宪章](01_概念体系/01_产品宪章与边界.md) | 产品价值、边界、八套机制、人/AI分工及反模式 |\n| 2 | [02 概念词典与知识本体](01_概念体系/02_知识本体_领域语义与词典.md) | 知识全貌、术语、概念层次与领域语言 |\n| 3 | [03 知识组织与语义追溯](02_核心机制/03_知识组织与语义追溯.md) | 整个项目如何构成一个可维护的知识空间 |\n| 4 | [04 知识表达与认知质量](02_核心机制/04_知识表达与认知质量.md) | 不同信息怎样编写、检查、组合与展示 |\n| 5 | [05 权威知识治理](02_核心机制/05_权威知识_审批与版本治理.md) | 提案、评审、批准、发布、冲突、历史、权限 |\n| 6 | [06 影响分析](02_核心机制/06_变更语义_影响分析与闭合.md) | 从抽象需求/字段/实现变化追踪并闭合影响 |\n| 7 | [07 AI 认知服务](02_核心机制/07_AI认知服务与开发协作.md) | Agent 获取、输出、审查、回写、控制漂移；服务输入输出 |\n| 8 | [08 产品界面](03_产品体验/08_信息架构_页面与交互规范.md) | 用户真正看到的页面、审核形式、可选内容、非绘图表达 |\n| 9 | [09 生命周期与场景](03_产品体验/09_项目生命周期与用户旅程.md) | 老项目、新项目、迭代、自举、跨角色协作 |\n| 10 | [10 黄金案例](04_案例与验收/10_业务黄金样本与变更推演.md) | 参数应用、搜索、字段删除、冗余路径、项目自举的完整推演 |\n| 11 | [11 产品要求与验收](04_案例与验收/11_产品需求与认知验收.md) | P1.0 新/修订要求、具体可判断的验收、试点方案 |\n| 12 | [12 设计决策与问题台账](05_决策与交接/12_设计决策与开放问题.md) | 结论/候选/未知、取舍、待批准项与责任 |\n| 13 | [13 研究依据与旧基线衔接](05_决策与交接/13_研究依据与既有基线衔接.md) | 参考来源、116条原要求的处理规则及14项不变量 |\n| 14 | [14 委托与维护规范](05_决策与交接/14_全量设计交接与维护规范.md) | 如何让下一个 Agent 按同一意图继续工作，成果更新方式 |\n| 附件 | [原 V1.2 需求追溯表](05_决策与交接/V1.2_116条需求衔接.csv) | 原始要求、行为、验收、工作包及本版处理意见；非实现记录 |\n\n## 权威/状态说明\n\n- **U（用户明确意图）**：直接来自用户讨论；如文字优先、不要堆叠字段和绘图、完整交付、关键业务决策由人审核、知识伴随开发演进。本稿记录该意图；不冒充逐条正式签署。\n- **R（设计建议）**：本次独立提出的候选设计，供评审。普通设计选择已给出推荐，不把所有选项推回用户。\n- **O（观察/历史输入）**：历史文件、源码观察或用户报告；不能自动升格为规范。\n- **X（未知/待验证）**：需要真实项目资料、业务确认或产品试点验证。\n- **示例**：黄金案例中 `EX-` 对象是虚构的可重复演练，而不是公司 CPQ 的实际批准规则。真实 CPQ 的完整源码、业务字段、审批意见未提供，本稿不会编造实际规则与完成率。\n\n解释设计意图时以用户明确表达的方向为依据；执行项目工作时以经正式批准且适用的知识为约束。当前任何历史候选稿均不能视为实际签署。新用户意见与已批准规范冲突时，要形成明确变更决策，不能按“最新话语优先”直接覆盖。工程 V1.2 继续作为工程合同参考，产品设计差异按第13份文件登记；未批准的替代建议不能静默覆盖已有契约。\n\n## 交付边界\n\n本包仅含 Markdown、CSV 与校验清单，无生产代码、无新增原型、无自动化测试工程。它覆盖产品定义与逻辑合同，给出完整的目标产品范围、场景和可验收要求；真实 API、数据库结构、部署及生产安全实现继续由正式开发阶段负责。当前未连接 CPQ 仓库、真实 Agent 或用户系统，因此影响召回率、认知效率、实际审批流程适配均待实证。全部设计可按本稿直接进入评审，无需重读此前几十轮对话。\n",
+      "contentHash": "0301653b9f680e9b93dae8cf52158883021ea7e0606b969488491bb8164743f8"
+    },
+    {
+      "path": "docs/baselines/T1.0/05_原始基线/V9.3原评审报告.md",
+      "content": "# Business Atlas V9.3 核心业务认知与交付闭环评审\n\n日期：2026-11-16  \n结论：**READY FOR CONTROLLED PILOT。V9.3 已把“知识条目管理”纠正为可解释、可验证、可演进的项目共同认知；交互与领域语义可作为正式产品开发纵切依据，但不等于生产上线就绪。**\n\n## 1. V9.2 的核心不足\n\nV9.2 已有统一实体/断言、基线、权限、局部图和任务契约，但核心阅读仍以“目的 → 关联规则 → 技术实现 → 来源”的对象组织为主：\n\n- 功能页能列出规则，却不能优先解释具体条件下怎样判断、产生什么结果。\n- 目标规范、代码实际行为和技术机制没有形成正式对照，容易把现状误读成需求。\n- 旧模拟器以枚举默认值和首条命中为主，缺失输入、未确认优先级、未知条件和默认分支不够严格。\n- Scenario 的 Flow-only Rule 可能遗漏，阶段出现 `GROUP-undefined`，同阶段不同条件边会被去重，状态过滤恒真。\n- Task 主要记录标题、状态、根知识和契约，未明确目标行为变化、保留约束、完整影响和知识交付。\n- Task、Issue、Delivery、首页等仍存在原始集合读取和草稿污染风险。\n\nV9.3 没有增加“业务决策契约”导航或第二知识库，而是修正既有模型、投影、阅读和闭环。\n\n## 2. 统一知识模型怎样修正\n\n所有能力继续使用 Entity、Assertion、Rule、Flow、Scenario、Source、Schema Registry、Read Context、Change Set 和 Baseline。新增仅是兼容语义字段与普通知识类型：\n\n- `factKind / semanticRole / decisionRef / implementationEvidenceRefs`。\n- `BusinessCase`：正、反、边界、未知和回归案例。\n- `ObservedBehavior`：对象、版本、环境、方式、输入、实际输出、可信度和适用范围。\n- Task 的 `semanticContract / impactInvestigation / delivery`。\n- Decision Record、KnowledgeChange 与 Delivery Manifest 关联记录。\n\n目标规范、当前观察、技术机制、任务和验收共享同一权威事实，不复制到不同知识库。\n\n## 3. 完整业务决策链怎样形成\n\nFeature/Scenario/Rule 默认先回答：为什么存在、谁使用、何时触发、依据什么判断、各分支什么结果、异常和默认怎样处理、实现是否符合。\n\n决策语义覆盖 Context、Inputs、Preconditions、Evaluation、Priority、Branch、Outcome、Default、Exception、Evidence。默认使用“条件—判断—结果”表；复杂 Scenario 先显示真实七阶段和当前阶段，再展开完整流程。\n\n规则收集统一覆盖直接关联、Action 所受规则、Flow 节点和条件边、显式状态 Guard；同时按根 Feature 的真实 Action 限定范围，避免登记功能误收整个处置流程的规则。\n\n## 4. 目标、行为与机制怎样区分\n\n- **Target Specification**：批准规则版本、业务目的、适用范围、来源和 Owner。\n- **Observed Behavior**：特定版本/环境的观察输入、实际输出、方式和可信度。\n- **Implementation Mechanism**：API、组件、SQL、配置、事件和调用链。\n\n符合性单独计算：一致、不一致、未验证、缺少目标、缺少观察、版本需复核、部分适用和来源冲突。观察版本与当前代码不同会要求重新核验，技术机制绝不自动批准目标。\n\n搜索黄金样本保持：123 与 1234 的当前结果不同、全文词元机制存在、目标匹配规则未确认。参数样本只执行已批准的存在性，未知比较字段不会被补齐。\n\n## 5. Rule 怎样利用案例验证\n\n确定性评估器只执行明确条件：equals、notEquals、contains、startsWith、exists、notExists、greaterThan、lessThan、in、all、any。\n\n每个结果包含前提、每条规则行、条件轨迹、命中分支、结果类型、缺失事实、冲突和来源。未知输入不默认成功，自定义条件不默认 true；无批准默认分支时不猜测结果。多行冲突不默认第一条/最新/最窄优先。\n\n案例固定 `ruleId + version`，验证不一致形成 `CASE_CONFLICT`，不会修改规则迎合示例。相同输入、权限、适用上下文和基线产生一致判断。\n\n## 6. Task Semantic Contract 怎样生成、维护和验收\n\n用户从“任务与问题 → 新建需求 / 变更任务”只描述业务目标、问题、功能、目标和来源。系统通过 Read Context 组织批准规则、观察、实现和未决问题。\n\n候选目标保存“批准规则版本 + 判断行差异 + proposed revision”，不是完整规范副本。新增、修改、删除和保持不变分别展示；其他判断行、默认和异常进入保留约束。\n\n完整行为变化使用完整合同；文案、样式和内部重构使用简化合同，但仍需保留行为和验证。正式验收检查目标、影响、实现、测试、旧路径、知识、版本和批准，Task 状态不能替代这些检查。\n\n## 7. 系统影响调查怎样组织\n\n调查覆盖功能、规则、调用方、前端、API、后端、数据库、参数、事件、配置、测试、旧路径、兼容、部署迁移和知识。\n\n关系遍历只生成候选，排除会把整个项目都变成影响的引用/归属扩展。每项记录路径、关系语义、证据、状态、决定、进度和理由：`required / potential / no-change / deferred / unknown`。\n\n无需修改必须有依据，转交必须有关联 Task，未知和必要项未完成会阻断完整交付。重复适配器、无效兼容、旧路径和死代码进入主动收敛调查，不以“用户没点名”为保留理由。\n\n## 8. 开发知识怎样持续回写\n\n与 V1.2 对齐：\n\n- PR 关联候选知识。\n- 合并后生成 Knowledge Delivery Manifest。\n- 测试绑定代码版本和案例。\n- KnowledgeChange 独立进入治理与 Baseline。\n- 部署版本与知识版本对账。\n- Task 可继续发起 Issue、Feedback、Proposal、Change Set 或架构决策。\n\n六类版本分别显示：需求、批准业务基线、实现代码、测试版本、部署版本、知识提案/清单批准状态。原型明确标注模拟 PR、测试和 Manifest，不冒充真实工程系统。\n\n制造模拟交付实际显示“实现完成 · 知识待审批”；点击完成会被阻止，因为知识提案和批准基线尚未完成。\n\n## 9. AI 自主判断与业务批准边界\n\nAgent 可调查源码、调用链、技术重复、未使用路径和潜在影响，提出架构收敛、技术测试、知识缺口和变更提案；授权范围内不改变业务语义的工程决定可独立记录。\n\n业务规则、客户可见行为、重要默认值、数据删除、关键权限和不可逆迁移必须由 Owner 决策。搜索待决问题提供精确/前缀/子串的业务结果、兼容影响和推荐依据，但 `approval:null` 前推荐不生效。\n\n## 10. 图形与权限缺陷怎样修复\n\n- 阶段节点不再按不存在的 `typeId` 聚合，七阶段身份独立。\n- 不同条件边按原 ID 保留，完整 Flow 可展开 14 条边，REWORK 回流保留。\n- 未确认状态转移只在探索中标记显示，正式视图排除。\n- 执行、约束、依赖、实现和读写采用不同标签/样式，不把依赖画成业务流程。\n- Flow 引用逐节点授权，受限引用不会泄露，正式契约会阻断而非误报完整。\n- Flow 语义指纹排除布局；纯布局不触发任务失效，真实节点/边变化会触发。\n- Task、Issue、首页、交付选择器、决策评估、导出统一授权；首页批准视图不读草稿介绍。\n- 非管理员备份不再导出整个 store；业务决策和 Task 导出重新授权。\n\n## 11. 全部测试与实际浏览器验收\n\n### 自动化语义与回归\n\n| 范围 | 结果 |\n|---|---:|\n| V3 / V4 / V5 / V6 / V7 / V8 | 17 + 32 + 43 + 41 + 35 + 30，全通过 |\n| V9 / V9.1 / V9.2 | 51 + 30 + 45，全通过 |\n| V9.3 指定 55 项及补充 10 项 | 65/65 |\n| **总计** | **389/389** |\n\n测试覆盖条件求值、目标/实现符合性、Task 语义、完整闭环、图形守恒、权限、缓存、历史和导出。V9-06 跨日失败通过 AKP 未声明有效期不自动取导入日修复，旧 324 项全部恢复。\n\n### 真实 Chrome 六条业务旅程\n\n- A 制造功能理解：通过。\n- B 正例/反例/未知例真实评估：通过。\n- C 123/1234 目标与实现差异：通过。\n- D 新需求、候选目标、差异和影响调查：通过。\n- E 模拟开发、测试、知识交付与完成阻断：通过。\n- F 七阶段、规则引用、条件分支、回流与完整图：通过。\n\n**19/19 浏览器断言通过；控制台错误 0；外部请求 0。** 1440、1280、1024、800 四种视口无整页横向溢出。11 张实际 Chrome 截图位于源码包 `artifacts/v9-3-browser/`，并经过读取复核。\n\n干净重建、全量测试、HTML SHA-256、源码 ZIP 实际解压再重建的详细机器证据见 `artifacts/v9-3-rebuild-validation.json` 和 `artifacts/v9-3-zip-validation.json`。测试数量只是证据之一，最终判断同时基于负向语义、真实交互和截图。\n\n## 12. 仍未解决的风险\n\n- 权限是前端模拟，不能作为生产安全边界；真实写授权、认证和服务端审计仍需实现。\n- 通用流程级多步状态机模拟尚未完成，当前主要是单 Rule 评估与真实 Flow 阅读。\n- 自由文本 Guard 需要人工治理成明确规则引用，不能自动形式化。\n- 影响调查在真实项目中的召回率、误报率和隐式调用覆盖需要试点数据。\n- 不包含真实后端、数据库、多人并发、仓库同步、MCP/LLM、真实编程 Agent 或部署。\n- localStorage 有容量和清理风险；复杂大图仍需更完整的导航/编辑能力。\n- 浏览器工具验收不是独立真人认知效率研究。\n\n## 13. 能否作为正式产品开发依据\n\n**可以，建议进入受控真实项目试点。** V9.3 已形成可实现的领域不变量、负向约束、页面结构、读模型、评估协议、Task 合同、交付状态和回归样本。\n\n正式开发应优先纵切：服务端身份与权限 → 统一知识/版本存储 → 决策阅读与评估 → Task 影响和 V1.2 交付 → 真实 Agent/仓库接入。不得把“原型验收通过”解释为生产性能、安全、并发、真实用户理解效率或全量影响召回已经证明。\n",
+      "contentHash": "32e75fd382812e85dbc1046f225bfa7374cb11d409162e743b56d158e58ab8b4"
+    },
+    {
+      "path": "docs/release/t1.0-handoff/HANDOFF.md",
+      "content": "# Business Atlas T1.0 handoff\n\nRelease: `T1.0-handoff`  \nSource: `4ccb3b624912b22d4f60cb714a35600e1e23de2f`  \nDecision: **not_ready**\n\n## Access and operation\n\n- Mac8 public development preview: https://atlas.lalapilot.com\n- Credentials remain in the approved private login configuration; they are not archived.\n- Start from the project home, then use import, reading, review, change, delivery and assistant journeys with project-scoped permissions.\n- Operations, backup and recovery: `deploy/ops/RUNBOOK.md` and `deploy/backup/README.md`.\n\n## Requirement traceability\n\nStatus | Count\n--- | ---:\naccepted | 0\nblocked | 0\ndeferred_approved | 0\nimplemented | 0\nin_progress | 0\nnot_started | 154\nverified | 0\n\n## Gates\n\n- G0: **not_started** — Evidence remains required.\n- G1: **not_started** — Evidence remains required.\n- G2: **not_started** — Evidence remains required.\n- G3: **not_started** — Evidence remains required.\n- G4: **not_started** — Evidence remains required.\n- G5: **not_started** — Evidence remains required.\n- G6: **in_progress** — Public preview exists; complete production acceptance evidence remains required.\n- G7: **not_started** — Evidence remains required.\n\n## Risks and unfinished work\n\n- blocking: Full 154-requirement, G0-G7 and human acceptance evidence has not been supplied; this handoff must not be represented as accepted final delivery. (owner: ProductOwner)\n\n`implemented` and `verified` are not human acceptance. Only explicit QA/BA/Leader/ProductOwner approvals can authorize final checkout.\n",
+      "contentHash": "ad9a91f242467d45ea9de4b1d99f66fa6bbc61e9eda459eee197ce257f35eee4"
+    },
+    {
+      "path": "docs/baselines/T1.0/01_技术实施/01_目标架构与范围.md",
+      "content": "# 01 技术目标架构、范围和选型决定\n\n关联：P1.0 01–03、07、08、11–14；V1.2 M01–M12、INV-01..14、G0–G7。所有具体选型是 T1.0 实施决定候选，除范围、真实业务、权限/费用等须人确定事项外，Leader 直接按默认实现，失败用实测证据变更 ADR，不能让每个开发 Agent 重选技术栈。\n\n## A. 正式产品必须完成的能力\n\n- 项目空间：空项目创建、成员、角色、范围、背景、标准五维知识目录、可扩展类型与谓词、术语/别名/语境/属性、知识搜索和定位。管理的是任意目标项目，不是只管理 Business Atlas。\n- 语义核心：稳定身份、版本化实体/断言/关系/Flow/状态/源码来源，规范与实际观察分离、内容契约、可判定业务规则、关联需求/行为/实现/案例、文本组合视图及受控导出。业务需求/规则/业务设计默认三个 Tab；按需内容，不新造页面。\n- 治理：Draft、ChangeSet、人类审批、驳回/重新提交、版本比较与原子发布、历史读取、适用性、证据和冲突；来源/字段级权限独立，两端点校验、审批可读性、撤权后的重新授权。\n- 开发协作：Task/Issue/反馈/评论和真实协作，轻量需求入口，AI 识别目标/保持/未知，候选影响、实际调查、方案比较、传播、验收与回写，决策授权、上下文失效；对空泛需求不制造合同，不能把十五类影响表交还给人。\n- AI：真实检索/生成/引文检查、外部 Agent MCP/REST、持久运行记录、真实证据分类、取消/预算/故障恢复；15项CS逻辑服务，同一应用层授权；Skill用于调用顺序，不是内建编程 Agent。真实开发工具可在授权的执行端调用仓库，不把shell直接暴露给模型。\n- 工程交付：Git PR 候选知识、合并后Manifest、CI证据、知识治理和部署对账、真实 Self Project、错误模式记录；正式安装、备份恢复、审计、并发、安全、性能、供应链与维护。完整产品在同一目标范围交付。\n\n**范围裁定建议：** BA-VIS-001/004/007/008 暂不实现专用绘图、画布布局、热点编辑、图形导出；BA-VIS-002/003/006 改为文本守恒、关系语义和焦点返回；005保留多种表达。保留外部图附件与描述/引用、Flow/State语义及历史导入，禁止引入布局引擎。此决定对应 DEC-07/Q-03，G0需Owner确认正式替代；目前建议按最新“文字优先、原型不要图”做减法。若不同意，先审范围更改，不默默重启图形工程。INV-10 扩展为任何呈现、折叠、焦点等操作不能变更知识事实。V1.2 原流程/权限/草稿/符合性缺陷均未减免。\n\n## B. 选型与部署拓扑\n\n| 层 | 默认决定 | 取舍/验证 |\n|---|---|---|\n| Runtime | .NET SDK/runtime 10 LTS + ASP.NET Core 10 + EF Core 10 + Npgsql 10；锁定补丁 | 官方支持期到2028-11-14；采用成熟性及维护目标，非声称比 .NET 11 支持更久；版本锁、依赖许可证与CVEs在G0/G1核验 |\n| Web | React 19、TypeScript strict、Vite、React Router、TanStack Query、普通 CSS design tokens；Markdown+受限结构化 blocks | UI不直读库；无需Next SSR、图形引擎或复杂富文本协作. 使用已维护的Markdown解析/净化库，默认禁止raw HTML. Node 24 LTS补丁锁与peer兼容实测 |\n| Database | PostgreSQL 17最新安全补丁；一个 DB，按模块 schema；EF migrations、参数化SQL、必要递归CTE+GIN/pg_trgm | 成熟稳定，Npgsql支持，ARM64镜像及extension在CI验证；以17为基线而非追求18新特性. 不采用图DB/ES作第一权威事实源 |\n| Auth | OIDC授权服务器（默认可用现有OIDC；无则Keycloak稳定版生产配置，优先部署其他机器，试点可同机） | 浏览器Authorization Code+PKCE与BFF安全cookie；API/MCP独立audience token，内部人员角色在Atlas DB. Keycloak官方小型生产建议2GB，必须实测8GB；不能因资源不足关闭认证 |\n| Storage | IBlobStore：本地私有挂载目录的不可变hash对象；企业可替换S3 adapter | 临时上传→扫描/hash→原子rename→DB提交引用；无公开目录；备份DB及blob一致. 首版默认不部署MinIO |\n| Jobs | PostgreSQL outbox、job、inbox tables + .NET Worker | `FOR UPDATE SKIP LOCKED`/lease/fence、幂等、恢复；无需Temporal/Redis/RabbitMQ。实际高负载证据才支持替换 |\n| Search | PostgreSQL exact alias + trigram + FTS(simple)（中文验收加Unicode子串/二元词法候选），ACL前后重验 | 查询词用于知识检索，不等于CPQ业务搜索规则。默认不依赖embedding；大规模再以真实检索质量POC决定 |\n| Realtime | SignalR / 同源Hub，通知仅 opaque event + 当前授权重新查询 | CAS是事实写入约束；不把CRDT用于批准语义。多人评论、审核变更通知及冲突提示需真实实现 |\n| AI/MCP | 真实 provider adapter（首个支持OpenAI兼容HTTP API，配置endpoint/key/model），官方受支持MCP SDK的Streamable HTTP + OAuth资源服务器 | SDK与可用客户端握手/权限需实测，凭据不进入前端。集成模型不能直接发SQL或批准。外部agent本地调查真实repo，平台有持久请求/事件/证据 |\n| Ops | Docker Compose Linux ARM64 on Mac（Colima或现有受控Docker Desktop），反向代理 TLS，CI构建multiarch制品 | Windows开发；CI备份/健康/迁移/回滚；不在8GB host本地跑大模型或编译全仓库。Ubuntu/Linux部署同配置 |\n\n**不是多套架构方案让用户选：** 默认组合为 API(BFF + MCP adapter + static Web)、Worker、DB、IdP(尽量复用/另机)、反向代理、私有volume。Web静态构建随API镜像发布；Worker和API可以同一 .NET solution，不需要每模块进程。外部 Agent 通过 API/MCP 和受控本地执行器访问项目资料，上传证据，不能直接访问平台数据库。运维与资源阈值详见部署文档。内部模型调用与工具任务不可无限等待；队列、过期、取消、持久checkpoint由M12提供。\n\n## C. 模块所有权与依赖\n\n保留 V1.1/V1.2 模块 ID，明确 P1.0 新需求，不新造平行领域。每个模块 Domain/Application/Infrastructure/Contracts 由唯一Owner负责；接口通过应用层，跨模块事务由单一Orchestrator/UoW协调，模块仅写自己schema，通过端口查询其它领域。\n\n| ID / 代码目录 | 数据所有权 | 公共端口/职责 | 禁止 |\n|---|---|---|---|\n| M01 ProjectIdentity | project, principal, membership, project profile pointer | IProjectDirectory, IMembership, ISubjectResolver；新建与隔离，身份外部sub映射 | 由客户端role决定权限 |\n| M02 SchemaCatalog | registry metadata；type/predicate/profile知識定义由M03存储，M02校验 | ITypeRegistry, IPredicateRegistry, IContentProfile；五维、扩展、型版本 | 同义谓词重复、用技术schema覆盖业务定义 |\n| M03 KnowledgeCore | unit, revision, revision_ref, relation_index, external_identity, evidence_link | IKnowledgeStore, IRuleEvaluator, IFlowSemantics, IRevisionFactory | 可变批准修订、把布局作为事实 |\n| M04 AccessApplicability | policy/field labels, resource grant, policy epoch | IAccessPolicy, IReadContextFactory, IApplicabilityResolver | UI/filter绕过、关系/来源泄露 |\n| M05 Governance | change_set/item, review, baseline/entries, publish | IChangeSet, IApprovalPolicy, IBaselinePublisher/Resolver | 审批和发布混同、未批自动改facts |\n| M06 ImportEvidence | blob, upload, import_batch/entry/decision, external evidence intake | IBlobStore, IPackageImport, ISourceIntake | 部分导入成正式、相同外部ID静默覆盖 |\n| M07 ReadSearchExplain | search cache/index、reading projection (派生) | ISearch, IReadingPlan, IVocabularyRead, IContentCheck, IConformanceRead | 独立可写事实、过期标签为真相、unlimited投影 |\n| M08 TaskCollab | task, issue, comment, feedback, activity, impact记录/调查 | ITask, IImpactInvestigation, IChangePlanner, ICollaboration | 用户原话即完整任务；任务done直接改规范 |\n| M09 ContractDelivery | task_context, context_dependency, conformance check, acceptance, delivery/deployment/knowledge debt | ITaskContext, IClosure, IDeliveryReconciler | 读旧契约绕权、commit=审批 |\n| M10 Assistant | conversation/message/citation, provider config(仅secret ref) | IConversation, IProvider, IReasoningRun | 把LLM输出当已验证事实/无限工具 |\n| M11 AgentMcp | agent_run/event, agent work request & evidence proposal refs | IAgentRun, IInvestigationRequest, IMcpDispatch, IProposalIntake | raw db/提升权限/自动审批 |\n| M12 PlatformOps | jobs, idempotency, audit, outbox/inbox, alerts, error patterns | IJobQueue, IAudit, IOutbox, IUnitOfWork, IEventBus | 异步代替原子发布、依赖全历史prompt |\n\n依赖顺序：BuildingBlocks不依赖任何业务模块；M01/04提供主体、权限及上下文；M02/M03持有类型语义与修订；M05协调M03/M04发布；M06经M03/M05进候选；M07通过M04/M05/M03读取；M08通过M07与M05调查和提案；M09通过M08及治理/证据对账；M10/M11只调用已定义应用服务；M12基础能力被注入，不反向引用领域实现。跨模块公开 Contracts 项目可互引其 DTO，运行循环由 composition root/ports 解决，不允许 Domain 引用另模块 Infrastructure。DB FK 是数据完整性约束不是越权读取许可。EF迁移集中生成/应用，SchemaOwner审批每个模块DDL，跨模块共享迁移串行。\n\n## D. 代码结构（创建目标，而非声称存在）\n\n```text\nbusiness-atlas/\n  BusinessAtlas.slnx   global.json   Directory.Build.props   Directory.Packages.props\n  apps/Atlas.Api/       # Composition, BFF, REST, MCP, Hub, serve wwwroot\n  apps/Atlas.Worker/    # jobs/outbox, import, async AI, index, reconcile\n  apps/web/             # src/routes + features/{project,knowledge,review,task,delivery,assistant}\n  src/BuildingBlocks/   # Result, ID, clocks, version/hash, command pipeline, transaction\n  src/Modules/{ProjectIdentity,SchemaCatalog,KnowledgeCore,AccessApplicability,\n    Governance,ImportEvidence,ReadSearchExplain,TaskCollab,ContractDelivery,Assistant,AgentMcp,PlatformOps}/\n     Domain/ Application/ Infrastructure/ Contracts/  # 小模块可合并目录，但所有权不变\n  contracts/{openapi,schemas,registry,akp,mcp,knowledge-delivery}/\n  db/migrations/       # 唯一 owner，EF生成并评审，不运行两套DDL迁移\n  tests/{Domain,Integration,Contract,Security,EndToEnd,GoldenSemantic}/\n  knowledge/{baseline,proposals,decisions,error-patterns}/\n  deploy/{compose,proxy,identity,backup,ops}/   scripts/  docs/\n  azure-pipelines.yml  AGENTS.md\n```\n\n共享 contracts/OpenAPI 由 T01合同 Owner 接管。根据本包实际文件名复制为仓库技术约定路径，机器规范版本及hash固定。各模块不得在 UI 手写另一套未登记 DTO；使用OpenAPI生成 TS client，业务视图组件只消费其 DTO。所有运行时依赖版本经lockfile管理；构建/测试/部署脚本必须在干净环境运行，不依赖IDE本地隐藏状态。\n\n## E. 必须验证的架构决定（可并行，不作为独立完成阶段）\n\n| ADR | 首选默认 | 必须提供验证/触发改选条件 |\n|---|---|---|\n| ADR-T01 | 模块化单体+单PG+worker | 用架构测试验证禁止跨Infra引用；真实跨模块publish单事务；无需微服务避免分布式一致性 |\n| ADR-T02 | 全量不可变baseline membership | 1万/10万单元、关系与100次基线样本，历史页/diff/publish/磁盘，达不到目标才切增量checkpoint，外部语义不变 |\n| ADR-T03 | OIDC+应用授权+pg schema/RLS项目隔离 | 双项目、字段/source、历史/cache/MCP、撤权、token audience负例；未通过生产拒收，不为速度移除 |\n| ADR-T04 | 候选影响有语义、实际调查由外部Agent提供 | 在已知隐藏调用、动态配置、字段语义反例的真实Repo验证，不宣传完全召回；外部证据受权核验 |\n| ADR-T05 | PG搜索、无图/向量服务 | 多语言词汇/同义词/中文业务/ACL召回、性能测试；只在真实质量不足且收益可证时加入新索引 |\n| ADR-T06 | PG持久Job/Outbox | 中途kill worker、租约争夺、重复提交、取消、网络超时、恢复；达不到SLO才考虑新调度Adapter |\n| ADR-T07 | 文件存储本地+一致快照备份 | 私有访问、hash、故障/恢复、容量测试；多实例并发部署时S3 adapter有必要再切换 |\n| ADR-T08 | Mac ARM64 小型环境 | 资源/完整运行/ARM64 SDK与镜像、备份/恢复；IdP优先另机，若仍超资源由实测提出部署资源变更 |\n| ADR-T09 | 实际模型/工具合同 | OIDC/MCP真实auth、引用、外部Agent证据、成本/取消、防注入；协议能力不足禁止mock充数 |\n\n## F. 参考核对（2026-11-19）\n\n- .NET支持政策：https://dotnet.microsoft.com/en-us/platform/support/policy （10 LTS，最新安全补丁以实际安装时为准）。\n- Npgsql EF Core 10 release notes：https://www.npgsql.org/efcore/release-notes/10.0.html 。\n- PostgreSQL 17 RLS：https://www.postgresql.org/docs/17/ddl-rowsecurity.html （表owner/约束与侧信道，不能只用 RLS 假定端到端安全）。\n- Keycloak容器官方说明：https://www.keycloak.org/server/containers （生产配置与内存限制）。\n- MCP官方规范发布：https://blog.modelcontextprotocol.io/posts/2026-07-28/ ，https://modelcontextprotocol.io/ （按SDK实际支持与客户端协商版本；HTTP transport/OAuth资源服务器、工具权限，不能硬编码假定旧协议永远最新）。\n\n上述为选型依据核对，不是依赖漏洞、实际ARM64运行、性能或生产部署测试。锁定工具包、SDK、镜像digest和许可证清单必须由Leader在实际仓库产生。沿用P1.0概念来源与原V1.2工程依据，避免照搬大型开源平台全部基础设施。\n",
+      "contentHash": "01e74d2f62c3051050861b5e6e2ba00d8ab613b8ab876146946c28e5c7e23881"
+    },
+    {
+      "path": "docs/baselines/T1.0/01_技术实施/08_导入与工程知识交付.md",
+      "content": "# 08 资料接入、旧知识兼容、Git/CI与真实Self Project\n\n所属M06/M05/M11/M09。P1.0 PD-21/30/32/33，V1.2 Git协议保留其核心约束。导入、实际观察、业务批准是三种不同事件。下文以真实运行设计为要求，合成example不是已执行记录。\n\n## 1. AKP与资料接入\n\n保留AKP/0.1：原V9.3 `packages/schema/akp-v0.1.schema.json` 原字节保存在机器合同；V1.0 候选知识包、V9.2制造资料可用legacy adapter导入。T1 native可采用`AtlasProposal/1.0` (revision inputs + refs)，对外新增标准AKP/1.0在真实兼容测试后通过versioned adapter发布，不直接把旧0.1改名。既有visual layout不进活跃模型，独立文字注释/源图片/业务引用可保留，原始包按权限保存。不能静默删除旧数据或当成真实生产代码。\n\n导入步骤：\n1. 人在项目菜单上传或Agent经REST提交已整理包；认证、project权限、file size/content type/扩展名、hash、速率校验。私有upload staging；初始默认单包JSON 50MiB，ZIP 100MiB、解压上限500MiB/10000 entries/压缩比100:1，按授权可调整。拒绝path traversal、symlink/设备文件、嵌套压缩炸弹、可执行文件；解析JSON限制深度/字段数，外部URL不自动fetch。原始内容提示词按数据看待。附件恶意扫描失败或unavailable不得正式接入；原始文件不公开。\n2. worker按formatVersion匹配Schema，做结构+业务语义验证：stableExternalId唯一、manifest来源/作用域、entity类型、assertion双方、Flow节点边/Rule refs、Source locator、factKind、适用性、外部身份namespace；旧版未声明有效范围不以导入日替代、不从UI/代码观察推断批准。将legacy `verificationStatus`映射到独立核验维度，`confirmed/approved`仅当有真实可核验导入审批记录且获重授权才继承语义；默认全部进proposal。\n3. 预览新增/修订/内容等价重复/冲突/无效，保留source hash、external namespace与现有identity映射；同包同hash同project重放产生同result，不重建对象；packageId相同hash不同→409，不将同名对象合并。preview基于记下的baseBaseline，当前B变化时重新生成差异、使旧decisions失效。过滤仅显示当前有权内容；候选相互依赖时按组处理，不能因为某个隐藏reference悄悄断开业务语义。\n4. 冲突可选reuse_existing（证据一致）、new_version（同身份）、new_identity（不同业务语境，须说明）、reject/needs_evidence；Agent给建议，用户只决定重要冲突，等价项自动化。必要source/identity冲突未决阻断stage。\n5. 完成扫描的blob先进入不可变私有目录（按project+sha256，temp写完fsync后原子rename，防止半blob）；stage时一个DB事务生成所有unit/revision/relation/evidence/external IDs与ChangeSet items/audit/outbox；事务前检查所有引用/授权/当前base，故障全回滚；临时孤儿blob后续GC（有宽限期并重新查引用）。stage仅draft。用户可discard未提交/未发布候选，不能删除已发布历史。完整知识需要通过正常M05 review/publish。\n6. 页面显示接入后阅读入口、未决问题、来源/处理记录、关联Agent run；所有source content按当前授权下载，受限source不能经包导出泄露。`GET import preview`读取不会批准。\n\n`legacy mapping` 示例：Entity→core.unit + revision；assertion→Assertion payload/ref/Relationship（有明确谓词时转换为Relationship，原assertion locator保留）；businessStructures.flow→Flow stages/nodes/edges/guards；technicalStructures→Implementation/Component/API/DataField及相应refs；sources→Source revision+私有blob或授权repo定位；unknownsAndConflicts→Issue+source metadata；importProvenance→agent/run_event，区分真实捕获与重建。数据兼容测试必须用原包（V1.0、V9.2/V9.3代表样本）和损坏/重复/跨项目/冲突负例；不能只测试新格式。原V9.3 Self Knowledge是原型事实，不冒充正式产品自身知识。\n\n## 2. PR候选与合并后Manifest（消除自引用SHA）\n\n沿用V1.2两阶段：PR只包含`KnowledgeChangeProposal`，记录源任务/需求ID/本次知识变化、branch/PR、相关changedFiles+blobHash、定位、API/data/测试及未知，**不含包含自身的未来最终commitSha**；`headSha`若指含文件的提交同样循环，因此在PR内候选中不写，将head/base真实状态放CI外部artifact，候选以source blob和显式路径绑定。CI在merge后生成外部`KnowledgeDeliveryManifest`，绑定最终commit、proposal exact bytes SHA256、build digest、CI签名/验证身份、实际测试产物与source anchor resolution。合并策略squash/rebase后若anchor变化，实际最终blob重新核对；不匹配必须标needs_revalidation，不能盲沿旧hash。Manifest保存在CI artifact/可信私有blob，不写回同最终commit形成循环。\n\n**本次重要兼容修订**：旧 V1.2 Proposal schema要求`requirementIds`匹配BA/ENG，不识别P1.0 PD-01..38；旧agent-task schema也同类限制。T1采用 `knowledge-change-proposal-v1.3.schema.json` + `knowledge-delivery-manifest-v1.3.schema.json`（来自原schema的受控版本增量，允许PD；保留旧1.2 adapter，禁止把旧example冒充1.3）。T1 tasks使用独立DAG schema；接入的CI检查脚本需支持两种已注册schema并依本次trace校验ID存在。未修改旧包字节。真正合并后需CI验证，不依赖模型自称signature。API可接受legacy envelope并按明确版本分派，未知版本拒绝/请求迁移。\n\n### 真工程链路（以Azure DevOps为默认，不依赖其实际账户已配置）\n\n仓库 `/knowledge/proposals/{taskId}/{proposalId}.json` 与实现PR共同提交；首次开发从bootstrap知识账本开始。每个受控PR（包括纯文档/infra）必须提供proposal或经批准的no-knowledge-impact声明+真实diff检验，不能由模型随意豁免；初始可统一要求所有PR含proposal。PR validation：1.检查branch/base/task/trace和current contract digest；2.校验schema、changedFiles真实覆盖（排除proposal文件本身，明确保留排除理由）、源路径/blob/locator；3.真实测试、禁密钥、迁移兼容、权限、静态检查；4.独立审查业务/保持项/实际完整影响；5.接入外部CI留证。合并后pipeline：checkout准确commit→重算proposal原字节哈希/最终source anchors→生成镜像与测试artifact→可信CI service identity上传manifest和实际测试结果→平台建立实施观察候选与原业务CS关联→review/publish→部署对账。任何fail保留原因和债务，不伪造成功。批准知识与CI分开；PR通过不意味着业务规范已批准。\n\n## 3. 代码、知识、部署的对账状态\n\n`delivery_record`唯一(project,repo,finalCommitSha,deliveryId)，manifest原始哈希、CI来源和task/requirement/knowledge proposal IDs、actualTestRefs。KnowledgeChange内部将 `normative` 与 `observed` 分开提交，业务规则须BA审批，工程事实需真实证据及核验。`deployment_record`记录environment/buildDigest/commit/databaseMigration/configDigest/deployedAt/actor/previousDeployment，不从Branch当前latest推断生产版本。`reconciliation`基于manifest、CS publishedBaseline、部署/current context、符合性/actual evidence动态计算：aligned/pending_review/divergent/rolled_back/evidence_missing。部署回滚更新deployment记录并重新核验相应规则，不把知识B从B3直接指回B1。发布/撤回源/代码变化/部署事件触发相关对账Job，幂等；未核实对账标stale。\n\n紧急修复允许有权人审批明确范围、原因、风险/期限，记录`knowledge_debt`责任/到期/回补Task。必须保持安全/关键业务约束，缺非关键知识允许例外交付；不是产品完整完成门槛。正常正式最终发布不允许关键知识债未关闭。所有`divergent/rolled_back`处置或明确unknown，不允许无限期无对账。\n\n## 4. Self Project的真实首次建构\n\n首个仓库提交即维护`knowledge/`候选：P1.0原则、PD/DEC ID、T1架构/数据/接口、决策、不变量、实际变更/测试与来源。Bootstrap在首个服务尚不可用时通过Git候选账本保存真实来源，后端导入可用后按其repo/commit/source hash导入映射到Self Project（内部UUID由实际导入生成，外部ID使用稳定PD/DEC/T）。提交者和批准者明确；不能一键把候选P1.0全批准。开发过程中每个任务生成业务规则、技术设计、接口、实际观察和测试的差异，持续可读；真正发布后进入平台自身知识。用一次后续真实需求变更验证读取现有Self Project规范、调查影响、审批、代码PR与知识回写的闭环。独立CPQ试点不因自举通过免验。\n",
+      "contentHash": "02f09dcec62e5ee0dfcfb5b8451b78e593e162f51254a985314b38a98090601e"
+    }
+  ],
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "dbb2dd1d3eafad25761b94f5289bcc043480ae20e0da7216f9e6f9cbebf10c5e",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:AGENTS.md"
+    },
+    {
+      "path": "README.md",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "45ef7bae827b33e6f629ee7ff7883bbd2904d019feda939eb33318a7155fdf67",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:README.md"
+    },
+    {
+      "path": "apps/Atlas.Api/Auth/AtlasAuthentication.cs",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "96c060d8a20b674777e4ea2cf570e9a1c20c73e47fb312fa72080426c67691c4",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:apps/Atlas.Api/Auth/AtlasAuthentication.cs"
+    },
+    {
+      "path": "apps/Atlas.Api/Auth/IdentityEndpoints.cs",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "0424abdcbb00113fac6a5c2e00815039efaee80098bdd8341bbf34ae3a49ba02",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:apps/Atlas.Api/Auth/IdentityEndpoints.cs"
+    },
+    {
+      "path": "apps/Atlas.Api/Program.cs",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "ba92a910e7e9ac9d1c71462e785dd13572163dda5c2d7321185338dd453ec5e0",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:apps/Atlas.Api/Program.cs"
+    },
+    {
+      "path": "apps/Atlas.Api/ReadSearchExplain/ReadSearchExplainEndpoints.cs",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "f6c79d81e803470130bef241e88331f35a6e06d09a6f4ca01fbc8152370535be",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:apps/Atlas.Api/ReadSearchExplain/ReadSearchExplainEndpoints.cs"
+    },
+    {
+      "path": "apps/web/src/features/project/CatalogPage.tsx",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "0e1759630294698b6f564989bfd560170b3770ae558e10857c0d957e34721b2d",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:apps/web/src/features/project/CatalogPage.tsx"
+    },
+    {
+      "path": "apps/web/src/features/project/ImportWorkspace.tsx",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "2d0dc6e54f697b9bda83889f059815a5ab6fdd6311f11fbd5a49d92c13130163",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:apps/web/src/features/project/ImportWorkspace.tsx"
+    },
+    {
+      "path": "apps/web/src/features/project/KnowledgePage.tsx",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "86b032efb72257b688579b97c900335cc238ad7671bff8e137328302ff5508b6",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:apps/web/src/features/project/KnowledgePage.tsx"
+    },
+    {
+      "path": "apps/web/src/features/project/OverviewPage.tsx",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "9f47a50ed210ded9482d064d0a969dd7f5e56dabd070ed59e506e0bc32f53f7e",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:apps/web/src/features/project/OverviewPage.tsx"
+    },
+    {
+      "path": "apps/web/src/features/project/ProjectShell.tsx",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "dbf7b53e8e88bc0054afde8892c2ed39c77805891d72154f4e4bd021d8586b10",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:apps/web/src/features/project/ProjectShell.tsx"
+    },
+    {
+      "path": "apps/web/src/features/public/SelfProjectPage.tsx",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "11116e92f0ddac499daf4ec5ebfe078849c78e4fe8e71cbf2a5af6fe80d028f3",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:apps/web/src/features/public/SelfProjectPage.tsx"
+    },
+    {
+      "path": "apps/web/src/features/public/self-project.css",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "2c395d33d0a1ac3ef855343c2362dbdb6e1500d299b1b8109d7bc1b48ce04159",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:apps/web/src/features/public/self-project.css"
+    },
+    {
+      "path": "apps/web/src/features/review/ReviewWorkspace.tsx",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "be5e9e93208dc6b403992c9f0adb4578396c31b9cd54d6287688f5df3d9f3508",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:apps/web/src/features/review/ReviewWorkspace.tsx"
+    },
+    {
+      "path": "apps/web/src/main.tsx",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "b157776dfbc12427516ed95d5aa185711e2c39e76ac74e618b92038855e9ef4b",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:apps/web/src/main.tsx"
+    },
+    {
+      "path": "apps/web/src/routes/ProjectsPage.tsx",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "baace9f5f1dc5d15b5c6e0a1de04c104fc86a4ea34fb66368d494873aba936fc",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:apps/web/src/routes/ProjectsPage.tsx"
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "c7537a3dff25496b02b7f5b2d1b4e0726fefb8a3958f32d57d1d85a3ac3cf1e6",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:azure-pipelines.yml"
+    },
+    {
+      "path": "contracts/openapi.yaml",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "f723fab0ab938e363009ee46bbb26cd7074dd44944fe04ef38b423ceed8871ca",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:contracts/openapi.yaml"
+    },
+    {
+      "path": "docs/baselines/T1.0/01_技术实施/01_目标架构与范围.md",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "01e74d2f62c3051050861b5e6e2ba00d8ab613b8ab876146946c28e5c7e23881",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:docs/baselines/T1.0/01_技术实施/01_目标架构与范围.md"
+    },
+    {
+      "path": "docs/baselines/T1.0/01_技术实施/08_导入与工程知识交付.md",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "02f09dcec62e5ee0dfcfb5b8451b78e593e162f51254a985314b38a98090601e",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:docs/baselines/T1.0/01_技术实施/08_导入与工程知识交付.md"
+    },
+    {
+      "path": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "6363701cd7ed5ee32030715389c3192aa747e8318759f0d045600e014a939596",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:docs/baselines/T1.0/03_开发执行/requirements-trace.csv"
+    },
+    {
+      "path": "docs/baselines/T1.0/03_开发执行/task-dag.json",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "33917a5cbedfb33a5d289bad4d5cd6517bd0691c3523db3b6efb4939254b4ea1",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:docs/baselines/T1.0/03_开发执行/task-dag.json"
+    },
+    {
+      "path": "docs/baselines/T1.0/05_原始基线/P1.0/BusinessAtlas_Product_Design_Baseline/01_概念体系/01_产品宪章与边界.md",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "c8d2a7177af85d68df9374d8fce1545a46ef7322ed47cdcb12b91e7f473278fe",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:docs/baselines/T1.0/05_原始基线/P1.0/BusinessAtlas_Product_Design_Baseline/01_概念体系/01_产品宪章与边界.md"
+    },
+    {
+      "path": "docs/baselines/T1.0/05_原始基线/P1.0/BusinessAtlas_Product_Design_Baseline/README.md",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "0301653b9f680e9b93dae8cf52158883021ea7e0606b969488491bb8164743f8",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:docs/baselines/T1.0/05_原始基线/P1.0/BusinessAtlas_Product_Design_Baseline/README.md"
+    },
+    {
+      "path": "docs/baselines/T1.0/05_原始基线/V9.3原评审报告.md",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "32e75fd382812e85dbc1046f225bfa7374cb11d409162e743b56d158e58ab8b4",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:docs/baselines/T1.0/05_原始基线/V9.3原评审报告.md"
+    },
+    {
+      "path": "docs/release/t1.0-handoff/HANDOFF.md",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "ad9a91f242467d45ea9de4b1d99f66fa6bbc61e9eda459eee197ce257f35eee4",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:docs/release/t1.0-handoff/HANDOFF.md"
+    },
+    {
+      "path": "knowledge/evidence/azure-build-103.json",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "a625eaaf2cea819651cd39d6395c60b487e118b8e5930c3090a387b15a3b1951",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:knowledge/evidence/azure-build-103.json"
+    },
+    {
+      "path": "knowledge/evidence/azure-pr-78.json",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "2e57bc87a66dd25d8fe7c29f03587a3100372f5f520860cab1864e001a370f62",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:knowledge/evidence/azure-pr-78.json"
+    },
+    {
+      "path": "scripts/self-project/build_case.py",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "e3576532bf79c58bb123ca3d2e19a4ceef175852893166719baf64544e0872ec",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:scripts/self-project/build_case.py"
+    },
+    {
+      "path": "scripts/self-project/test_self_project.py",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "86e2baf0d7419653bb1945707908efc167e0ff91277d57d0a14a870af1557dc3",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:scripts/self-project/test_self_project.py"
+    },
+    {
+      "path": "src/Modules/Governance/Infrastructure/PostgresGovernanceStore.cs",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "743f3315d0f7aad79b71e2469703d662dc4dfcd0b46aafacb2e17a87b5bf0b9f",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:src/Modules/Governance/Infrastructure/PostgresGovernanceStore.cs"
+    },
+    {
+      "path": "src/Modules/KnowledgeCore/Infrastructure/PostgresKnowledgeStore.cs",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "dd76ef40190ad848d135eed2ee2b410bde6f0594d34be00d2f3f731ebeb37b90",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:src/Modules/KnowledgeCore/Infrastructure/PostgresKnowledgeStore.cs"
+    },
+    {
+      "path": "src/Modules/ProjectIdentity/Infrastructure/PostgresProjectIdentityStore.cs",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "68743fcb02c1fc6ed1aedc500c9d73644fcf8b445d41c0c82f85e5c7b57dc012",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:src/Modules/ProjectIdentity/Infrastructure/PostgresProjectIdentityStore.cs"
+    },
+    {
+      "path": "tests/Integration/ProjectIdentityTests.cs",
+      "revision": "de1873271c9b06871d492395b27cf40eac175035",
+      "contentHash": "87bca656b1b5ca17b7fd95ca160a03ac2c9b2f8d7290d920a2d49409894886d3",
+      "uri": "git:de1873271c9b06871d492395b27cf40eac175035:tests/Integration/ProjectIdentityTests.cs"
+    }
+  ],
+  "provenance": {
+    "sourceRevision": "de1873271c9b06871d492395b27cf40eac175035",
+    "generatedAt": "2026-11-22T00:00:00Z",
+    "sourceScope": "Repository docs/code and actual Azure DevOps records; no prototype simulation data."
+  }
 }
