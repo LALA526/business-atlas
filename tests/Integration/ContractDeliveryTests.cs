@@ -69,15 +69,14 @@ public sealed class ContractDeliveryTests
 
             var ci = await projects.ResolvePrincipalAsync($"https://identity.test/{Guid.NewGuid():N}", "t24-ci-service", PrincipalKind.Service, CancellationToken.None);
             await AddMembership(administrator.ConnectionString, project.ProjectId, ci.PrincipalId, "CIService");
-            var proposal = JsonSerializer.SerializeToElement(new { schemaVersion = "1.3.0", proposalId = "T24-PROPOSAL", projectId = project.ProjectId, taskId = task.TaskId,
-                repo = new { url = "https://example.invalid/business-atlas.git", branch = "task/T24", pullRequestId = "24" } });
+            var proposal = ValidProposal("T24-PROPOSAL", project.ProjectId, task.TaskId, "24");
             await delivery.IngestProposalAsync(author, project.ProjectId, proposal, "t24-proposal-01", "t24-r8", null, CancellationToken.None);
             var proposalSha = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(proposal.GetRawText()))).ToLowerInvariant();
             var commit = new string('c', 40); var build = new string('d', 64);
             var manifest = JsonSerializer.SerializeToElement(new { schemaVersion = "1.3.0", deliveryId = "T24-DELIVERY", proposalId = "T24-PROPOSAL", proposalSha256 = proposalSha,
                 projectId = project.ProjectId, taskId = task.TaskId, repo = new { url = "https://example.invalid/business-atlas.git", pullRequestId = "24" }, finalCommitSha = commit,
                 mergeStrategy = "squash", buildId = "CI-24", buildDigest = build, verifiedAt = DateTimeOffset.UtcNow,
-                testEvidence = new[] { new { testId = "AT-T24", result = "passed", artifactUri = "private://ci/24/tests" } },
+                testEvidence = new[] { new { testId = "AT-T24", result = "passed", artifactUri = "private://ci/24/tests", artifactSha256 = new string('f', 64) } },
                 anchorResolutions = new[] { new { path = "src/Modules/ContractDelivery", locator = "contract", resolvedBlobSha = new string('e', 40), verification = "matched" } }, status = "verified" });
             var delivered = await delivery.IngestManifestAsync(ci, project.ProjectId, manifest, "t24-manifest-01", "t24-r9", null, CancellationToken.None);
             Assert.Equal("evidence_missing", delivered.Status);
@@ -147,15 +146,14 @@ public sealed class ContractDeliveryTests
                 new(built.ContextId, revision.ToString(), expected, expected, "pass", checkRequest.BuildDigest, "production", evidence),
                 amended.Version + 1, "t25-acceptance-pass", "t25-r7", null, CancellationToken.None);
 
-            var proposal = JsonSerializer.SerializeToElement(new { schemaVersion = "1.3.0", proposalId = "T25-PROPOSAL", projectId = project.ProjectId, taskId = task.TaskId,
-                repo = new { url = "https://example.invalid/business-atlas.git", branch = "task/T25", pullRequestId = "25" } });
+            var proposal = ValidProposal("T25-PROPOSAL", project.ProjectId, task.TaskId, "25");
             await delivery.IngestProposalAsync(author, project.ProjectId, proposal, "t25-proposal-01", "t25-r8", null, CancellationToken.None);
             var proposalSha = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(proposal.GetRawText()))).ToLowerInvariant();
             var commit = new string('c', 40);
             var manifest = JsonSerializer.SerializeToElement(new { schemaVersion = "1.3.0", deliveryId = "T25-DELIVERY", proposalId = "T25-PROPOSAL", proposalSha256 = proposalSha,
                 projectId = project.ProjectId, taskId = task.TaskId, repo = new { url = "https://example.invalid/business-atlas.git", pullRequestId = "25" }, finalCommitSha = commit,
                 mergeStrategy = "squash", buildId = "CI-25", buildDigest = checkRequest.BuildDigest, verifiedAt = DateTimeOffset.UtcNow,
-                testEvidence = new[] { new { testId = "AT-T25", result = "passed", artifactUri = "private://ci/25/tests" } },
+                testEvidence = new[] { new { testId = "AT-T25", result = "passed", artifactUri = "private://ci/25/tests", artifactSha256 = new string('f', 64) } },
                 anchorResolutions = new[] { new { path = "src/Modules/ContractDelivery", locator = "contract", resolvedBlobSha = new string('e', 40), verification = "matched" } }, status = "verified" });
             var delivered = await delivery.IngestManifestAsync(ci, project.ProjectId, manifest, "t25-manifest-01", "t25-r9", null, CancellationToken.None);
             await PublishKnowledge(administrator.ConnectionString, project.ProjectId, project.CurrentBaselineId, delivered.DeliveryId, author.PrincipalId);
@@ -187,6 +185,18 @@ public sealed class ContractDeliveryTests
             if (Directory.Exists(blobRoot)) Directory.Delete(blobRoot, true);
         }
     }
+
+    private static JsonElement ValidProposal(string proposalId, Guid project, Guid task, string pullRequest) =>
+        JsonSerializer.SerializeToElement(new
+        {
+            schemaVersion = "1.3.0", proposalId, projectId = project, taskId = task, requirementIds = new[] { "PD-32" }, changeKind = "feature",
+            repo = new { url = "https://example.invalid/business-atlas.git", branch = $"task/{proposalId[..3]}", pullRequestId = pullRequest, baseSha = new string('a', 40) },
+            changedFiles = new[] { new { path = "src/Modules/ContractDelivery", changeType = "modified", contentSha256 = new string('b', 64) } },
+            entityChanges = Array.Empty<object>(), assertionChanges = Array.Empty<object>(), apiChanges = Array.Empty<object>(), dataChanges = Array.Empty<object>(),
+            testEvidence = new[] { new { testId = "AT-T31", result = "passed", artifactUri = "private://ci/proposal/tests" } },
+            sourceAnchors = new[] { new { path = "src/Modules/ContractDelivery", locator = "contract", contentSha256 = new string('e', 64) } },
+            knowledgeStatus = "proposed", unknowns = Array.Empty<string>(), errorsObserved = Array.Empty<object>()
+        });
 
     private static string TestEvidenceHash(IEnumerable<ContextEvidence> evidence) =>
         CanonicalJson.Sha256(JsonSerializer.SerializeToElement(evidence, new JsonSerializerOptions(JsonSerializerDefaults.Web)));

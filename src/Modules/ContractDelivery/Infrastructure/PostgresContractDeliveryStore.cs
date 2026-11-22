@@ -4,6 +4,7 @@ using System.Text.Json;
 using AccessApplicability.Contracts;
 using AccessApplicability.Infrastructure;
 using ContractDelivery.Contracts;
+using ContractDelivery.Delivery;
 using ImportEvidence.Blob;
 using KnowledgeCore.Application;
 using Npgsql;
@@ -201,6 +202,7 @@ public sealed class PostgresContractDeliveryStore(string connectionString, Postg
     public async Task<IdView> IngestProposalAsync(AtlasPrincipal actor, Guid project, JsonElement proposal, string key, string requestId, string? trace, CancellationToken ct)
     {
         ValidateKey(key); if (actor.Kind == PrincipalKind.Service) throw ProjectIdentityException.Forbidden();
+        KnowledgeDeliveryProtocol.ValidateProposal(proposal);
         var version = RequiredString(proposal, "schemaVersion"); if (version is not ("1.2.0" or "1.3.0")) throw ProjectIdentityException.Invalid("Only proposal schema 1.2.0 or 1.3.0 is supported.");
         var external = RequiredString(proposal, "proposalId"); var task = RequiredGuid(proposal, "taskId"); if (RequiredGuid(proposal, "projectId") != project) throw ProjectIdentityException.Invalid("Proposal project does not match the route.");
         var raw = proposal.GetRawText(); var sha = Sha256(raw); var digest = Digest(new { proposal }); await using var connection = await OpenAsync(ct); await using var tx = await connection.BeginTransactionAsync(ct);
@@ -214,7 +216,8 @@ public sealed class PostgresContractDeliveryStore(string connectionString, Postg
 
     public async Task<DeliveryStatus> IngestManifestAsync(AtlasPrincipal actor, Guid project, JsonElement manifest, string key, string requestId, string? trace, CancellationToken ct)
     {
-        ValidateKey(key); var version = RequiredString(manifest, "schemaVersion"); if (version is not ("1.2.0" or "1.3.0")) throw ProjectIdentityException.Invalid("Only manifest schema 1.2.0 or 1.3.0 is supported.");
+        ValidateKey(key); KnowledgeDeliveryProtocol.ValidateManifest(manifest);
+        var version = RequiredString(manifest, "schemaVersion");
         var task = RequiredGuid(manifest, "taskId"); if (RequiredGuid(manifest, "projectId") != project) throw ProjectIdentityException.Invalid("Manifest project does not match the route.");
         var proposalSha = RequiredString(manifest, "proposalSha256"); var external = RequiredString(manifest, "deliveryId"); var repo = RequiredString(manifest.GetProperty("repo"), "url");
         var commit = RequiredString(manifest, "finalCommitSha"); var build = RequiredString(manifest, "buildDigest"); var status = RequiredString(manifest, "status");
@@ -222,8 +225,11 @@ public sealed class PostgresContractDeliveryStore(string connectionString, Postg
         await SetContext(tx, project, actor.PrincipalId, ct); var member = await RequireMember(tx, project, actor.PrincipalId, true, ct); if (!member.Roles.Contains("CIService") || actor.Kind == PrincipalKind.Human) throw ProjectIdentityException.Forbidden();
         if (await Replay<DeliveryStatus>(tx, project, actor.PrincipalId, "ingestDeliveryManifest", key, digest, ct) is { } replay) { await tx.CommitAsync(ct); return replay; }
         _ = await TaskRow(tx, project, task, false, ct);
-        await using (var check = Command(tx, "SELECT 1 FROM delivery.proposal_intake WHERE project_id=@project AND proposal_sha256=@sha AND task_id=@task AND repo_key=@repo", ("project", project), ("sha", proposalSha), ("task", task), ("repo", repo)))
-            if (await check.ExecuteScalarAsync(ct) is null) throw ProjectIdentityException.Invalid("The exact proposal bytes must be ingested for this task and repository first.");
+        string proposalStorageKey;
+        await using (var check = Command(tx, "SELECT b.storage_key FROM delivery.proposal_intake p JOIN intake.blob b ON b.project_id=p.project_id AND b.blob_id=p.blob_id WHERE p.project_id=@project AND p.proposal_sha256=@sha AND p.task_id=@task AND p.repo_key=@repo", ("project", project), ("sha", proposalSha), ("task", task), ("repo", repo)))
+            proposalStorageKey = await check.ExecuteScalarAsync(ct) as string ?? throw ProjectIdentityException.Invalid("The exact proposal bytes must be ingested for this task and repository first.");
+        await using (var original = await blobs.OpenReadAsync(project, proposalStorageKey, ct)) using (var document = await JsonDocument.ParseAsync(original, cancellationToken: ct))
+            KnowledgeDeliveryProtocol.BindManifestToProposal(manifest, document.RootElement);
         var blob = await StoreBlob(project, raw, tx, actor.PrincipalId, ct); var id = Guid.NewGuid();
         await Execute(tx, "INSERT INTO delivery.delivery_record(project_id,delivery_id,external_delivery_id,task_id,repo_key,final_commit_sha,manifest_sha256,build_digest,proposal_sha256,blob_id,created_by) VALUES(@project,@id,@external,@task,@repo,@commit,@manifest,@build,@proposal,@blob,@actor)", ct,
             ("project", project), ("id", id), ("external", external), ("task", task), ("repo", repo), ("commit", commit), ("manifest", manifestSha), ("build", build), ("proposal", proposalSha), ("blob", blob), ("actor", actor.PrincipalId));

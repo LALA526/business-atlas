@@ -235,6 +235,16 @@
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.0, )"
         }
       },
+      "contractdelivery": {
+        "type": "Project",
+        "dependencies": {
+          "AccessApplicability": "[1.0.0, )",
+          "ImportEvidence": "[1.0.0, )",
+          "KnowledgeCore": "[1.0.0, )",
+          "ProjectIdentity": "[1.0.0, )",
+          "TaskCollab": "[1.0.0, )"
+        }
+      },
       "importevidence": {
         "type": "Project",
         "dependencies": {
@@ -272,6 +282,13 @@
         }
       },
       "schemacatalog": {
+        "type": "Project",
+        "dependencies": {
+          "AccessApplicability": "[1.0.0, )",
+          "ProjectIdentity": "[1.0.0, )"
+        }
+      },
+      "taskcollab": {
         "type": "Project",
         "dependencies": {
           "AccessApplicability": "[1.0.0, )",

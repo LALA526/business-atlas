@@ -1,0 +1,45 @@
+{
+  "schemaVersion": "1.3.0",
+  "proposalId": "KCP-T31-001",
+  "projectId": "PRJ-SELF",
+  "taskId": "T31",
+  "requirementIds": ["BA-COL-005", "BA-DLV-002", "ENG-KNW-001", "ENG-KNW-002", "ENG-KNW-003", "ENG-KNW-004", "ENG-KNW-005", "ENG-KNW-006", "ENG-DEL-006", "PD-30", "PD-32", "PD-33"],
+  "changeKind": "feature",
+  "repo": {
+    "url": "https://dev.azure.com/2717243207/Business%20Atlas/_git/Business%20Atlas",
+    "branch": "task/T31",
+    "pullRequestId": "PENDING",
+    "baseSha": "4a6d6a8eb4049c817fed58fb5063fbfe24aec25d"
+  },
+  "changedFiles": [
+    {"path": "azure-pipelines.yml", "changeType": "modified", "contentSha256": "aa1c25af01ad37d97661a111a11d42cc8f22cb0819cba02af1408f1209875b57"},
+    {"path": "src/Modules/ContractDelivery/Delivery/KnowledgeDeliveryProtocol.cs", "changeType": "added", "contentSha256": "2bf42db14ad73ec6aa83771cebf5dd0965fa14daad943c99a1d0e0d77edd21f2"},
+    {"path": "src/Modules/ContractDelivery/Infrastructure/PostgresContractDeliveryStore.cs", "changeType": "modified", "contentSha256": "76ddb22db831fc5b9a96ab915899e3b614ba35ad2337ec95584c2a0a08a2724e"},
+    {"path": "tests/Domain/Atlas.Domain.Tests.csproj", "changeType": "modified", "contentSha256": "3b3c1ba103500b04de54d8f9f3ce8016df3dfa93d1fccee7fe161d1056407a38"},
+    {"path": "tests/Domain/KnowledgeDeliveryProtocolTests.cs", "changeType": "added", "contentSha256": "4b16793a38129304349661134dc22affd9901dc74a3ba2f17f456cb1d864aeb8"},
+    {"path": "tests/Domain/packages.lock.json", "changeType": "modified", "contentSha256": "4a30b097b6c6ec8ddb875d48fd1743c7914bfd61a7eec93299e83a0e1753e1fa"},
+    {"path": "tests/Integration/ContractDeliveryTests.cs", "changeType": "modified", "contentSha256": "b3435644762498afa202f301d1f24be21780ec5a7102d181aca31878ecbd57a9"}
+  ],
+  "entityChanges": [
+    {"stableId": "ENG-KNW-003", "kind": "modified", "factLevel": "observed", "summary": "External proposals remain proposed observations; ingestion never approves or publishes business knowledge.", "sourceAnchorIds": ["protocol-validation"]},
+    {"stableId": "PD-32", "kind": "modified", "factLevel": "observed", "summary": "Trusted CI binds original proposal bytes, reviewed candidate evidence and the actual merge SHA; service ingestion binds the same proposal and PR identity.", "sourceAnchorIds": ["protocol-validation", "pipeline"]}
+  ],
+  "assertionChanges": [
+    {"stableId": "T31-FAIL-CLOSED", "kind": "added", "factLevel": "documented_intent", "summary": "Malformed, duplicated, mismatched or inadequately evidenced delivery manifests are rejected instead of becoming verified delivery facts.", "sourceAnchorIds": ["protocol-validation"]}
+  ],
+  "apiChanges": [
+    {"operationId": "ingestKnowledgeProposal", "kind": "modified", "contractPath": "contracts/openapi.yaml#/paths/~1api~1v1~1projects~1{projectId}~1knowledge-delivery~1proposals", "authorizationPolicy": "atlas.propose; human or authorized non-service contributor"},
+    {"operationId": "ingestDeliveryManifest", "kind": "modified", "contractPath": "contracts/openapi.yaml#/paths/~1api~1v1~1projects~1{projectId}~1knowledge-delivery~1manifests", "authorizationPolicy": "atlas.ci; CIService only"}
+  ],
+  "dataChanges": [],
+  "testEvidence": [{"testId": "AT-T31", "result": "passed", "artifactUri": "local://automated-test-actor/knowledge-delivery-protocol-and-git"}],
+  "sourceAnchors": [
+    {"path": "src/Modules/ContractDelivery/Delivery/KnowledgeDeliveryProtocol.cs", "locator": "KnowledgeDeliveryProtocol", "contentSha256": "2bf42db14ad73ec6aa83771cebf5dd0965fa14daad943c99a1d0e0d77edd21f2", "sourceRevision": "candidate"},
+    {"path": "src/Modules/ContractDelivery/Infrastructure/PostgresContractDeliveryStore.cs", "locator": "IngestProposalAsync and IngestManifestAsync", "contentSha256": "76ddb22db831fc5b9a96ab915899e3b614ba35ad2337ec95584c2a0a08a2724e", "sourceRevision": "candidate"},
+    {"path": "azure-pipelines.yml", "locator": "KnowledgeManifest", "contentSha256": "aa1c25af01ad37d97661a111a11d42cc8f22cb0819cba02af1408f1209875b57", "sourceRevision": "candidate"}
+  ],
+  "knowledgeStatus": "proposed",
+  "unknowns": ["The actual PR ID must replace PENDING before the real PR gate runs.", "PostgreSQL integration was not run because ATLAS_TEST_CONNECTIONSTRING was unavailable; focused executable protocol and real Git merge tests passed.", "Human knowledge approval, publication and deployment remain separate product operations and are not claimed by this candidate."],
+  "errorsObserved": [{"patternId": "T31-FORGED-MANIFEST", "symptom": "Schema-shaped input can otherwise claim a different proposal, PR or unverified evidence chain.", "preventionTestId": "AT_T31_Forged_or_malformed_manifest_is_rejected"}],
+  "contractDigests": ["sha256:9cfef8a3c201cb92e6b6b272f46b8fe8f8517dda66fbf3a38f5f036e9a332008"]
+}
