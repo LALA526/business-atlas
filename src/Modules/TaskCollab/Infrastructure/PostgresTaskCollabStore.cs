@@ -527,7 +527,15 @@ public sealed class PostgresTaskCollabStore(string connectionString, PostgresAcc
         }
         return items;
     }
-    private static async Task<bool> ContextBelongs(NpgsqlTransaction tx, Guid project, Guid task, Guid id, CancellationToken ct) { await using var command = Command(tx); command.CommandText = "SELECT EXISTS(SELECT 1 FROM delivery.task_context WHERE project_id=@project AND task_id=@task AND context_id=@id AND phase='executable' AND NOT EXISTS(SELECT 1 FROM delivery.context_invalidation i WHERE i.project_id=@project AND i.context_id=@id))"; Add(command, "project", project); Add(command, "task", task); Add(command, "id", id); return await command.ExecuteScalarAsync(ct) is true; }
+    private static async Task<bool> ContextBelongs(NpgsqlTransaction tx, Guid project, Guid task, Guid id, CancellationToken ct) { await using var command = Command(tx); command.CommandText = """
+        SELECT EXISTS(SELECT 1 FROM delivery.task_context c JOIN identity.project p ON p.project_id=c.project_id
+          WHERE c.project_id=@project AND c.task_id=@task AND c.context_id=@id AND c.phase='executable'
+            AND c.policy_epoch=p.policy_epoch AND (c.expires_at IS NULL OR c.expires_at>now())
+            AND NOT EXISTS(SELECT 1 FROM delivery.context_invalidation i WHERE i.project_id=@project AND i.context_id=@id)
+            AND NOT EXISTS(SELECT 1 FROM delivery.context_dependency d LEFT JOIN gov.baseline_entry e
+              ON e.project_id=d.project_id AND e.baseline_id=p.current_baseline_id AND e.unit_id=d.unit_id
+              WHERE d.project_id=@project AND d.context_id=@id AND d.required AND (e.revision_id IS NULL OR e.revision_id<>d.revision_id)))
+        """; Add(command, "project", project); Add(command, "task", task); Add(command, "id", id); return await command.ExecuteScalarAsync(ct) is true; }
     private static async Task<bool> ChangeSetBelongs(NpgsqlTransaction tx, Guid project, Guid id, CancellationToken ct) { await using var command = Command(tx); command.CommandText = "SELECT EXISTS(SELECT 1 FROM gov.change_set WHERE project_id=@project AND change_set_id=@id)"; Add(command, "project", project); Add(command, "id", id); return await command.ExecuteScalarAsync(ct) is true; }
 
     private static async Task Save<T>(NpgsqlTransaction tx, Guid project, Guid actor, string operation, string key, string digest, T result, string request, string? trace, CancellationToken ct)

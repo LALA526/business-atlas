@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../AccessApplicability/AccessApplicability.csproj" />
+    <ProjectReference Include="../ImportEvidence/ImportEvidence.csproj" />
+    <ProjectReference Include="../KnowledgeCore/KnowledgeCore.csproj" />
+    <ProjectReference Include="../ProjectIdentity/ProjectIdentity.csproj" />
+    <ProjectReference Include="../TaskCollab/TaskCollab.csproj" />
+  </ItemGroup>
+</Project>

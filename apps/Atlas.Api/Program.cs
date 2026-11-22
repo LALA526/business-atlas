@@ -18,6 +18,8 @@ using Atlas.Api.ImportEvidence;
 using Atlas.Api.Governance;
 using Atlas.Api.ReadSearchExplain;
 using Atlas.Api.TaskCollab;
+using Atlas.Api.ContractDelivery;
+using ContractDelivery.Infrastructure;
 using Atlas.Api.Hubs;
 using TaskCollab.Infrastructure;
 using ReadSearchExplain.Export;
@@ -45,6 +47,7 @@ builder.Services.AddSingleton(services => new PostgresReadSearchService(builder.
 builder.Services.AddSingleton<ReadingProjectionService>();
 builder.Services.AddScoped<PostgresExportService>();
 builder.Services.AddSingleton(services => new PostgresTaskCollabStore(builder.Configuration.GetConnectionString("Atlas") ?? string.Empty, services.GetRequiredService<PostgresAccessApplicabilityStore>()));
+builder.Services.AddSingleton(services => new PostgresContractDeliveryStore(builder.Configuration.GetConnectionString("Atlas") ?? string.Empty, services.GetRequiredService<PostgresAccessApplicabilityStore>(), services.GetRequiredService<IPrivateBlobStorage>()));
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<ProjectHubConnections>();
 builder.Services.AddSingleton<ProjectRealtimeNotifier>();
@@ -74,6 +77,7 @@ app.MapImportEvidenceEndpoints();
 app.MapGovernanceEndpoints();
 app.MapReadSearchExplainEndpoints();
 app.MapTaskCollabEndpoints();
+app.MapContractDeliveryEndpoints();
 app.MapHub<ProjectHub>("/hubs/project");
 
 app.MapGet("/health/live", (HttpContext context) => HealthResponse(context, "ok"));
