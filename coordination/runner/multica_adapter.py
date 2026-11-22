@@ -30,6 +30,7 @@ class MulticaAdapter:
         return {'ready':ready,'runtimeId':self.binding['runtimeId'],'daemonId':self.binding['daemonId'],'workspaceId':self.binding['workspaceId']}
 
     def run(self,role,prompt,cwd,log_dir,timeout_seconds):
+        prompt=prompt.replace('\r\n','\n').replace('\r','\n')
         if self.supervisor.stop_event.is_set(): raise StopRequested()
         if not self.preflight()['ready']: return RoleResult(False,category='runtime_not_ready')
         cwd=Path(cwd).resolve()
@@ -48,6 +49,9 @@ class MulticaAdapter:
         issue=None
         try:
             saved=json.loads(active.read_text()) if active.exists() else None
+            if saved and saved.get('prompt') is not None:
+                saved['prompt']=saved['prompt'].replace('\r\n','\n').replace('\r','\n')
+                write_json(active,saved)
             if saved and (saved['cwd']!=str(cwd) or saved['prompt']!=prompt):
                 raise RunnerError('dispatch_conflict','Unfinished native dispatch has different context; refuse duplicate execution')
             with (state/'source-ignore.lock').open('a+') as ignore_lock:

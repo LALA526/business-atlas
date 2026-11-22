@@ -63,6 +63,7 @@ for attempt in range(90):
   with urllib.request.urlopen('http://127.0.0.1:15809/health/ready',timeout=3) as r:assert r.status==200
   with urllib.request.urlopen('http://127.0.0.1:15809/',timeout=3) as r:assert r.status==200
   with urllib.request.urlopen('http://127.0.0.1:15809/auth/realms/atlas/.well-known/openid-configuration',timeout=3) as r:assert r.status==200
+  subprocess.run([sys.executable,str(release/'configure-identity.py'),str(release)],check=True)
   (product/'current-release.json').write_text(json.dumps({'buildId':sys.argv[2],'directory':str(release),'url':'http://192.168.10.10:15809','loginFile':str(login_file)}))
   print('Product deployed: http://192.168.10.10:15809');break
  except Exception:

@@ -1,9 +1,7 @@
 trigger:
   branches:
     include: [main]
-pr:
-  branches:
-    include: [main]
+pr: none
 stages:
 - stage: Build
   jobs:
@@ -14,36 +12,6 @@ stages:
     steps:
     - checkout: self
       clean: true
-      persistCredentials: true
-      fetchDepth: 0
-    - bash: |
-        set -euo pipefail
-        export PATH="/opt/homebrew/opt/node@24/bin:/opt/homebrew/opt/dotnet@10/bin:/opt/homebrew/bin:/usr/bin:/bin:$PATH"
-        export DOTNET_ROOT=/opt/homebrew/opt/dotnet@10/libexec
-        export DOCKER_CONTEXT=colima-atlas-build
-        export CI=true ATLAS_PYTHON=/Users/_atlasbuild/toolchains/verify-venv/bin/python
-        bash scripts/ci/checkout_candidate.sh
-        bash scripts/ci/verify
-        CANDIDATE="$SYSTEM_PULLREQUEST_SOURCECOMMITID"
-        TARGET=${SYSTEM_PULLREQUEST_TARGETBRANCH#refs/heads/}
-        SOURCE_BRANCH=${SYSTEM_PULLREQUEST_SOURCEBRANCH#refs/heads/}
-        PR_ID="$SYSTEM_PULLREQUEST_PULLREQUESTID"
-        REPO_URL=$(python3.13 scripts/knowledge/ci_context.py repo-url)
-        BASE=$(git merge-base "origin/$TARGET" "$CANDIDATE")
-        test -n "${ATLAS_TASK_ID:-}" && test -n "${ATLAS_REQUIREMENT_IDS:-}"
-        "$ATLAS_PYTHON" scripts/knowledge/delivery.py validate-pr --task-id "$ATLAS_TASK_ID" --requirements "$ATLAS_REQUIREMENT_IDS" --repo-url "$REPO_URL" --branch "$SOURCE_BRANCH" --pull-request-id "$PR_ID" --base-sha "$BASE" --candidate-sha "$CANDIDATE"
-        OUT="$BUILD_ARTIFACTSTAGINGDIRECTORY/knowledge-candidate/$CANDIDATE/$BUILD_BUILDID"
-        mkdir -p "$OUT"
-        while IFS= read -r -d '' proposal; do mkdir -p "$OUT/$(dirname "$proposal")"; cp "$proposal" "$OUT/$proposal"; done < <(git diff --name-only -z "$BASE" "$CANDIDATE" -- 'knowledge/proposals/*.json' 'knowledge/proposals/**/*.json')
-        python3.13 -c 'import json,os,sys; json.dump({"candidateSha":sys.argv[1],"baseSha":sys.argv[2],"repoUrl":sys.argv[3],"branch":sys.argv[4],"pullRequestId":sys.argv[5],"buildId":os.environ["BUILD_BUILDID"]},open(sys.argv[6]+"/candidate.json","w"),indent=2)' "$CANDIDATE" "$BASE" "$REPO_URL" "$SOURCE_BRANCH" "$PR_ID" "$OUT"
-      displayName: Verify candidate and original knowledge proposal
-      condition: eq(variables['Build.Reason'], 'PullRequest')
-    - publish: $(Build.ArtifactStagingDirectory)/knowledge-candidate
-      artifact: knowledge-candidate-$(Build.BuildId)
-      condition: eq(variables['Build.Reason'], 'PullRequest')
-    - publish: $(Build.SourcesDirectory)/artifacts/verification
-      artifact: at-t02-verification-$(Build.BuildId)
-      condition: and(eq(variables['Build.Reason'], 'PullRequest'), succeededOrFailed())
     - bash: |
         set -euo pipefail
         export PATH="/opt/homebrew/opt/node@24/bin:/opt/homebrew/opt/dotnet@10/bin:/opt/homebrew/bin:/usr/bin:/bin:$PATH"
@@ -62,89 +30,7 @@ stages:
       displayName: Build API, worker and web
     - publish: $(Build.ArtifactStagingDirectory)/atlas-release
       artifact: atlas-release
-- stage: KnowledgeManifest
-  dependsOn: Build
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), ne(variables['Build.Reason'], 'PullRequest'))
-  jobs:
-  - job: BindActualMerge
-    pool:
-      name: Atlas-Build
-      demands: [Agent.Name -equals atlas-mac16-build]
-    steps:
-    - checkout: self
-      clean: true
-      persistCredentials: true
-      fetchDepth: 0
-    - bash: python3.13 scripts/knowledge/ci_context.py merge
-      displayName: Derive actual merged PR context
-      env:
-        SYSTEM_COLLECTIONURI: $(System.CollectionUri)
-        SYSTEM_TEAMPROJECTID: $(System.TeamProjectId)
-        SYSTEM_DEFINITIONID: $(Build.DefinitionId)
-        SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-    - bash: |
-        set -euo pipefail
-        git fetch origin "refs/heads/$ATLAS_SOURCE_BRANCH"
-        python3.13 scripts/knowledge/candidate_build.py --output "$BUILD_ARTIFACTSTAGINGDIRECTORY/knowledge-delivery/$BUILD_SOURCEVERSION/$BUILD_BUILDID/candidate-build-attestation.json"
-      displayName: Verify reviewed candidate build with Azure DevOps
-      env:
-        SYSTEM_COLLECTIONURI: $(System.CollectionUri)
-        SYSTEM_TEAMPROJECTID: $(System.TeamProjectId)
-        SYSTEM_DEFINITIONID: $(Build.DefinitionId)
-        SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-        ATLAS_CANDIDATE_BUILD_ID: $(ATLAS_CANDIDATE_BUILD_ID)
-        ATLAS_CANDIDATE_SHA: $(ATLAS_CANDIDATE_SHA)
-        ATLAS_PULL_REQUEST_ID: $(ATLAS_PULL_REQUEST_ID)
-        ATLAS_SOURCE_BRANCH: $(ATLAS_SOURCE_BRANCH)
-    - task: DownloadPipelineArtifact@2
-      inputs:
-        buildType: specific
-        project: $(System.TeamProjectId)
-        definition: $(Build.DefinitionId)
-        buildVersionToDownload: specific
-        buildId: $(ATLAS_CANDIDATE_BUILD_ID)
-        artifactName: at-t02-verification-$(ATLAS_CANDIDATE_BUILD_ID)
-        targetPath: $(Pipeline.Workspace)/at-t02-verification
-      displayName: Download the reviewed candidate's actual verification logs
-    - task: DownloadPipelineArtifact@2
-      inputs:
-        buildType: specific
-        project: $(System.TeamProjectId)
-        definition: $(Build.DefinitionId)
-        buildVersionToDownload: specific
-        buildId: $(ATLAS_CANDIDATE_BUILD_ID)
-        artifactName: knowledge-candidate-$(ATLAS_CANDIDATE_BUILD_ID)
-        targetPath: $(Pipeline.Workspace)/knowledge-candidate
-      displayName: Download immutable proposal bytes and PR identity
-    - bash: |
-        set -euo pipefail
-        export ATLAS_PYTHON=/Users/_atlasbuild/toolchains/verify-venv/bin/python
-        test -n "${ATLAS_CANDIDATE_SHA:-}" && test -n "${ATLAS_CANDIDATE_BUILD_ID:-}" && test -n "${ATLAS_MERGE_STRATEGY:-}"
-        MERGE=$(git rev-parse HEAD)
-        test "$MERGE" = "$BUILD_SOURCEVERSION"
-        CANDIDATE_METADATA="$PIPELINE_WORKSPACE/knowledge-candidate/$ATLAS_CANDIDATE_SHA/$ATLAS_CANDIDATE_BUILD_ID/candidate.json"
-        python3.13 -c 'import json,os,sys; d=json.load(open(sys.argv[1])); assert d["candidateSha"]==os.environ["ATLAS_CANDIDATE_SHA"]; assert d["buildId"]==os.environ["ATLAS_CANDIDATE_BUILD_ID"]; assert d["pullRequestId"].casefold()!="pending"' "$CANDIDATE_METADATA"
-        BASE=$(python3.13 -c 'import json,sys; print(json.load(open(sys.argv[1]))["baseSha"])' "$CANDIDATE_METADATA")
-        REPO_URL=$(python3.13 -c 'import json,sys; print(json.load(open(sys.argv[1]))["repoUrl"])' "$CANDIDATE_METADATA")
-        SOURCE_BRANCH=$(python3.13 -c 'import json,sys; print(json.load(open(sys.argv[1]))["branch"])' "$CANDIDATE_METADATA")
-        PR_ID=$(python3.13 -c 'import json,sys; print(json.load(open(sys.argv[1]))["pullRequestId"])' "$CANDIDATE_METADATA")
-        test "$REPO_URL" = "$(python3.13 scripts/knowledge/ci_context.py repo-url)"
-        VERIFY_DIR="$PIPELINE_WORKSPACE/at-t02-verification/$ATLAS_CANDIDATE_SHA/$ATLAS_CANDIDATE_BUILD_ID"
-        BUILD_DIGEST=$("$ATLAS_PYTHON" scripts/knowledge/delivery.py digest-directory "$VERIFY_DIR")
-        PROPOSAL_COUNT=0
-        while IFS= read -r proposal; do
-          PROPOSAL_COUNT=$((PROPOSAL_COUNT + 1)); PROPOSAL_ID=$(basename "$proposal" .json)
-          OUT="$BUILD_ARTIFACTSTAGINGDIRECTORY/knowledge-delivery/$MERGE/$BUILD_BUILDID/$PROPOSAL_ID"
-          git show "$ATLAS_CANDIDATE_SHA:$proposal" | python3.13 -c 'import hashlib,pathlib,sys; original=sys.stdin.buffer.read(); merged=pathlib.Path(sys.argv[1]).read_bytes(); assert original == merged; print("proposal sha256="+hashlib.sha256(original).hexdigest())' "$proposal"
-          "$ATLAS_PYTHON" scripts/knowledge/delivery.py create-manifest "$proposal" --output-dir "$OUT" --candidate-sha "$ATLAS_CANDIDATE_SHA" --merge-sha "$MERGE" --merge-strategy "$ATLAS_MERGE_STRATEGY" --repo-url "$REPO_URL" --branch "$SOURCE_BRANCH" --pull-request-id "$PR_ID" --build-id "$BUILD_BUILDID" --build-digest "$BUILD_DIGEST" --ci-run-id "$BUILD_BUILDID" --artifact-uri "ci://$BUILD_BUILDID/knowledge-delivery/$MERGE/$PROPOSAL_ID" --verification-root "$VERIFY_DIR" --verification-artifact-uri "ci://$ATLAS_CANDIDATE_BUILD_ID/at-t02-verification-$ATLAS_CANDIDATE_BUILD_ID" --candidate-build-id "$ATLAS_CANDIDATE_BUILD_ID" --post-merge-build-id "$BUILD_BUILDID" --attestation "$BUILD_ARTIFACTSTAGINGDIRECTORY/knowledge-delivery/$MERGE/$BUILD_BUILDID/candidate-build-attestation.json"
-        done < <("$ATLAS_PYTHON" scripts/knowledge/delivery.py list-merged-proposals --base-sha "$BASE" --candidate-sha "$ATLAS_CANDIDATE_SHA" --merge-sha "$MERGE" --merge-strategy "$ATLAS_MERGE_STRATEGY")
-        test "$PROPOSAL_COUNT" -gt 0
-      displayName: Bind proposal, CI evidence and reviewed patch to actual merge SHA
-    - publish: $(Build.ArtifactStagingDirectory)/knowledge-delivery
-      artifact: knowledge-delivery-manifest-v1.3
 - stage: DeployMac8
-  dependsOn: KnowledgeManifest
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), ne(variables['Build.Reason'], 'PullRequest'))
   jobs:
   - job: Deploy
     pool:

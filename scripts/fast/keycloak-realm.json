@@ -28,7 +28,13 @@
         "profile",
         "email",
         "atlas.read",
-        "atlas.admin"
+        "atlas.propose",
+        "atlas.admin",
+        "atlas.task",
+        "atlas.evidence",
+        "atlas.review",
+        "atlas.ci",
+        "atlas.agent"
       ],
       "protocolMappers": [
         {
@@ -141,6 +147,48 @@
           }
         }
       ]
+    },
+    {
+      "name": "atlas.propose",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true"
+      }
+    },
+    {
+      "name": "atlas.task",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true"
+      }
+    },
+    {
+      "name": "atlas.evidence",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true"
+      }
+    },
+    {
+      "name": "atlas.review",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true"
+      }
+    },
+    {
+      "name": "atlas.ci",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true"
+      }
+    },
+    {
+      "name": "atlas.agent",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true"
+      }
     }
   ],
   "users": [
