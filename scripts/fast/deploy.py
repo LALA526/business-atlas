@@ -3,6 +3,7 @@
 
 import datetime
 import ipaddress
+import http.cookiejar
 import json
 import os
 import secrets
@@ -109,13 +110,14 @@ def https_get(opener, url):
 def check_health(ca_cert, authority, local_url):
     context = ssl.create_default_context(cafile=str(ca_cert))
     opener = urllib.request.build_opener(
-        urllib.request.ProxyHandler({}), urllib.request.HTTPSHandler(context=context)
+        urllib.request.ProxyHandler({}), urllib.request.HTTPSHandler(context=context),
+        urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar())
     )
     https_get(opener, local_url + "/health/ready")
     https_get(opener, local_url + "/")
     https_get(opener, local_url + "/auth/realms/atlas/.well-known/openid-configuration")
     # Exercise the real BFF authorization-code + PKCE challenge through discovery.
-    https_get(opener, local_url + "/auth/login?returnUrl=/")
+    https_get(opener, authority + "/auth/login?returnUrl=/")
 
 
 def main():
