@@ -48,6 +48,9 @@ public sealed class PolicyService(PostgresAccessApplicabilityStore store) : IRea
 
     public Task EnsureCurrentAsync(ResolvedReadContext context, CancellationToken cancellationToken) => store.EnsureCurrentAsync(context, ct: cancellationToken);
 
+    public static JsonElement ProjectAuthorizedFields(ResourceAccess access, JsonElement payload) =>
+        Filter(payload, string.Empty, access.AllowedFieldPaths, access.DeniedFieldPaths);
+
     private static bool HasAny(ResolvedReadContext context, params string[] roles) => context.Roles.Any(role => roles.Contains(role, StringComparer.Ordinal));
 
     private static JsonElement Filter(JsonElement value, string path, IReadOnlyList<string> allowed, IReadOnlyList<string> denied)

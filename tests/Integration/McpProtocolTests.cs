@@ -4,12 +4,14 @@ using System.Security.Claims;
 using System.Text.Json;
 using Atlas.Api.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using ModelContextProtocol.Client;
@@ -81,6 +83,12 @@ public sealed class McpProtocolTests : IClassFixture<WebApplicationFactory<Progr
         .ConfigureLogging(logging => logging.AddConsole().SetMinimumLevel(LogLevel.Debug))
         .ConfigureServices(services =>
         {
+            services.PostConfigureAll<OpenIdConnectOptions>(options =>
+            {
+                options.Authority = null; options.MetadataAddress = null;
+                options.Configuration = new OpenIdConnectConfiguration { Issuer = Issuer };
+                options.ConfigurationManager = new StaticConfigurationManager<OpenIdConnectConfiguration>(options.Configuration);
+            });
             if (connection is not null) services.AddSingleton(new ProjectIdentity.Infrastructure.PostgresProjectIdentityStore(connection));
             services.PostConfigure<JwtBearerOptions>(AtlasAuthentication.BearerScheme, options =>
             {

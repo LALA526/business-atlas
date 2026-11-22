@@ -420,16 +420,17 @@ public sealed class PostgresKnowledgeStore(string connectionString, PostgresAcce
         var after = DecodeCursor(cursor); var candidates = new List<RevisionView>();
         await using (var reader = await command.ExecuteReaderAsync(ct)) while (await reader.ReadAsync(ct)) candidates.Add(ReadRevision(reader));
         var authorized = new List<RevisionView>();
-        foreach (var item in candidates)
+        foreach (var item in candidates.Where(item => !after.HasValue || cursorKey(item).CompareTo(after.Value) > 0))
         {
             try
             {
                 await AuthorizeAsync(context, item, ct, exactRevision);
                 if (visibilityFilter is null || await visibilityFilter(item, ct)) authorized.Add(item);
+                if (authorized.Count > limit) break;
             }
             catch (ProjectIdentityException exception) when (exception.StatusCode == 404) { }
         }
-        var items = authorized.Where(item => !after.HasValue || cursorKey(item).CompareTo(after.Value) > 0).Take(limit + 1).ToList();
+        var items = authorized.Take(limit + 1).ToList();
         var next = items.Count > limit ? EncodeCursor(cursorKey(items[limit - 1])) : null;
         if (items.Count > limit) items.RemoveAt(limit);
         await access.EnsureCurrentAsync(context, ct);

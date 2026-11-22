@@ -173,9 +173,86 @@ public sealed class PostgresAccessApplicabilityStore(string connectionString)
             else { hasAllow = true; allowed.AddRange(fieldPaths); }
         }
         await grantReader.CloseAsync();
-        if (hasWholeDeny || !hasAllow && context.Clearance < visibility)
+        if (hasWholeDeny || action == "read_source" && !hasAllow || !hasAllow && context.Clearance < visibility)
             throw ProjectIdentityException.NotFound();
         return new ResourceAccess(unitId, resolvedRevisionId, applicability, allowed.Distinct(StringComparer.Ordinal).ToArray(), denied.Distinct(StringComparer.Ordinal).ToArray());
+    }
+
+    public async Task<IReadOnlyDictionary<Guid, ResourceAccess>> AuthorizeReadBatchAsync(
+        ResolvedReadContext context, IReadOnlyList<(Guid UnitId, Guid RevisionId)> requested, string action, CancellationToken ct)
+    {
+        if (!Actions.Contains(action)) throw ProjectIdentityException.Invalid("The requested resource action is unknown.");
+        if (requested.Count == 0) return new Dictionary<Guid, ResourceAccess>();
+        if (requested.Count > 1000) throw ProjectIdentityException.Invalid("The authorization batch is too large.");
+        var unitIds = requested.Select(item => item.UnitId).ToArray(); var revisionIds = requested.Select(item => item.RevisionId).ToArray();
+        await using var connection = await OpenAsync(ct); await using var transaction = await connection.BeginTransactionAsync(ct);
+        await SetContextAsync(transaction, context.ProjectId, context.PrincipalId, ct);
+        await using (var membership = transaction.CreateCommand())
+        {
+            membership.CommandText = """
+                SELECT p.policy_epoch,m.clearance FROM identity.project p JOIN identity.membership m ON m.project_id=p.project_id AND m.principal_id=@principal AND m.active
+                WHERE p.project_id=@project AND p.archived_at IS NULL;
+                """;
+            membership.Parameters.AddWithValue("project", context.ProjectId); membership.Parameters.AddWithValue("principal", context.PrincipalId);
+            await using var reader = await membership.ExecuteReaderAsync(ct);
+            if (!await reader.ReadAsync(ct) || reader.GetInt64(0) != context.PolicyEpoch || reader.GetInt32(1) != context.Clearance)
+                throw new ProjectIdentityException("POLICY_CONTEXT_STALE", "The authorization context is stale; reauthorize before reading.", 403);
+        }
+        var visibility = new Dictionary<Guid, int>();
+        await using (var units = transaction.CreateCommand())
+        {
+            var selected = context.Mode == ReadMode.Draft ? """
+                JOIN core.unit u ON u.project_id=requested.project AND u.unit_id=requested.unit AND u.archived_at IS NULL
+                LEFT JOIN gov.change_item ci ON ci.project_id=u.project_id AND ci.unit_id=u.unit_id AND ci.change_set_id=@changeSet
+                LEFT JOIN gov.baseline_entry be ON be.project_id=u.project_id AND be.unit_id=u.unit_id AND be.baseline_id=@baseline
+                JOIN core.revision r ON r.project_id=u.project_id AND r.unit_id=u.unit_id AND r.revision_id=COALESCE(ci.proposed_revision_id,be.revision_id) AND r.revision_id=requested.revision
+                WHERE ci.unit_id IS NOT NULL OR be.unit_id IS NOT NULL
+                """ : """
+                JOIN core.unit u ON u.project_id=requested.project AND u.unit_id=requested.unit AND u.archived_at IS NULL
+                JOIN gov.baseline_entry be ON be.project_id=u.project_id AND be.unit_id=u.unit_id AND be.baseline_id=@baseline
+                JOIN core.revision r ON r.project_id=u.project_id AND r.unit_id=u.unit_id AND r.revision_id=be.revision_id AND r.revision_id=requested.revision
+                """;
+            units.CommandText = $"""
+                WITH requested AS (SELECT @project AS project,* FROM unnest(@units,@revisions) AS item(unit,revision))
+                SELECT requested.unit,u.visibility,r.revision_id FROM requested {selected};
+                """;
+            units.Parameters.AddWithValue("project", context.ProjectId); units.Parameters.AddWithValue("baseline", context.BaselineId);
+            units.Parameters.AddWithValue("changeSet", NpgsqlDbType.Uuid, (object?)context.ChangeSetId ?? DBNull.Value);
+            units.Parameters.Add(new NpgsqlParameter("units", NpgsqlDbType.Array | NpgsqlDbType.Uuid) { Value = unitIds });
+            units.Parameters.Add(new NpgsqlParameter("revisions", NpgsqlDbType.Array | NpgsqlDbType.Uuid) { Value = revisionIds });
+            await using var reader = await units.ExecuteReaderAsync(ct);
+            while (await reader.ReadAsync(ct)) visibility[reader.GetGuid(0)] = reader.GetInt32(1);
+        }
+        var grants = new Dictionary<Guid, List<(string Action, string Effect, string[] Fields)>>();
+        await using (var grantCommand = transaction.CreateCommand())
+        {
+            grantCommand.CommandText = "SELECT unit_id,action,effect,field_paths FROM access.grant WHERE project_id=@project AND unit_id=ANY(@units) AND principal_id=@principal AND (action=@action OR action='read_history');";
+            grantCommand.Parameters.AddWithValue("project", context.ProjectId); grantCommand.Parameters.AddWithValue("principal", context.PrincipalId); grantCommand.Parameters.AddWithValue("action", action);
+            grantCommand.Parameters.Add(new NpgsqlParameter("units", NpgsqlDbType.Array | NpgsqlDbType.Uuid) { Value = unitIds });
+            await using var reader = await grantCommand.ExecuteReaderAsync(ct);
+            while (await reader.ReadAsync(ct))
+            {
+                var unit = reader.GetGuid(0); if (!grants.TryGetValue(unit, out var list)) grants[unit] = list = [];
+                list.Add((reader.GetString(1), reader.GetString(2), reader.GetFieldValue<string[]>(3)));
+            }
+        }
+        var result = new Dictionary<Guid, ResourceAccess>();
+        foreach (var item in requested)
+        {
+            if (!visibility.TryGetValue(item.UnitId, out var level)) continue;
+            grants.TryGetValue(item.UnitId, out var rows); rows ??= [];
+            var current = rows.Where(row => row.Action == action).ToArray();
+            var allowed = current.Where(row => row.Effect == "allow").SelectMany(row => row.Fields).Distinct(StringComparer.Ordinal).ToArray();
+            var denied = current.Where(row => row.Effect == "deny").SelectMany(row => row.Fields).Distinct(StringComparer.Ordinal).ToArray();
+            var hasAllow = current.Any(row => row.Effect == "allow");
+            var wholeDeny = current.Any(row => row.Effect == "deny" && (row.Fields.Length == 0 || row.Fields.Contains("*", StringComparer.Ordinal)));
+            var historyDenied = context.Mode == ReadMode.Historical &&
+                (!rows.Any(row => row.Action == "read_history" && row.Effect == "allow") ||
+                 rows.Any(row => row.Action == "read_history" && row.Effect == "deny" && (row.Fields.Length == 0 || row.Fields.Contains("*", StringComparer.Ordinal))));
+            if (wholeDeny || historyDenied || action == "read_source" && !hasAllow || !hasAllow && context.Clearance < level) continue;
+            result[item.UnitId] = new ResourceAccess(item.UnitId, item.RevisionId, JsonDocument.Parse("{}").RootElement.Clone(), allowed, denied);
+        }
+        return result;
     }
 
     public async Task<GrantMutation> SetGrantAsync(AtlasPrincipal actor, Guid projectId, ResourceGrant input,

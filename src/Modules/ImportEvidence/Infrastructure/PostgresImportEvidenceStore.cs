@@ -81,6 +81,9 @@ public sealed class PostgresImportEvidenceStore(string connectionString, IPrivat
     public async Task<SourceContent> ReadSourceContentAsync(ResolvedReadContext context, Guid sourceId, CancellationToken ct)
     {
         var source = await GetSourceAsync(context, sourceId, ct);
+        // Reading a source summary never implies permission to retrieve its bytes.
+        // Reauthorize the explicit source action on every download, including old URLs.
+        await access.AuthorizeReadAsync(context, sourceId, "read_source", source.RevisionId, ct);
         Guid project; Guid blob; string key; string hash; long size;
         await using (var connection = await OpenAsync(ct))
         await using (var tx = await connection.BeginTransactionAsync(ct))

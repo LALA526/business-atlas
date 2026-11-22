@@ -30,6 +30,8 @@ public sealed class PostgresReadSearchService(
         if (kind is not null && (string.IsNullOrWhiteSpace(kind) || kind.Length > 100)) throw ProjectIdentityException.Invalid("The kind filter is invalid.");
         var offset = DecodeCursor(cursor, context, normalized, kind);
         var candidates = await CandidatesAsync(context, normalized, kind, ct);
+        var authorizations = await access.AuthorizeReadBatchAsync(context,
+            candidates.Select(item => (item.UnitId, item.RevisionId)).ToArray(), "read", ct);
         var hits = new List<SearchHit>();
         var skipped = 0;
         foreach (var candidate in candidates)
@@ -38,11 +40,13 @@ public sealed class PostgresReadSearchService(
             if (hits.Count == limit) break;
             try
             {
-                await access.AuthorizeReadAsync(context, candidate.UnitId, "read", candidate.RevisionId, ct);
+                if (!authorizations.TryGetValue(candidate.UnitId, out var authorization)) continue;
                 var applicability = ApplicabilityEvaluator.Evaluate(candidate.Applicability, context.Context);
                 if (applicability.Status != ApplicabilityStatus.Applicable) continue;
-                var revision = await knowledge.GetUnitAsync(context, candidate.UnitId, ct);
-                revision = await ProjectAsync(context, revision, ct);
+                var revision = ProjectAuthorized(candidate.Revision, authorization);
+                // Candidate selection may inspect fields which are later removed by
+                // field-level policy. Never return a hit whose only match was hidden.
+                if (!MatchesVisibleContent(revision, normalized)) continue;
                 hits.Add(new(revision.UnitId, revision.RevisionId, revision.Title, revision.Kind, Snippet(revision, normalized)));
             }
             catch (ProjectIdentityException error) when (error.StatusCode is 403 or 404) { if (error.Code == "POLICY_CONTEXT_STALE") throw; }
@@ -88,6 +92,13 @@ public sealed class PostgresReadSearchService(
         return JsonSerializer.Deserialize<RevisionView>(projected, Json) ?? throw ProjectIdentityException.NotFound();
     }
 
+    private static RevisionView ProjectAuthorized(RevisionView revision, ResourceAccess authorization)
+    {
+        var payload = JsonSerializer.SerializeToElement(revision, Json);
+        var projected = PolicyService.ProjectAuthorizedFields(authorization, payload);
+        return JsonSerializer.Deserialize<RevisionView>(projected, Json) ?? throw ProjectIdentityException.NotFound();
+    }
+
     private async Task<List<Candidate>> CandidatesAsync(ResolvedReadContext context, string query, string? kind, CancellationToken ct)
     {
         await using var connection = new NpgsqlConnection(connectionString);
@@ -110,7 +121,8 @@ public sealed class PostgresReadSearchService(
             WHERE u.project_id=@project AND u.archived_at IS NULL
             """;
         command.CommandText = $"""
-            SELECT u.unit_id,r.revision_id,u.kind,r.applicability,
+            SELECT u.unit_id,r.revision_id,r.rev_no,u.kind,r.schema_version,r.fact_kind,r.verification,r.payload,
+              r.content_sha256,r.created_at,r.created_by,r.parent_revision_id,r.sealed,r.applicability,
               CASE WHEN lower(r.payload->>'title')=@query THEN 0
                    WHEN EXISTS(SELECT 1 FROM jsonb_array_elements_text(COALESCE(r.payload->'body'->'aliases','[]'::jsonb)) a WHERE lower(a)=@query) THEN 1
                    WHEN strpos(lower(r.payload->>'title'),@query)>0 THEN 2
@@ -128,7 +140,21 @@ public sealed class PostgresReadSearchService(
         command.Parameters.AddWithValue("query", NpgsqlDbType.Text, query); command.Parameters.AddWithValue("kind", NpgsqlDbType.Text, (object?)kind ?? DBNull.Value);
         var result = new List<Candidate>();
         await using var reader = await command.ExecuteReaderAsync(ct);
-        while (await reader.ReadAsync(ct)) result.Add(new(reader.GetGuid(0), reader.GetGuid(1), reader.GetString(2), JsonDocument.Parse(reader.GetString(3)).RootElement.Clone(), reader.GetInt32(4)));
+        while (await reader.ReadAsync(ct))
+        {
+            var payload = JsonDocument.Parse(reader.GetString(7)).RootElement.Clone();
+            var revision = new RevisionView(reader.GetGuid(0), reader.GetGuid(1), reader.GetInt64(2),
+                payload.GetProperty("title").GetString() ?? string.Empty, reader.GetString(3), reader.GetString(4), reader.GetString(5), reader.GetString(6),
+                payload.TryGetProperty("applicability", out var applicability) ? applicability.Clone() : Empty("{}"),
+                payload.TryGetProperty("body", out var body) ? body.Clone() : Empty("{}"),
+                payload.TryGetProperty("blocks", out var blocks) ? blocks.Clone() : Empty("[]"),
+                payload.TryGetProperty("evidence", out var evidence) ? evidence.Clone() : Empty("[]"),
+                payload.TryGetProperty("unknowns", out var unknowns) ? unknowns.Clone() : Empty("[]"),
+                reader.GetString(8), new DateTimeOffset(reader.GetDateTime(9), TimeSpan.Zero), reader.GetGuid(10),
+                payload.TryGetProperty("categoryKeys", out var categories) ? categories.EnumerateArray().Select(item => item.GetString()!).ToArray() : [])
+            { ParentRevisionId = reader.IsDBNull(11) ? null : reader.GetGuid(11), Sealed = reader.GetBoolean(12) };
+            result.Add(new(revision.UnitId, revision.RevisionId, revision.Kind, JsonDocument.Parse(reader.GetString(13)).RootElement.Clone(), reader.GetInt32(14), revision));
+        }
         return result;
     }
 
@@ -164,11 +190,26 @@ public sealed class PostgresReadSearchService(
     private static string Normalize(string value) => (value ?? string.Empty).Normalize(NormalizationForm.FormKC).Trim().ToLowerInvariant();
     private static string? String(JsonElement body, string key) => body.ValueKind == JsonValueKind.Object && body.TryGetProperty(key, out var value) && value.ValueKind == JsonValueKind.String ? value.GetString() : null;
     private static IEnumerable<string> Aliases(JsonElement body) => body.ValueKind == JsonValueKind.Object && body.TryGetProperty("aliases", out var values) && values.ValueKind == JsonValueKind.Array ? values.EnumerateArray().Where(v => v.ValueKind == JsonValueKind.String).Select(v => v.GetString()!) : [];
+    private static bool MatchesVisibleContent(RevisionView revision, string query)
+    {
+        static bool Contains(string? value, string query) => value?.Contains(query, StringComparison.OrdinalIgnoreCase) == true;
+        if (Contains(revision.Title, query) || Aliases(revision.Body).Any(alias => Contains(alias, query)) || Contains(revision.Body.GetRawText(), query)) return true;
+        // Preserve PostgreSQL trigram title matches without treating a match in a
+        // denied JSON property as a visible hit.
+        var left = Trigrams(revision.Title.ToLowerInvariant()); var right = Trigrams(query);
+        return right.Count > 0 && left.Intersect(right).Count() * 2d / (left.Count + right.Count) >= 0.3;
+    }
+    private static HashSet<string> Trigrams(string value)
+    {
+        var padded = "  " + value + " ";
+        return Enumerable.Range(0, Math.Max(0, padded.Length - 2)).Select(index => padded.Substring(index, 3)).ToHashSet(StringComparer.Ordinal);
+    }
     private static string Snippet(RevisionView revision, string query)
     {
         var text = revision.Body.ValueKind == JsonValueKind.Object && revision.Body.TryGetProperty("definition", out var definition) && definition.ValueKind == JsonValueKind.String ? definition.GetString()! : revision.Title;
         var index = text.IndexOf(query, StringComparison.OrdinalIgnoreCase); var start = Math.Max(0, index < 0 ? 0 : index - 60);
         return text.Length <= 240 ? text : text.Substring(start, Math.Min(240, text.Length - start));
     }
-    private sealed record Candidate(Guid UnitId, Guid RevisionId, string Kind, JsonElement Applicability, int Rank);
+    private static JsonElement Empty(string json) => JsonDocument.Parse(json).RootElement.Clone();
+    private sealed record Candidate(Guid UnitId, Guid RevisionId, string Kind, JsonElement Applicability, int Rank, RevisionView Revision);
 }
