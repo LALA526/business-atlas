@@ -30,6 +30,10 @@ public static class AtlasAuthentication
         var allowInsecurePreview = configuration.GetValue("Authentication:AllowInsecureLanPreview", false);
         var allowInternalMetadata = configuration.GetValue("Authentication:AllowInsecureInternalMetadata", false);
         var cookieSecurePolicy = allowInsecurePreview ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
+        var oidcAuthority = configuration["Authentication:Oidc:Authority"];
+        var oidcMetadataAddress = configuration["Authentication:Oidc:MetadataAddress"];
+        var bearerAuthority = configuration["Authentication:Bearer:Authority"];
+        var bearerMetadataAddress = configuration["Authentication:Bearer:MetadataAddress"];
 
         services.AddAuthentication(options =>
         {
@@ -63,8 +67,10 @@ public static class AtlasAuthentication
         })
         .AddOpenIdConnect(OidcScheme, options =>
         {
-            options.Authority = configuration["Authentication:Oidc:Authority"];
-            options.MetadataAddress = configuration["Authentication:Oidc:MetadataAddress"];
+            options.Authority = oidcAuthority;
+            options.MetadataAddress = oidcMetadataAddress;
+            if (allowInternalMetadata)
+                options.BackchannelHttpHandler = PrivateIdentityBackchannelHandler.Create(oidcAuthority, oidcMetadataAddress);
             options.ClientId = configuration["Authentication:Oidc:ClientId"];
             options.ClientSecret = configuration["Authentication:Oidc:ClientSecret"];
             options.CallbackPath = "/signin-oidc";
@@ -101,9 +107,13 @@ public static class AtlasAuthentication
         })
         .AddJwtBearer(BearerScheme, options =>
         {
-            options.Authority = configuration["Authentication:Bearer:Authority"];
-            if (configuration["Authentication:Bearer:MetadataAddress"] is { Length: > 0 } bearerMetadataAddress)
+            options.Authority = bearerAuthority;
+            if (!string.IsNullOrWhiteSpace(bearerMetadataAddress))
+            {
                 options.MetadataAddress = bearerMetadataAddress;
+                if (allowInternalMetadata)
+                    options.BackchannelHttpHandler = PrivateIdentityBackchannelHandler.Create(bearerAuthority, bearerMetadataAddress);
+            }
             options.Audience = configuration["Authentication:Bearer:Audience"];
             options.RequireHttpsMetadata = !allowInsecurePreview && !allowInternalMetadata && !environment.IsDevelopment();
             options.MapInboundClaims = false;
@@ -199,5 +209,61 @@ public static class AtlasAuthentication
         return user.FindAll("scope").SelectMany(claim => claim.Value.Split(' ', StringSplitOptions.RemoveEmptyEntries))
             .Concat(user.FindAll("scp").SelectMany(claim => claim.Value.Split(' ', StringSplitOptions.RemoveEmptyEntries)))
             .Contains(required, StringComparer.Ordinal);
+    }
+
+    /// <summary>
+    /// Keeps the public HTTPS issuer unchanged while sending server-side discovery,
+    /// JWKS, token and user-info requests over the private identity network.
+    /// Discovery alone is not sufficient: its jwks_uri still contains the public URL.
+    /// </summary>
+    private sealed class PrivateIdentityBackchannelHandler : HttpClientHandler
+    {
+        private readonly Uri _authority;
+        private readonly Uri _metadata;
+        private readonly string _authorityPath;
+        private readonly string _privateRealmPath;
+
+        private PrivateIdentityBackchannelHandler(Uri authority, Uri metadata)
+        {
+            _authority = authority;
+            _metadata = metadata;
+            _authorityPath = authority.AbsolutePath.TrimEnd('/');
+            var realm = metadata.AbsolutePath.IndexOf("/realms/", StringComparison.Ordinal);
+            _privateRealmPath = realm < 0 ? string.Empty : metadata.AbsolutePath[..realm].TrimEnd('/');
+        }
+
+        public static PrivateIdentityBackchannelHandler? Create(string? authority, string? metadataAddress)
+        {
+            if (!Uri.TryCreate(authority, UriKind.Absolute, out var publicAuthority) ||
+                !Uri.TryCreate(metadataAddress, UriKind.Absolute, out var privateMetadata) ||
+                publicAuthority.Scheme != Uri.UriSchemeHttps || privateMetadata.Scheme != Uri.UriSchemeHttp ||
+                !privateMetadata.AbsolutePath.Contains("/realms/", StringComparison.Ordinal))
+                return null;
+            return new PrivateIdentityBackchannelHandler(publicAuthority, privateMetadata);
+        }
+
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            if (request.RequestUri is { } uri && IsPublicIdentityUrl(uri))
+            {
+                var relativePath = uri.AbsolutePath[_authorityPath.Length..];
+                var builder = new UriBuilder(uri)
+                {
+                    Scheme = _metadata.Scheme,
+                    Host = _metadata.Host,
+                    Port = _metadata.IsDefaultPort ? -1 : _metadata.Port,
+                    Path = _privateRealmPath + relativePath
+                };
+                request.RequestUri = builder.Uri;
+            }
+            return base.SendAsync(request, cancellationToken);
+        }
+
+        private bool IsPublicIdentityUrl(Uri uri) =>
+            string.Equals(uri.Scheme, _authority.Scheme, StringComparison.OrdinalIgnoreCase) &&
+            string.Equals(uri.Host, _authority.Host, StringComparison.OrdinalIgnoreCase) &&
+            uri.Port == _authority.Port &&
+            (uri.AbsolutePath.Equals(_authorityPath, StringComparison.Ordinal) ||
+             uri.AbsolutePath.StartsWith(_authorityPath + "/", StringComparison.Ordinal));
     }
 }

@@ -42,7 +42,9 @@ host-private local CA and a server certificate covering the LAN address and
 loopback. Authorized clients must trust the CA identified by `caCertificate` in
 `initial-login.json`; the CA private key and all credentials remain on the runtime
 host. Browser cookies and the public OIDC issuer are HTTPS-only, while OIDC
-discovery uses the private container network. `ATLAS_BASE_URL` can select another
+discovery, signing-key, token and user-info requests use the private container
+network (avoiding a LAN hairpin without changing the issuer).
+`ATLAS_BASE_URL` can select another
 HTTPS host on port 15809; the non-secret `scripts/fast/secrets.env.example` lists
 all required configuration names without containing credentials.
 

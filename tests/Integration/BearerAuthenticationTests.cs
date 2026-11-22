@@ -1,6 +1,9 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
+using System.Net.Sockets;
 using System.Security.Claims;
+using System.Text;
+using System.Text.Json;
 using Atlas.Api.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
@@ -52,6 +55,67 @@ public sealed class BearerAuthenticationTests : IClassFixture<WebApplicationFact
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
         Assert.Contains(response.Headers.WwwAuthenticate, value => value.Scheme == "Bearer");
+    }
+
+    [Fact]
+    public async Task Private_oidc_backchannel_retrieves_public_jwks_without_a_hairpin_connection()
+    {
+        const string issuer = "https://identity.test/auth/realms/atlas";
+        using var listener = new HttpListener();
+        var port = FreePort();
+        listener.Prefixes.Add($"http://127.0.0.1:{port}/");
+        listener.Start();
+        var requests = new List<string>();
+        var serving = Task.Run(async () =>
+        {
+            while (listener.IsListening)
+            {
+                var context = await listener.GetContextAsync();
+                requests.Add(context.Request.Url!.AbsolutePath);
+                var document = context.Request.Url.AbsolutePath.EndsWith("/certs", StringComparison.Ordinal)
+                    ? "{\"keys\":[]}"
+                    : JsonSerializer.Serialize(new
+                    {
+                        issuer,
+                        authorization_endpoint = issuer + "/protocol/openid-connect/auth",
+                        token_endpoint = issuer + "/protocol/openid-connect/token",
+                        userinfo_endpoint = issuer + "/protocol/openid-connect/userinfo",
+                        jwks_uri = issuer + "/protocol/openid-connect/certs"
+                    });
+                var bytes = Encoding.UTF8.GetBytes(document);
+                context.Response.ContentType = "application/json";
+                context.Response.ContentLength64 = bytes.Length;
+                await context.Response.OutputStream.WriteAsync(bytes);
+                context.Response.Close();
+            }
+        });
+        using var factory = _factory.WithWebHostBuilder(builder => builder
+            .UseSetting("Authentication:AllowInsecureInternalMetadata", "true")
+            .UseSetting("Authentication:Oidc:Authority", "https://identity.test/auth")
+            .UseSetting("Authentication:Oidc:MetadataAddress", $"http://127.0.0.1:{port}/realms/atlas/.well-known/openid-configuration")
+            .UseSetting("Authentication:Oidc:ClientId", "atlas-test")
+            .UseSetting("Authentication:Oidc:UseUserInfo", "false")
+            .UseSetting("Authentication:Bearer:Authority", "https://identity.test/auth")
+            .UseSetting("Authentication:Bearer:MetadataAddress", $"http://127.0.0.1:{port}/realms/atlas/.well-known/openid-configuration")
+            .UseSetting("Authentication:DataProtectionKeyPath", ""));
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+
+        using var response = await client.GetAsync("/auth/login?returnUrl=/");
+
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        Assert.StartsWith(issuer + "/protocol/openid-connect/auth", response.Headers.Location?.ToString(), StringComparison.Ordinal);
+        Assert.Contains("/realms/atlas/protocol/openid-connect/certs", requests);
+        listener.Stop();
+        try { await serving; } catch (Exception) when (!listener.IsListening) { }
+    }
+
+    private static int FreePort()
+    {
+        var listener = new TcpListener(IPAddress.Loopback, 0);
+        listener.Start();
+        var port = ((IPEndPoint)listener.LocalEndpoint).Port;
+        listener.Stop();
+        return port;
     }
 
     private static string CreateToken(string audience, bool expired)
