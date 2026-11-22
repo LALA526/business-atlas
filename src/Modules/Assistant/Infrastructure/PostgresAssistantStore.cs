@@ -21,8 +21,8 @@ public sealed class PostgresAssistantStore(string connectionString)
     {
         var offset = Offset(cursor);
         await using var db = await Open(project, principal, ct);
-        await using var command = Command(db, "SELECT conversation_id,root_unit_id,baseline_id,title,version FROM assistant.conversation WHERE project_id=@project ORDER BY created_at DESC,conversation_id DESC OFFSET @offset LIMIT @limit");
-        Add(command, "project", project); Add(command, "offset", offset); Add(command, "limit", limit + 1);
+        await using var command = Command(db, "SELECT conversation_id,root_unit_id,baseline_id,title,version FROM assistant.conversation WHERE project_id=@project AND owner_id=@principal AND EXISTS(SELECT 1 FROM identity.membership WHERE project_id=@project AND principal_id=@principal AND active) ORDER BY created_at DESC,conversation_id DESC OFFSET @offset LIMIT @limit");
+        Add(command, "project", project); Add(command, "principal", principal); Add(command, "offset", offset); Add(command, "limit", limit + 1);
         var items = new List<ConversationView>();
         await using var reader = await command.ExecuteReaderAsync(ct);
         while (await reader.ReadAsync(ct)) items.Add(new(reader.GetGuid(0), reader.IsDBNull(1) ? null : reader.GetGuid(1), reader.GetGuid(2), reader.GetString(3), reader.GetInt64(4)));
@@ -233,12 +233,12 @@ public sealed class PostgresAssistantStore(string connectionString)
         return new(id, seq, "assistant", text, answer, DateTimeOffset.UtcNow, runId);
     }
 
-    public async Task FailRunAsync(Guid project, Guid principal, Guid runId, string code, string safeMessage, CancellationToken ct)
+    public async Task FailRunAsync(Guid project, Guid principal, Guid runId, string code, string safeMessage, bool willRetry, CancellationToken ct)
     {
         var binding = await GetRunBindingAsync(project, principal, runId, ct);
         await using var db = await Open(project, principal, ct);
         await Execute(db, "UPDATE agent.run SET state='failed',version=version+1 WHERE project_id=@project AND run_id=@run AND state IN ('queued','running')", ("project", project), ("run", runId));
-        await Emit(db, project, binding.ConversationId, "run.failed", new { runId, code, message = safeMessage }, ct);
+        await Emit(db, project, binding.ConversationId, willRetry ? "run.retrying" : "run.failed", new { runId, code, message = safeMessage, willRetry }, ct);
         await Capture(db, project, principal, runId, "provider.error", new { code, message = safeMessage }, ct);
         await db.Transaction.CommitAsync(ct);
     }
@@ -275,7 +275,7 @@ public sealed class PostgresAssistantStore(string connectionString)
 
     private static async Task<ConversationView> RequireConversation(Db db, Guid id, CancellationToken ct, bool update = false)
     {
-        await using var command = Command(db, $"SELECT conversation_id,root_unit_id,baseline_id,title,version FROM assistant.conversation WHERE project_id=current_setting('atlas.project_id')::uuid AND conversation_id=@id{(update ? " FOR UPDATE" : "")}");
+        await using var command = Command(db, $"SELECT conversation_id,root_unit_id,baseline_id,title,version FROM assistant.conversation WHERE project_id=current_setting('atlas.project_id')::uuid AND conversation_id=@id AND owner_id=current_setting('atlas.subject_id')::uuid AND EXISTS(SELECT 1 FROM identity.membership WHERE project_id=current_setting('atlas.project_id')::uuid AND principal_id=current_setting('atlas.subject_id')::uuid AND active){(update ? " FOR UPDATE" : "")}");
         Add(command, "id", id);
         await using var reader = await command.ExecuteReaderAsync(ct);
         if (!await reader.ReadAsync(ct)) throw ProjectIdentityException.NotFound();
@@ -321,7 +321,7 @@ public sealed class PostgresAssistantStore(string connectionString)
     private static NpgsqlCommand Command(Db db, string sql) { var command = db.Connection.CreateCommand(); command.Transaction = db.Transaction; command.CommandText = sql; return command; }
     private static async Task<T> Scalar<T>(Db db, string sql, params (string Name, object? Value)[] parameters) { await using var command = Command(db, sql); foreach (var p in parameters) Add(command, p.Name, p.Value); return (T)(await command.ExecuteScalarAsync())!; }
     private static async Task<int> Execute(Db db, string sql, params (string Name, object? Value)[] parameters) { await using var command = Command(db, sql); foreach (var p in parameters) Add(command, p.Name, p.Value); return await command.ExecuteNonQueryAsync(); }
-    private static void Add(NpgsqlCommand command, string name, object? value, NpgsqlDbType? type = null) { var parameter = command.Parameters.AddWithValue(name, type ?? NpgsqlDbType.Unknown, value ?? DBNull.Value); if (type is null && value is Guid) parameter.NpgsqlDbType = NpgsqlDbType.Uuid; }
+    private static void Add(NpgsqlCommand command, string name, object? value, NpgsqlDbType? type = null) { var parameter = command.CreateParameter(); parameter.ParameterName = name; parameter.Value = value ?? DBNull.Value; if (type.HasValue) parameter.NpgsqlDbType = type.Value; command.Parameters.Add(parameter); }
     private static string? Text(JsonElement value, string key) => value.ValueKind == JsonValueKind.Object && value.TryGetProperty(key, out var item) && item.ValueKind == JsonValueKind.String ? item.GetString() : null;
     private static int Offset(string? cursor) { if (string.IsNullOrEmpty(cursor)) return 0; try { var value = Encoding.UTF8.GetString(Convert.FromBase64String(cursor)); return int.TryParse(value, out var offset) && offset >= 0 ? offset : throw new FormatException(); } catch { throw ProjectIdentityException.Invalid("The page cursor is invalid."); } }
     private static string Cursor(int offset) => Convert.ToBase64String(Encoding.UTF8.GetBytes(offset.ToString()));

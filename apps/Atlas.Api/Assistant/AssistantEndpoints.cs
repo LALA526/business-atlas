@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using AccessApplicability.Application;
 using AccessApplicability.Contracts;
+using AccessApplicability.Infrastructure;
 using Assistant.Contracts;
 using Assistant.Infrastructure;
 using Atlas.Api.Auth;
@@ -24,6 +25,7 @@ public static class AssistantEndpoints
         {
             if (request is null) throw ProjectIdentityException.Invalid("A conversation body is required.");
             var context = await Context(http, actor, projectId, request.ReadContext, ct);
+            if (request.RootUnitId.HasValue) await Access(http).AuthorizeReadAsync(context, request.RootUnitId.Value, "read", null, ct);
             var normalized = request with { ReadContext = request.ReadContext with { BaselineId = context.BaselineId } };
             var result = await Store(http).CreateConversationAsync(actor.PrincipalId, projectId, normalized, Key(http), RequestId(http), TraceId(http), ct);
             http.Response.Headers.ETag = $"\"{result.Version}\"";
@@ -81,7 +83,7 @@ public static class AssistantEndpoints
                     await http.Response.WriteAsync($"id: {item.Seq}\nevent: {item.Kind}\ndata: {payload}\n\n", Encoding.UTF8, ct);
                     await http.Response.Body.FlushAsync(ct);
                 }
-                if (events.Any(e => e.Kind is "message.completed" or "run.failed")) return;
+                if (events.Any(e => e.Kind is "message.completed" or "run.failed" or "conversation.cancel_requested")) return;
                 await Task.Delay(TimeSpan.FromSeconds(1), ct);
                 if (events.Count == 0) await http.Response.WriteAsync(": keep-alive\n\n", Encoding.UTF8, ct);
             }
@@ -109,6 +111,7 @@ public static class AssistantEndpoints
     private static Task<ResolvedReadContext> Context(HttpContext http, AtlasPrincipal actor, Guid project, ReadContextRequest? request, CancellationToken ct) => Policy(http).CreateReadContextAsync(actor.PrincipalId, project, request ?? new(ReadMode.Published, ReadPurpose.Understand, null, null, null), ct);
     private static PostgresAssistantStore Store(HttpContext http) => http.RequestServices.GetRequiredService<PostgresAssistantStore>();
     private static PolicyService Policy(HttpContext http) => http.RequestServices.GetRequiredService<PolicyService>();
+    private static PostgresAccessApplicabilityStore Access(HttpContext http) => http.RequestServices.GetRequiredService<PostgresAccessApplicabilityStore>();
     private static int Limit(int? limit) => limit is null ? 30 : limit is >= 1 and <= 100 ? limit.Value : throw ProjectIdentityException.Invalid("Page limit must be between 1 and 100.");
     private static string Key(HttpContext http) => http.Request.Headers["Idempotency-Key"].ToString();
     private static long Expected(HttpContext http) { var value = http.Request.Headers.IfMatch.ToString(); if (value.Length >= 3 && value[0] == '"' && value[^1] == '"' && long.TryParse(value[1..^1], out var version) && version >= 0) return version; throw new ProjectIdentityException("PRECONDITION_REQUIRED", "A valid quoted aggregate version is required in If-Match.", 428); }

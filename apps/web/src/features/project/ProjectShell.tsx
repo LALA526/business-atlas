@@ -6,6 +6,7 @@ import { atlasApi } from '../../shared/api';
 import type { Project, ReadingView } from '../../shared/api';
 import { useSession } from '../../shared/session';
 import { ErrorState, LoadingState } from '../../shared/states';
+import AssistantPanel from '../assistant/AssistantPanel';
 
 export type ProjectOutletContext = { project: Project; overview?: ReadingView };
 const entries = [
@@ -24,6 +25,7 @@ export default function ProjectShell() {
   const queryClient = useQueryClient();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [assistantOpen, setAssistantOpen] = useState(false);
   const [query, setQuery] = useState('');
   const searchButton = useRef<HTMLButtonElement>(null);
   const closeSearch = () => { setSearchOpen(false); requestAnimationFrame(() => searchButton.current?.focus()); };
@@ -59,6 +61,8 @@ export default function ProjectShell() {
         {projects.isPending ? <LoadingState label="正在确认项目访问权限" /> : projects.isError ? <ErrorState error={projects.error} onRetry={() => projects.refetch()} /> : !project ? <ErrorState error={new Error('项目不存在，或当前账号无权访问。')} /> : overview.isError ? <ErrorState error={overview.error} onRetry={() => overview.refetch()} /> : <Outlet context={{ project, overview: overview.data } satisfies ProjectOutletContext} />}
       </main>
     </div>
+    {project && <button className="assistant-launch" aria-expanded={assistantOpen} aria-controls="project-assistant" onClick={() => setAssistantOpen(value => !value)}><span aria-hidden="true">AI</span>{assistantOpen ? '收起项目助手' : '询问项目助手'}</button>}
+    {project && <AssistantPanel project={project} open={assistantOpen} onClose={() => setAssistantOpen(false)} />}
     {searchOpen && <div className="modal-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) closeSearch(); }}><section className="search-dialog" role="dialog" aria-modal="true" aria-labelledby="search-title"><div className="dialog-head"><div><p className="eyebrow">当前项目内搜索</p><h2 id="search-title">找到功能、规则或业务名词</h2></div><button className="icon-button" aria-label="关闭搜索" onClick={closeSearch}>×</button></div><form onSubmit={submitSearch}><label htmlFor="global-search">搜索词</label><div className="search-input-row"><input id="global-search" autoFocus value={query} onChange={event => setQuery(event.target.value)} placeholder="输入业务名称，无需内部 ID" /><button className="primary" disabled={!query.trim()}>搜索</button></div></form><p>搜索只返回当前项目、当前账号有权阅读的内容。</p></section></div>}
   </div>;
 }

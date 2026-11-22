@@ -21,6 +21,11 @@ export type Activity = Schema<'Activity'>;
 export type ActivityPage = Schema<'ActivityPage'>;
 export type SearchPage = Schema<'SearchHitPage'>;
 export type ImportBatch = Schema<'ImportBatch'>;
+export type Conversation = Schema<'Conversation'>;
+export type ConversationPage = Schema<'ConversationPage'>;
+export type AssistantMessage = Schema<'Message'>;
+export type MessagePage = Schema<'MessagePage'>;
+export type ConversationJob = Schema<'Job'>;
 export type Session = { principalId: string; displayName: string; expiresAt: string; csrfToken: string };
 
 let csrfToken = '';
@@ -85,6 +90,12 @@ export const atlasApi = {
   comments: (projectId: string, changeSetId: string) => unwrap<ActivityPage>(client.GET('/api/v1/projects/{projectId}/comments', { params: { path: { projectId }, query: { changeSetId, limit: 100 } } })),
   createComment: (projectId: string, input: Schema<'ActivityInput'>, key: string) => unwrap<Activity>(client.POST('/api/v1/projects/{projectId}/comments', { params: { path: { projectId }, header: { 'Idempotency-Key': key } }, body: input })),
   resolveComment: (projectId: string, activityId: string, version: number, reason: string, changeSetId: string, key: string) => unwrap<Activity>(client.POST('/api/v1/projects/{projectId}/comments/{activityId}/resolve', { params: { path: { projectId, activityId }, header: { 'Idempotency-Key': key, 'If-Match': `"${version}"` } }, body: { reason, changeSetId } })),
+  conversations: (projectId: string) => unwrap<ConversationPage>(client.GET('/api/v1/projects/{projectId}/conversations', { params: { path: { projectId }, query: { limit: 100 } } })),
+  createConversation: (projectId: string, rootUnitId: string | undefined, baselineId: string, historical: boolean, key: string) => unwrap<Conversation>(client.POST('/api/v1/projects/{projectId}/conversations', { params: { path: { projectId }, header: { 'Idempotency-Key': key } }, body: { rootUnitId, title: '项目上下文问答', readContext: { mode: historical ? 'historical' : 'published', baselineId, purpose: 'understand' } } })),
+  messages: (projectId: string, conversationId: string) => unwrap<MessagePage>(client.GET('/api/v1/projects/{projectId}/conversations/{conversationId}/messages', { params: { path: { projectId, conversationId }, query: { limit: 100 } } })),
+  sendMessage: (projectId: string, conversation: Conversation, currentBaselineId: string, text: string, key: string) => unwrap<ConversationJob>(client.POST('/api/v1/projects/{projectId}/conversations/{conversationId}/messages', { params: { path: { projectId, conversationId: conversation.conversationId }, header: { 'Idempotency-Key': key, 'If-Match': `"${conversation.version}"` } }, body: { text, readContext: { mode: conversation.baselineId === currentBaselineId ? 'published' : 'historical', baselineId: conversation.baselineId, purpose: 'understand' } } })),
+  cancelConversation: (projectId: string, conversationId: string, jobId: string, version: number, key: string) => unwrap<ConversationJob>(client.POST('/api/v1/projects/{projectId}/conversations/{conversationId}/cancel', { params: { path: { projectId, conversationId }, header: { 'Idempotency-Key': key, 'If-Match': `"${version}"` } }, body: { jobId } })),
+  createFeedback: (projectId: string, input: Schema<'ActivityInput'>, key: string) => unwrap<Activity>(client.POST('/api/v1/projects/{projectId}/feedback', { params: { path: { projectId }, header: { 'Idempotency-Key': key } }, body: input })),
 };
 
 export async function apiRequest<T>(url: string, init: RequestInit = {}): Promise<T> {

@@ -51,12 +51,12 @@ public sealed class ConversationJobHandler(PostgresAssistantStore store, Assista
         }
         catch (ProviderException error)
         {
-            await store.FailRunAsync(job.ProjectId, job.RequesterId, runId, error.Code, error.Message, CancellationToken.None);
+            await store.FailRunAsync(job.ProjectId, job.RequesterId, runId, error.Code, error.Message, error.Transient && context.Job.Attempt < job.MaxAttempt, CancellationToken.None);
             throw new JobExecutionException(error.Code, error.Message, error.Transient);
         }
         catch (JsonException)
         {
-            await store.FailRunAsync(job.ProjectId, job.RequesterId, runId, "PROVIDER_RESPONSE_INVALID", "The model returned an invalid structured answer; no unsupported content was saved.", CancellationToken.None);
+            await store.FailRunAsync(job.ProjectId, job.RequesterId, runId, "PROVIDER_RESPONSE_INVALID", "The model returned an invalid structured answer; no unsupported content was saved.", false, CancellationToken.None);
             throw new JobExecutionException("PROVIDER_RESPONSE_INVALID", "The model returned an invalid structured answer.");
         }
     }
