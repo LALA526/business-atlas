@@ -33,4 +33,4 @@ public sealed record DeploymentInput(Guid? DeploymentId, [property: JsonRequired
 public sealed record DeliveryStatus(Guid DeliveryId, Guid TaskId, string CommitSha, string BuildDigest, Guid? ChangeSetId,
     Guid? PublishedBaselineId, string Status, IReadOnlyList<ContextUnknown> Unknowns);
 public sealed record DeliveryPage(IReadOnlyList<DeliveryStatus> Items, string? NextCursor);
-public sealed record ReconcileRequest(Guid? DeliveryId);
+public sealed record ReconcileRequest([property: JsonRequired] Guid TaskId, string? Environment);

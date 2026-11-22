@@ -10,6 +10,7 @@ using Npgsql;
 using ProjectIdentity.Application;
 using ProjectIdentity.Contracts;
 using ProjectIdentity.Infrastructure;
+using PlatformOps;
 using TaskCollab.Contracts;
 using TaskCollab.Infrastructure;
 
@@ -185,6 +186,101 @@ public sealed class ContractDeliveryTests
             if (Directory.Exists(blobRoot)) Directory.Delete(blobRoot, true);
         }
     }
+
+    [PostgreSqlFact]
+    public async Task AT_T32_Deployment_environments_rollback_and_reviewed_error_preflight_are_reconciled()
+    {
+        var administrator = new NpgsqlConnectionStringBuilder(Environment.GetEnvironmentVariable("ATLAS_TEST_CONNECTIONSTRING"));
+        var database = $"atlas_t32_{Guid.NewGuid():N}"; var blobRoot = Path.Combine(Path.GetTempPath(), $"atlas-t32-{Guid.NewGuid():N}");
+        await using (var connection = new NpgsqlConnection(administrator.ConnectionString))
+        { await connection.OpenAsync(); await using var command = connection.CreateCommand(); command.CommandText = $"CREATE DATABASE {database}"; await command.ExecuteNonQueryAsync(); }
+        administrator.Database = database;
+        try
+        {
+            var options = new DbContextOptionsBuilder<BuildingBlocks.Persistence.AtlasDbContext>().UseNpgsql(administrator.ConnectionString).Options;
+            await using (var context = new BuildingBlocks.Persistence.AtlasDbContext(options)) await context.Database.MigrateAsync();
+            var runtime = new NpgsqlConnectionStringBuilder(administrator.ConnectionString) { Options = "-c role=atlas_app" }.ConnectionString;
+            var projects = new PostgresProjectIdentityStore(runtime); var access = new PostgresAccessApplicabilityStore(runtime);
+            var collab = new PostgresTaskCollabStore(runtime, access); var delivery = new PostgresContractDeliveryStore(runtime, access, new PrivateBlobStorage(blobRoot));
+            var author = await projects.ResolvePrincipalAsync($"https://identity.test/{Guid.NewGuid():N}", "t32-automated-author", PrincipalKind.Human, CancellationToken.None);
+            var ci = await projects.ResolvePrincipalAsync($"https://identity.test/{Guid.NewGuid():N}", "t32-ci-service", PrincipalKind.Service, CancellationToken.None);
+            var verifier = await projects.ResolvePrincipalAsync($"https://identity.test/{Guid.NewGuid():N}", "t32-automated-verifier", PrincipalKind.Human, CancellationToken.None);
+            var project = await projects.CreateProjectAsync(author, new("Deployment reconciliation", $"reconcile-{Guid.NewGuid():N}", "t32-project-0001"), "t32-r1", null, CancellationToken.None);
+            await AddMembership(administrator.ConnectionString, project.ProjectId, ci.PrincipalId, "CIService");
+            await AddMembership(administrator.ConnectionString, project.ProjectId, verifier.PrincipalId, "Verifier");
+            var unit = Guid.NewGuid(); var revision = Guid.NewGuid();
+            await AddUnit(administrator.ConnectionString, project.ProjectId, author.PrincipalId, project.CurrentBaselineId, unit, revision);
+            var task = await collab.CreateTaskAsync(author, project.ProjectId, new("Exercise deployment reconciliation and reviewed preflight", null, unit, null, null), "t32-task-0001", "t32-r2", null, CancellationToken.None);
+            var amended = await collab.AmendTaskAsync(author, project.ProjectId, task.TaskId,
+                new(null, [new("revalidate", "Reconcile actual deployment evidence", "Implementation-only operations check", new(unit, revision))], [new(unit, revision)], null),
+                task.Version, "t32-amend-001", "t32-r3", null, CancellationToken.None);
+            await SetImplementationOnly(administrator.ConnectionString, project.ProjectId, task.TaskId);
+            var readRequest = new ReadContextRequest(ReadMode.Published, ReadPurpose.Implement, project.CurrentBaselineId, null, null);
+
+            await using (var context = new BuildingBlocks.Persistence.AtlasDbContext(options))
+            {
+                var patterns = new PostgresErrorPatternStore(context);
+                var candidate = await patterns.ProposeAsync(project.ProjectId, author.PrincipalId, new ErrorPattern(Guid.Empty, "t32.rollback", 1,
+                    JsonSerializer.SerializeToElement(new { kind = "implementation_only" }), "stale deployment accepted", "environment was not scoped", "latest deployment mismatch",
+                    "reconcile the latest deployment per environment", "AT-T32", JsonSerializer.SerializeToElement(Array.Empty<object>()), "candidate"),
+                    "t32-pattern-1", "t32-pattern-request-1", null, CancellationToken.None);
+                var candidateContext = await delivery.BuildContextAsync(author, project.ProjectId, task.TaskId, new(readRequest, "executable"), amended.Version,
+                    "t32-context-candidate", "t32-r4", null, CancellationToken.None);
+                Assert.DoesNotContain(candidateContext.KnowledgeRequirements, item => item.Contains("t32.rollback", StringComparison.Ordinal));
+                var reviewed = await patterns.ReviewAsync(project.ProjectId, verifier.PrincipalId, true, candidate.PatternId, 1, "reviewed",
+                    "Automated test actor reviewed the synthetic preflight candidate.", "t32-pattern-review", "t32-pattern-request-2", null, CancellationToken.None);
+                Assert.Equal("reviewed", reviewed.State);
+            }
+            var currentTask = await collab.GetTaskAsync(author.PrincipalId, project.ProjectId, task.TaskId, CancellationToken.None);
+            var contextWithPreflight = await delivery.BuildContextAsync(author, project.ProjectId, task.TaskId, new(readRequest, "executable"), currentTask.Version,
+                "t32-context-reviewed", "t32-r5", null, CancellationToken.None);
+            Assert.Contains(contextWithPreflight.KnowledgeRequirements, item => item.Contains("t32.rollback@2", StringComparison.Ordinal) && item.Contains("AT-T32", StringComparison.Ordinal));
+
+            var previousProposal = ValidProposal("T32-PREVIOUS", project.ProjectId, task.TaskId, "321");
+            await delivery.IngestProposalAsync(author, project.ProjectId, previousProposal, "t32-proposal-old", "t32-r6", null, CancellationToken.None);
+            var currentProposal = ValidProposal("T32-CURRENT", project.ProjectId, task.TaskId, "322");
+            await delivery.IngestProposalAsync(author, project.ProjectId, currentProposal, "t32-proposal-new", "t32-r7", null, CancellationToken.None);
+            var previousCommit = new string('b', 40); var previousBuild = new string('e', 64);
+            var currentCommit = new string('c', 40); var currentBuild = new string('d', 64);
+            var previous = await delivery.IngestManifestAsync(ci, project.ProjectId, Manifest("T32-PREVIOUS-DELIVERY", "T32-PREVIOUS", previousProposal, project.ProjectId, task.TaskId, "321", previousCommit, previousBuild),
+                "t32-manifest-old", "t32-r8", null, CancellationToken.None);
+            var current = await delivery.IngestManifestAsync(ci, project.ProjectId, Manifest("T32-CURRENT-DELIVERY", "T32-CURRENT", currentProposal, project.ProjectId, task.TaskId, "322", currentCommit, currentBuild),
+                "t32-manifest-new", "t32-r9", null, CancellationToken.None);
+            var evidence = new[] { new ContextEvidence(new(unit, revision), JsonSerializer.SerializeToElement(new { kind = "deployment", uri = "private://ci/32/deploy" }), "supports", "rawCaptured") };
+            var now = DateTimeOffset.UtcNow;
+            await delivery.RecordDeploymentAsync(ci, project.ProjectId, new(null, "production", "https://example.invalid/business-atlas.git", previousCommit, previousBuild,
+                "20261122000000", new string('f', 64), now.AddMinutes(-10), null, evidence), "t32-deploy-old", "t32-r10", null, CancellationToken.None);
+            await delivery.RecordDeploymentAsync(ci, project.ProjectId, new(null, "production", "https://example.invalid/business-atlas.git", currentCommit, currentBuild,
+                "20261122000001", new string('f', 64), now.AddMinutes(-5), null, evidence), "t32-deploy-new", "t32-r11", null, CancellationToken.None);
+            await delivery.RecordDeploymentAsync(ci, project.ProjectId, new(null, "staging", "https://example.invalid/business-atlas.git", currentCommit, currentBuild,
+                "20261122000001", new string('f', 64), now.AddMinutes(-5), null, evidence), "t32-deploy-stage", "t32-r12", null, CancellationToken.None);
+            Assert.Equal("aligned", (await delivery.ReconcileAsync(author, project.ProjectId, new(task.TaskId, "production"), "t32-reconcile-prod", "t32-r13", null, CancellationToken.None)).Status);
+
+            await delivery.RecordDeploymentAsync(ci, project.ProjectId, new(null, "production", "https://example.invalid/business-atlas.git", previousCommit, previousBuild,
+                "20261122000000", new string('f', 64), now, null, evidence), "t32-deploy-rollback", "t32-r14", null, CancellationToken.None);
+            var rolledBack = await delivery.ReconcileAsync(author, project.ProjectId, new(task.TaskId, "production"), "t32-reconcile-back", "t32-r15", null, CancellationToken.None);
+            Assert.Equal(current.DeliveryId, rolledBack.DeliveryId); Assert.Equal("rolled_back", rolledBack.Status);
+            Assert.Equal("stale", (await delivery.GetContextAsync(author.PrincipalId, project.ProjectId, contextWithPreflight.ContextId, CancellationToken.None)).Status);
+            var all = await delivery.ListDeliveriesAsync(author.PrincipalId, project.ProjectId, null, 30, CancellationToken.None);
+            Assert.Equal("divergent", all.Items.Single(item => item.DeliveryId == current.DeliveryId).Status);
+            Assert.Equal("divergent", all.Items.Single(item => item.DeliveryId == previous.DeliveryId).Status);
+        }
+        finally
+        {
+            NpgsqlConnection.ClearAllPools(); administrator.Database = "postgres";
+            await using var connection = new NpgsqlConnection(administrator.ConnectionString); await connection.OpenAsync();
+            await using var command = connection.CreateCommand(); command.CommandText = $"DROP DATABASE IF EXISTS {database} WITH (FORCE)"; await command.ExecuteNonQueryAsync();
+            if (Directory.Exists(blobRoot)) Directory.Delete(blobRoot, true);
+        }
+    }
+
+    private static JsonElement Manifest(string deliveryId, string proposalId, JsonElement proposal, Guid project, Guid task, string pullRequest, string commit, string build) =>
+        JsonSerializer.SerializeToElement(new { schemaVersion = "1.3.0", deliveryId, proposalId,
+            proposalSha256 = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(proposal.GetRawText()))).ToLowerInvariant(),
+            projectId = project, taskId = task, repo = new { url = "https://example.invalid/business-atlas.git", pullRequestId = pullRequest }, finalCommitSha = commit,
+            mergeStrategy = "squash", buildId = $"CI-{pullRequest}", buildDigest = build, verifiedAt = DateTimeOffset.UtcNow,
+            testEvidence = new[] { new { testId = "AT-T32", result = "passed", artifactUri = $"private://ci/{pullRequest}/tests", artifactSha256 = new string('f', 64) } },
+            anchorResolutions = new[] { new { path = "src/Modules/ContractDelivery", locator = "contract", resolvedBlobSha = new string('e', 40), verification = "matched" } }, status = "verified" });
 
     private static JsonElement ValidProposal(string proposalId, Guid project, Guid task, string pullRequest) =>
         JsonSerializer.SerializeToElement(new

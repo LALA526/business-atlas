@@ -56,9 +56,10 @@ public sealed class PostgresContractDeliveryStore(string connectionString, Postg
         var id = Guid.NewGuid(); var expires = DateTimeOffset.UtcNow.AddHours(8);
         var status = unknowns.Any(item => item.Severity == "blocking") ? "insufficient" : "valid";
         if (request.Phase == "executable" && status != "valid") throw ProjectIdentityException.Invalid("An executable context cannot freeze unresolved target, approval or impact unknowns.");
+        var preflight = await ErrorPatternPreflight(tx, project, row.Classification, row.Summary, ct);
         var body = new TaskContextView(id, project, task, row.BaseBaseline, member.Epoch, request.Phase, new string('0', 64), targets, preserve, required,
             evidence, impacts.Select(item => item.ImpactId).Order().ToArray(), approvals, acceptance,
-            ["approved knowledge proposal", "verified CI delivery manifest", "target environment deployment reconciliation"], unknowns, status, expires);
+            new[] { "approved knowledge proposal", "verified CI delivery manifest", "target environment deployment reconciliation" }.Concat(preflight).ToArray(), unknowns, status, expires);
         var contractDigest = CanonicalJson.Sha256(JsonSerializer.SerializeToElement(body with { Digest = string.Empty }, Json));
         body = body with { Digest = contractDigest };
         await Execute(tx, "INSERT INTO delivery.task_context(project_id,context_id,task_id,baseline_id,policy_epoch,phase,contract_digest,body,expires_at,created_by) VALUES(@project,@id,@task,@baseline,@epoch,@phase,@digest,@body::jsonb,@expires,@actor)", ct,
@@ -234,12 +235,16 @@ public sealed class PostgresContractDeliveryStore(string connectionString, Postg
         await Execute(tx, "INSERT INTO delivery.delivery_record(project_id,delivery_id,external_delivery_id,task_id,repo_key,final_commit_sha,manifest_sha256,build_digest,proposal_sha256,blob_id,created_by) VALUES(@project,@id,@external,@task,@repo,@commit,@manifest,@build,@proposal,@blob,@actor)", ct,
             ("project", project), ("id", id), ("external", external), ("task", task), ("repo", repo), ("commit", commit), ("manifest", manifestSha), ("build", build), ("proposal", proposalSha), ("blob", blob), ("actor", actor.PrincipalId));
         if (status != "verified") await InvalidateTaskContexts(tx, project, task, $"manifest_{status}", ct);
-        var result = await ReconcileOne(tx, project, id, ct); await Save(tx, project, actor.PrincipalId, "ingestDeliveryManifest", key, digest, result, requestId, trace, ct); await tx.CommitAsync(ct); return result;
+        var result = await ReconcileOne(tx, project, id, null, ct); await Save(tx, project, actor.PrincipalId, "ingestDeliveryManifest", key, digest, result, requestId, trace, ct); await tx.CommitAsync(ct); return result;
     }
 
     public async Task<DeliveryStatus> RecordDeploymentAsync(AtlasPrincipal actor, Guid project, DeploymentInput request, string key, string requestId, string? trace, CancellationToken ct)
     {
-        ValidateKey(key); if (string.IsNullOrWhiteSpace(request.Environment) || string.IsNullOrWhiteSpace(request.RepoKey) || string.IsNullOrWhiteSpace(request.MigrationVersion) || request.Evidence.Count == 0) throw ProjectIdentityException.Invalid("Deployment environment, repository, migration and evidence are required.");
+        ValidateKey(key);
+        if (string.IsNullOrWhiteSpace(request.Environment) || string.IsNullOrWhiteSpace(request.RepoKey) || string.IsNullOrWhiteSpace(request.MigrationVersion) ||
+            string.IsNullOrWhiteSpace(request.CommitSha) || string.IsNullOrWhiteSpace(request.BuildDigest) || !IsSha256(request.ConfigDigest) || request.Evidence.Count == 0)
+            throw ProjectIdentityException.Invalid("Deployment environment, repository, commit, build, migration, configuration digest and evidence are required.");
+        if (request.Evidence.Any(item => item.CaptureKind is "proposed" or "reconstructed")) throw ProjectIdentityException.Invalid("Deployment requires actual captured or human-attested evidence.");
         var digest = Digest(request); await using var connection = await OpenAsync(ct); await using var tx = await connection.BeginTransactionAsync(ct); await SetContext(tx, project, actor.PrincipalId, ct);
         var member = await RequireMember(tx, project, actor.PrincipalId, true, ct); if (!member.Roles.Contains("CIService") || actor.Kind == PrincipalKind.Human) throw ProjectIdentityException.Forbidden();
         if (await Replay<DeliveryStatus>(tx, project, actor.PrincipalId, "recordDeployment", key, digest, ct) is { } replay) { await tx.CommitAsync(ct); return replay; }
@@ -251,7 +256,28 @@ public sealed class PostgresContractDeliveryStore(string connectionString, Postg
         var delivery = await Scalar<Guid?>(tx, "SELECT delivery_id FROM delivery.delivery_record WHERE project_id=@project AND repo_key=@repo AND final_commit_sha=@commit AND build_digest=@build ORDER BY created_at DESC LIMIT 1", ct,
             ("project", project), ("repo", request.RepoKey), ("commit", request.CommitSha), ("build", request.BuildDigest));
         if (!delivery.HasValue) throw ProjectIdentityException.Invalid("Deployment must match a recorded final commit and build digest.");
-        var result = await ReconcileOne(tx, project, delivery.Value, ct); await Save(tx, project, actor.PrincipalId, "recordDeployment", key, digest, result, requestId, trace, ct); await tx.CommitAsync(ct); return result;
+        var result = await ReconcileOne(tx, project, delivery.Value, request.Environment, ct);
+        await InvalidateSupersededDeployments(tx, project, request, id, ct);
+        await Save(tx, project, actor.PrincipalId, "recordDeployment", key, digest, result, requestId, trace, ct); await tx.CommitAsync(ct); return result;
+    }
+
+    private static async Task InvalidateSupersededDeployments(NpgsqlTransaction tx, Guid project, DeploymentInput request, Guid deploymentId, CancellationToken ct)
+    {
+        var superseded = new List<Guid>();
+        await using (var command = Command(tx, """
+            SELECT DISTINCT d.task_id
+            FROM delivery.delivery_record d
+            JOIN delivery.deployment_record old ON old.project_id=d.project_id AND old.repo_key=d.repo_key
+              AND old.final_commit_sha=d.final_commit_sha AND old.build_digest=d.build_digest
+            WHERE d.project_id=@project AND d.repo_key=@repo AND old.environment=@environment
+              AND (old.final_commit_sha<>@commit OR old.build_digest<>@build)
+              AND (@deployed>old.deployed_at OR @deployed=old.deployed_at AND @deployment>old.deployment_id)
+            """, ("project", project), ("repo", request.RepoKey), ("environment", request.Environment), ("commit", request.CommitSha), ("build", request.BuildDigest),
+            ("deployed", request.DeployedAt), ("deployment", deploymentId)))
+        {
+            await using var reader = await command.ExecuteReaderAsync(ct); while (await reader.ReadAsync(ct)) superseded.Add(reader.GetGuid(0));
+        }
+        foreach (var task in superseded) await InvalidateTaskContexts(tx, project, task, $"deployment_superseded_{deploymentId}", ct);
     }
 
     public async Task<DeliveryPage> ListDeliveriesAsync(Guid principal, Guid project, string? cursor, int limit, CancellationToken ct)
@@ -260,15 +286,18 @@ public sealed class PostgresContractDeliveryStore(string connectionString, Postg
         var ids = new List<Guid>(); await using (var command = Command(tx, "SELECT delivery_id FROM delivery.delivery_record WHERE project_id=@project AND (@after IS NULL OR delivery_id>@after) ORDER BY delivery_id LIMIT @limit", ("project", project), ("after", after), ("limit", limit + 1)))
         { await using var reader = await command.ExecuteReaderAsync(ct); while (await reader.ReadAsync(ct)) ids.Add(reader.GetGuid(0)); }
         var next = ids.Count > limit ? Convert.ToBase64String(ids[limit - 1].ToByteArray()) : null; if (ids.Count > limit) ids.RemoveAt(limit);
-        var items = new List<DeliveryStatus>(); foreach (var id in ids) items.Add(await ReconcileOne(tx, project, id, ct)); return new(items, next);
+        var items = new List<DeliveryStatus>(); foreach (var id in ids) items.Add(await ReconcileOne(tx, project, id, null, ct)); return new(items, next);
     }
 
     public async Task<DeliveryStatus> ReconcileAsync(AtlasPrincipal actor, Guid project, ReconcileRequest request, string key, string requestId, string? trace, CancellationToken ct)
     {
-        ValidateKey(key); var digest = Digest(request); await using var connection = await OpenAsync(ct); await using var tx = await connection.BeginTransactionAsync(ct); await SetContext(tx, project, actor.PrincipalId, ct); await RequireMember(tx, project, actor.PrincipalId, true, ct);
+        ValidateKey(key); if (request.TaskId == Guid.Empty) throw ProjectIdentityException.Invalid("A taskId is required for reconciliation.");
+        var digest = Digest(request); await using var connection = await OpenAsync(ct); await using var tx = await connection.BeginTransactionAsync(ct); await SetContext(tx, project, actor.PrincipalId, ct); await RequireMember(tx, project, actor.PrincipalId, true, ct);
         if (await Replay<DeliveryStatus>(tx, project, actor.PrincipalId, "reconcileDelivery", key, digest, ct) is { } replay) { await tx.CommitAsync(ct); return replay; }
-        var id = request.DeliveryId ?? await Scalar<Guid?>(tx, "SELECT delivery_id FROM delivery.delivery_record WHERE project_id=@project ORDER BY created_at DESC LIMIT 1", ct, ("project", project)) ?? throw ProjectIdentityException.NotFound();
-        var result = await ReconcileOne(tx, project, id, ct); await Save(tx, project, actor.PrincipalId, "reconcileDelivery", key, digest, result, requestId, trace, ct); await tx.CommitAsync(ct); return result;
+        _ = await TaskRow(tx, project, request.TaskId, false, ct);
+        var id = await Scalar<Guid?>(tx, "SELECT delivery_id FROM delivery.delivery_record WHERE project_id=@project AND task_id=@task ORDER BY created_at DESC,delivery_id DESC LIMIT 1", ct,
+            ("project", project), ("task", request.TaskId)) ?? throw ProjectIdentityException.NotFound();
+        var result = await ReconcileOne(tx, project, id, request.Environment, ct); await Save(tx, project, actor.PrincipalId, "reconcileDelivery", key, digest, result, requestId, trace, ct); await tx.CommitAsync(ct); return result;
     }
 
     private async Task<ClosureView> Closure(NpgsqlTransaction tx, Guid principal, Guid project, Guid task, Guid contextId, CancellationToken ct)
@@ -289,7 +318,7 @@ public sealed class PostgresContractDeliveryStore(string connectionString, Postg
             [], "Resolve and verify every frozen impact."));
 
         var delivery = await Scalar<Guid?>(tx, "SELECT delivery_id FROM delivery.delivery_record WHERE project_id=@project AND task_id=@task ORDER BY created_at DESC LIMIT 1", ct, ("project", project), ("task", task));
-        DeliveryStatus? status = delivery.HasValue ? await ReconcileOne(tx, project, delivery.Value, ct) : null;
+        DeliveryStatus? status = delivery.HasValue ? await ReconcileOne(tx, project, delivery.Value, null, ct) : null;
         checks.Add(new("codeEvidenceCheck", status?.Status is "aligned" or "pending_review" ? "pass" : "fail", true, status is null ? "No verified CI delivery manifest exists." : $"Delivery reconciliation is {status.Status}.", []));
         checks.Add(new("knowledgeCheck", status?.ChangeSetId.HasValue == true && status.PublishedBaselineId.HasValue ? "pass" : "unknown", true, "Knowledge must be approved and published, or explicitly handled as authorized noncritical debt.", []));
         var openCriticalDebt = await Scalar<long>(tx, "SELECT count(*) FROM delivery.knowledge_debt WHERE project_id=@project AND task_id=@task AND state NOT IN ('closed','cancelled') AND risk IN ('high','critical')", ct, ("project", project), ("task", task));
@@ -310,11 +339,15 @@ public sealed class PostgresContractDeliveryStore(string connectionString, Postg
         var deployedAcceptance = passing.FirstOrDefault(item => status is not null && item.BuildDigest == status.BuildDigest && !string.IsNullOrWhiteSpace(item.Environment));
         var targetEnvironment = deployedAcceptance?.Environment;
         var deployed = targetEnvironment is not null && status is not null && await Scalar<long>(tx, """
-            SELECT count(*) FROM delivery.deployment_record WHERE project_id=@project AND environment=@environment AND repo_key=(SELECT repo_key FROM delivery.delivery_record WHERE project_id=@project AND delivery_id=@delivery)
-              AND final_commit_sha=@commit AND build_digest=@build
+            WITH latest AS (
+                SELECT d.*,row_number() OVER(ORDER BY d.deployed_at DESC,d.deployment_id DESC) AS rank
+                FROM delivery.deployment_record d
+                WHERE d.project_id=@project AND d.environment=@environment
+                  AND d.repo_key=(SELECT repo_key FROM delivery.delivery_record WHERE project_id=@project AND delivery_id=@delivery))
+            SELECT count(*) FROM latest WHERE rank=1 AND final_commit_sha=@commit AND build_digest=@build
             """, ct, ("project", project), ("delivery", delivery), ("environment", targetEnvironment), ("commit", status.CommitSha), ("build", status.BuildDigest)) > 0;
         checks.Add(new("deploymentCheck", deployed && status?.Status == "aligned" ? "pass" : "fail", true,
-            deployed ? "The acceptance target environment matches the delivered commit and build." : "The passing acceptance build has no matching target-environment deployment reconciliation.", []));
+            deployed ? "The latest target-environment deployment matches the delivered commit and build." : "The latest target-environment deployment does not match the accepted delivery; rollback requires fresh reconciliation and acceptance.", []));
 
         var conformance = 0L; var conformant = 0L;
         if (status is not null && targetEnvironment is not null && context.RequiredRefs.Count > 0)
@@ -341,6 +374,47 @@ public sealed class PostgresContractDeliveryStore(string connectionString, Postg
         return new(task, contextId, state, checks, unknowns);
     }
 
+    private static async Task<List<string>> ErrorPatternPreflight(NpgsqlTransaction tx, Guid project, string classification, string taskSummary, CancellationToken ct)
+    {
+        var result = new List<string>();
+        await using var command = Command(tx, """
+            WITH latest AS (
+                SELECT pattern_key,pattern_revision,applicability::text,detector,mitigation,regression_test_id,state,
+                       row_number() OVER(PARTITION BY pattern_key ORDER BY pattern_revision DESC) AS rank
+                FROM ops.error_pattern WHERE project_id=@project)
+            SELECT pattern_key,pattern_revision,applicability,detector,mitigation,regression_test_id
+            FROM latest WHERE rank=1 AND state='reviewed' ORDER BY pattern_key
+            """, ("project", project));
+        await using var reader = await command.ExecuteReaderAsync(ct);
+        while (await reader.ReadAsync(ct))
+        {
+            var applicability = JsonDocument.Parse(reader.GetString(2)).RootElement;
+            if (!AppliesToTask(applicability, classification, taskSummary)) continue;
+            result.Add($"error preflight {reader.GetString(0)}@{reader.GetInt32(1)}: detect={reader.GetString(3)}; prevent={reader.GetString(4)}; regression={reader.GetString(5)}");
+        }
+        return result;
+    }
+
+    private static bool AppliesToTask(JsonElement applicability, string classification, string taskSummary)
+    {
+        if (applicability.ValueKind != JsonValueKind.Object) return false;
+        if (applicability.TryGetProperty("kind", out var kind) && !MatchesApplicability(kind, classification)) return false;
+        if (applicability.TryGetProperty("path", out var path))
+        {
+            var paths = path.ValueKind == JsonValueKind.Array ? path.EnumerateArray().Where(item => item.ValueKind == JsonValueKind.String).Select(item => item.GetString()!) :
+                path.ValueKind == JsonValueKind.String ? [path.GetString()!] : [];
+            if (!paths.Any(item => !string.IsNullOrWhiteSpace(item) && taskSummary.Contains(item, StringComparison.Ordinal))) return false;
+        }
+        return true;
+    }
+
+    private static bool MatchesApplicability(JsonElement value, string classification)
+    {
+        if (value.ValueKind == JsonValueKind.String)
+            return value.GetString() is "*" || string.Equals(value.GetString(), classification, StringComparison.Ordinal);
+        return value.ValueKind == JsonValueKind.Array && value.EnumerateArray().Any(item => MatchesApplicability(item, classification));
+    }
+
     private static bool Covers(AcceptanceRecord acceptance, RevisionRef reference) =>
         acceptance.TestId == reference.RevisionId.ToString() || acceptance.TestId == reference.UnitId.ToString() || acceptance.Evidence.Any(item => item.Source == reference);
 
@@ -358,7 +432,7 @@ public sealed class PostgresContractDeliveryStore(string connectionString, Postg
         return result;
     }
 
-    private async Task<DeliveryStatus> ReconcileOne(NpgsqlTransaction tx, Guid project, Guid delivery, CancellationToken ct)
+    private async Task<DeliveryStatus> ReconcileOne(NpgsqlTransaction tx, Guid project, Guid delivery, string? environment, CancellationToken ct)
     {
         await using var command = Command(tx, "SELECT d.task_id,d.final_commit_sha,d.build_digest,d.change_set_id,d.repo_key,d.manifest_sha256,b.storage_key FROM delivery.delivery_record d JOIN intake.blob b ON b.project_id=d.project_id AND b.blob_id=d.blob_id WHERE d.project_id=@project AND d.delivery_id=@delivery", ("project", project), ("delivery", delivery));
         await using var reader = await command.ExecuteReaderAsync(ct); if (!await reader.ReadAsync(ct)) throw ProjectIdentityException.NotFound();
@@ -373,12 +447,26 @@ public sealed class PostgresContractDeliveryStore(string connectionString, Postg
         Guid? baseline = null; string? changeState = null;
         if (changeSet.HasValue) await using (var find = Command(tx, "SELECT state,(SELECT baseline_id FROM gov.baseline b WHERE b.project_id=cs.project_id AND b.change_set_id=cs.change_set_id AND b.sealed) FROM gov.change_set cs WHERE project_id=@project AND change_set_id=@change", ("project", project), ("change", changeSet.Value)))
         { await using var found = await find.ExecuteReaderAsync(ct); if (await found.ReadAsync(ct)) { changeState = found.GetString(0); baseline = found.IsDBNull(1) ? null : found.GetGuid(1); } }
-        var deployed = await Scalar<long>(tx, "SELECT count(*) FROM delivery.deployment_record WHERE project_id=@project AND repo_key=@repo AND final_commit_sha=@commit AND build_digest=@build", ct, ("project", project), ("repo", repo), ("commit", commit), ("build", build));
-        var laterRollback = await Scalar<long>(tx, "SELECT count(*) FROM delivery.deployment_record latest WHERE latest.project_id=@project AND latest.repo_key=@repo AND latest.deployed_at>(SELECT max(match.deployed_at) FROM delivery.deployment_record match WHERE match.project_id=@project AND match.repo_key=@repo AND match.final_commit_sha=@commit AND match.build_digest=@build)", ct, ("project", project), ("repo", repo), ("commit", commit), ("build", build));
-        var status = manifestState == "rejected" ? "divergent" : manifestState == "evidence_missing" ? "evidence_missing" : laterRollback > 0 ? "rolled_back" : deployed == 0 ? "evidence_missing" : changeSet.HasValue && changeState != "published" ? "pending_review" : "aligned";
+        var deployed = 0L; var rolledBack = 0L;
+        await using (var deployments = Command(tx, """
+            WITH scoped AS (
+                SELECT environment,final_commit_sha,build_digest,deployed_at,deployment_id,
+                       row_number() OVER(PARTITION BY environment ORDER BY deployed_at DESC,deployment_id DESC) AS rank
+                FROM delivery.deployment_record
+                WHERE project_id=@project AND repo_key=@repo AND (@environment::text IS NULL OR environment=@environment::text))
+            SELECT environment,final_commit_sha=@commit AND build_digest=@build AS matches
+            FROM scoped WHERE rank=1
+            """, ("project", project), ("repo", repo), ("commit", commit), ("build", build), ("environment", Db(environment))))
+        {
+            await using var found = await deployments.ExecuteReaderAsync(ct);
+            while (await found.ReadAsync(ct)) { if (found.GetBoolean(1)) deployed++; else rolledBack++; }
+        }
+        var status = manifestState == "rejected" ? "divergent" : manifestState == "evidence_missing" || deployed + rolledBack == 0 ? "evidence_missing" :
+            rolledBack > 0 && deployed > 0 ? "divergent" : rolledBack > 0 ? "rolled_back" : changeSet.HasValue && changeState != "published" ? "pending_review" : "aligned";
         var unknowns = new List<ContextUnknown>();
-        if (status == "evidence_missing") unknowns.Add(new("deployment", "No deployment evidence matches the exact commit and build.", "blocking", "missing"));
-        if (status == "rolled_back") unknowns.Add(new("deployment", "A later deployment supersedes this delivery.", "warning", "stale"));
+        if (status == "evidence_missing") unknowns.Add(new("deployment", environment is null ? "No deployment evidence exists for this delivery." : $"No current {environment} deployment evidence matches the exact commit and build.", "blocking", "missing"));
+        if (status == "rolled_back") unknowns.Add(new("deployment", environment is null ? "The latest deployment in every observed environment supersedes this delivery." : $"A later {environment} deployment supersedes this delivery; reconciliation and acceptance must be repeated.", "warning", "stale"));
+        if (status == "divergent" && rolledBack > 0 && deployed > 0) unknowns.Add(new("deployment", "Observed environments disagree: at least one runs this delivery and another has rolled back or moved to a different build.", "blocking", "conflicting", "Reconcile each environment and repeat acceptance against the intended target."));
         if (status == "pending_review") unknowns.Add(new("knowledge", "Knowledge change awaits approval and publication.", "warning", "unverified"));
         return new(delivery, task, commit, build, changeSet, baseline, status, unknowns);
     }

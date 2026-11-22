@@ -138,7 +138,7 @@ public sealed class AtlasMcpDispatcher(IServiceProvider services, IHttpContextAc
             case "delivery.list":
                 return Envelope(requestId, await Delivery.ListDeliveriesAsync(actor.PrincipalId, project, Optional(a, "cursor"), Limit(a), ct), trace);
             case "delivery.reconcile":
-                return Envelope(requestId, await Delivery.ReconcileAsync(actor, project, body.ValueKind == JsonValueKind.Undefined ? new(null) : Deserialize<ReconcileRequest>(body), key, requestId, trace, ct), trace);
+                return Envelope(requestId, await Delivery.ReconcileAsync(actor, project, Deserialize<ReconcileRequest>(body), key, requestId, trace, ct), trace);
             case "feedback.create":
                 return Envelope(requestId, await Tasks.CreateActivityAsync(actor, project, "feedback", Deserialize<ActivityInput>(body), key, requestId, trace, ct), trace);
             case "issues.create":
