@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "1.3.0",
+  "proposalId": "KCP-T31-002",
+  "projectId": "PRJ-SELF",
+  "taskId": "T31",
+  "requirementIds": ["BA-COL-005", "BA-DLV-002", "ENG-KNW-001", "ENG-KNW-002", "ENG-KNW-003", "ENG-KNW-004", "ENG-KNW-005", "ENG-KNW-006", "ENG-DEL-006", "PD-30", "PD-32", "PD-33"],
+  "changeKind": "fix",
+  "repo": {
+    "url": "https://dev.azure.com/2717243207/Business%20Atlas/_git/Business%20Atlas",
+    "branch": "task/T31",
+    "pullRequestId": "PENDING",
+    "baseSha": "b4e34f176a2bab9d170e525c1fc1620676de6eca"
+  },
+  "changedFiles": [
+    {"path": "scripts/knowledge/ci_context.py", "changeType": "modified", "contentSha256": "b73d0ef607b61698e553c0a3434652e6e90afe7e1441de2cb62a0d8005907c68"},
+    {"path": "scripts/knowledge/test_real_azure_context.py", "changeType": "modified", "contentSha256": "57fd587f6cb6cc32bca472ffb589211b2ec2c00977a8906689baf906b7a9be3b"}
+  ],
+  "entityChanges": [
+    {"stableId": "PD-32", "kind": "modified", "factLevel": "observed", "summary": "Post-merge delivery can recover exact reviewed-candidate build evidence from Azure Builds when completed-PR policy evaluation data is no longer available.", "sourceAnchorIds": ["merge-context"]}
+  ],
+  "assertionChanges": [
+    {"stableId": "T31-EXACT-CANDIDATE-FALLBACK", "kind": "added", "factLevel": "observed", "summary": "The Builds fallback accepts only completed successful builds for the current definition, PR merge ref and exact reviewed source commit; independent candidate-build attestation remains mandatory.", "sourceAnchorIds": ["merge-context"]}
+  ],
+  "apiChanges": [],
+  "dataChanges": [],
+  "testEvidence": [{"testId": "AT-T31", "result": "passed", "artifactUri": "local://automated-test-actor/azure-merge-context"}],
+  "sourceAnchors": [
+    {"path": "scripts/knowledge/ci_context.py", "locator": "merge_context Builds API fallback", "contentSha256": "b73d0ef607b61698e553c0a3434652e6e90afe7e1441de2cb62a0d8005907c68", "sourceRevision": "candidate"}
+  ],
+  "knowledgeStatus": "proposed",
+  "unknowns": ["The actual PR ID must replace PENDING before the real PR gate runs.", "The fallback requires authenticated Azure Builds access at deployment time; no production run is claimed by local automated tests.", "Human knowledge approval, publication and deployment remain separate product operations."],
+  "errorsObserved": [{"patternId": "T31-POLICY-EVIDENCE-EXPIRED", "symptom": "A completed PR may no longer expose its approved exact-candidate policy evaluation during the post-merge job.", "preventionTestId": "AT_T31_Completed_PR_uses_exact_successful_build"}],
+  "contractDigests": ["sha256:9cfef8a3c201cb92e6b6b272f46b8fe8f8517dda66fbf3a38f5f036e9a332008"]
+}

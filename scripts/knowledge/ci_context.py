@@ -24,10 +24,27 @@ def merge_context(api,environment):
  artifact='vstfs:///CodeReview/CodeReviewId/'+environment['SYSTEM_TEAMPROJECTID']+'/'+pid
  evaluations=api('/_apis/policy/evaluations?'+urllib.parse.urlencode({'artifactId':artifact,'api-version':'7.1-preview.1'}))['value']
  own=[e for e in evaluations if e.get('status')=='approved' and e.get('configuration',{}).get('isEnabled') and e['configuration'].get('isBlocking') and e['configuration'].get('settings',{}).get('buildDefinitionId')==definition and e.get('context',{}).get('lastMergeSourceCommitId')==candidate]
- require(len(own)==1 and own[0]['context'].get('buildId'),'No approved exact-candidate build policy evidence')
+ if len(own)==1 and own[0]['context'].get('buildId'):
+  build_id=str(own[0]['context']['buildId'])
+ else:
+  # Completed-PR policy evaluations are not durable on every Azure DevOps
+  # version. Recover the same trusted evidence from Builds, then let
+  # candidate_build.py authenticate the complete response before use.
+  query=urllib.parse.urlencode({'definitions':definition,'reasonFilters':'pullRequest','branchName':'refs/pull/'+pid+'/merge','$top':100,'api-version':'7.1'})
+  builds=api('/_apis/build/builds?'+query)['value'];matching=[]
+  for build in builds:
+   if build.get('status')!='completed' or build.get('result')!='succeeded':continue
+   parameters=build.get('parameters') or {}
+   try:parameters=json.loads(parameters) if isinstance(parameters,str) else parameters
+   except ValueError:continue
+   if not isinstance(parameters,dict):continue
+   if parameters.get('system.pullRequest.sourceCommitId')==candidate and str(parameters.get('system.pullRequest.pullRequestId'))==pid:
+    matching.append(build)
+  require(bool(matching),'No approved exact-candidate build policy or successful exact-candidate build evidence')
+  build_id=str(max(matching,key=lambda build:int(build['id']))['id'])
  strategy=pr.get('completionOptions',{}).get('mergeStrategy');strategy={'noFastForward':'merge'}.get(strategy,strategy)
  require(strategy in ('merge','squash','rebase'),'Unsupported actual merge strategy')
- return {'ATLAS_CANDIDATE_SHA':candidate,'ATLAS_CANDIDATE_BUILD_ID':str(own[0]['context']['buildId']),'ATLAS_MERGE_STRATEGY':strategy,'ATLAS_PULL_REQUEST_ID':pid,'ATLAS_SOURCE_BRANCH':pr['sourceRefName'].removeprefix('refs/heads/')}
+ return {'ATLAS_CANDIDATE_SHA':candidate,'ATLAS_CANDIDATE_BUILD_ID':build_id,'ATLAS_MERGE_STRATEGY':strategy,'ATLAS_PULL_REQUEST_ID':pid,'ATLAS_SOURCE_BRANCH':pr['sourceRefName'].removeprefix('refs/heads/')}
 
 def canonical_repo_url(url):
  parsed=urllib.parse.urlsplit(url)
