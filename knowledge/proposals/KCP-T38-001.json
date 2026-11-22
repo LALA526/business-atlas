@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "1.3.0",
+  "proposalId": "KCP-T38-001",
+  "projectId": "PRJ-SELF",
+  "taskId": "T38",
+  "requirementIds": ["BA-QA-005", "ENG-KNW-001", "ENG-KNW-002", "ENG-KNW-004", "PD-32", "PD-33", "PD-38"],
+  "changeKind": "feature",
+  "repo": {
+    "url": "https://dev.azure.com/2717243207/Business%20Atlas/_git/Business%20Atlas",
+    "branch": "task/T38",
+    "pullRequestId": "PENDING",
+    "baseSha": "95783495c5f79838b03330997d4f4f701bd7966e"
+  },
+  "changedFiles": [
+    {"path": "knowledge/baseline/self-bootstrap.akp.json", "changeType": "added", "contentSha256": "e18a2ca6cd387ff61344e0a0afbe6f41e60256c237db575067e40b1dfbe0d365"},
+    {"path": "knowledge/baseline/self-change-T36.akp.json", "changeType": "added", "contentSha256": "28cae564a3661136afd41d0077dac3a6c749cc00e64cf38afa0c6e0298bd0fcf"},
+    {"path": "scripts/self-project/self_project.py", "changeType": "added", "contentSha256": "0cd393ee57c325aef7d6ad6c9fd9cfc6add3267449297c4169c83a2c64d2b226"},
+    {"path": "scripts/self-project/test_self_project.py", "changeType": "added", "contentSha256": "e1fc345f80a39ae34aa95d61c7a502f3a96f3eebcc490aabf5831cb6407c78bb"},
+    {"path": "tests/Domain/SelfProjectPackageTests.cs", "changeType": "added", "contentSha256": "47b83347d04099cd3f8b7cf0314fb8e6beca3d86a8f083b6fc786e2dbe4d362a"}
+  ],
+  "entityChanges": [
+    {"stableId": "ENG-KNW-002", "kind": "modified", "factLevel": "observed", "summary": "Self Project AKP candidates are generated from exact Git objects and verified against source SHA-256 and stable external identities before normal governed import.", "sourceAnchorIds": ["self-project-collector", "bootstrap-package"]},
+    {"stableId": "PD-33", "kind": "modified", "factLevel": "observed", "summary": "The initial candidate contains the controlled Self requirements, T38 and exact implementation observations; a second candidate binds the actual T36 merge interval for subsequent change writeback.", "sourceAnchorIds": ["bootstrap-package", "change-package"]}
+  ],
+  "assertionChanges": [
+    {"stableId": "T38-HUMAN-PUBLICATION", "kind": "added", "factLevel": "documented_intent", "summary": "AKP generation, import, approval and publication remain separate events; these candidates do not claim human acceptance or a published baseline.", "sourceAnchorIds": ["self-project-collector"]}
+  ],
+  "apiChanges": [],
+  "dataChanges": [],
+  "testEvidence": [{"testId": "AT-T38", "result": "passed", "artifactUri": "local://automated-test-actor/self-project-git-collection-and-writeback"}],
+  "sourceAnchors": [
+    {"path": "scripts/self-project/self_project.py", "locator": "build_package, verify_package and change writeback", "contentSha256": "0cd393ee57c325aef7d6ad6c9fd9cfc6add3267449297c4169c83a2c64d2b226", "sourceRevision": "candidate"},
+    {"path": "scripts/self-project/test_self_project.py", "locator": "SelfProjectTests", "contentSha256": "e1fc345f80a39ae34aa95d61c7a502f3a96f3eebcc490aabf5831cb6407c78bb", "sourceRevision": "candidate"},
+    {"path": "tests/Domain/SelfProjectPackageTests.cs", "locator": "AT_T38 product AKP reader checks", "contentSha256": "47b83347d04099cd3f8b7cf0314fb8e6beca3d86a8f083b6fc786e2dbe4d362a", "sourceRevision": "candidate"},
+    {"path": "knowledge/baseline/self-bootstrap.akp.json", "locator": "AKP-SELF-95783495c5f7", "contentSha256": "e18a2ca6cd387ff61344e0a0afbe6f41e60256c237db575067e40b1dfbe0d365", "sourceRevision": "candidate"},
+    {"path": "knowledge/baseline/self-change-T36.akp.json", "locator": "AKP-SELF-3400a48f291b-95783495c5f7", "contentSha256": "28cae564a3661136afd41d0077dac3a6c749cc00e64cf38afa0c6e0298bd0fcf", "sourceRevision": "candidate"}
+  ],
+  "knowledgeStatus": "proposed",
+  "unknowns": ["The actual PR ID must replace PENDING before the controlled PR validation runs.", "Human knowledge approval, publication, CI manifest ingestion and deployment reconciliation are separate operations and are not claimed by these candidates.", "The candidates bind real source and merge commit 95783495c5f79838b03330997d4f4f701bd7966e; they do not assert acceptance of the historical requirements."],
+  "errorsObserved": [{"patternId": "T38-SOURCE-DRIFT", "symptom": "A copied candidate can otherwise retain stale or unverifiable source hashes after repository changes.", "preventionTestId": "test_tampered_hash_identity_and_non_ancestor_change_are_rejected"}],
+  "contractDigests": ["sha256:9cfef8a3c201cb92e6b6b272f46b8fe8f8517dda66fbf3a38f5f036e9a332008"]
+}

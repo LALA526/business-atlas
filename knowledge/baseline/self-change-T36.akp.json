@@ -1,0 +1,921 @@
+{
+  "manifest": {
+    "formatVersion": "AKP/0.1",
+    "packageId": "AKP-SELF-3400a48f291b-95783495c5f7",
+    "sourceProjectId": "BusinessAtlas-Self",
+    "projectName": "Business Atlas",
+    "generatedAt": "2026-11-22T03:46:00Z",
+    "producer": {
+      "kind": "tool",
+      "identity": "scripts/self-project/self_project.py"
+    },
+    "sourceRevision": "95783495c5f79838b03330997d4f4f701bd7966e",
+    "importPurpose": "Traceable Self Project change candidate; human review and publication are still required",
+    "declaredScope": [
+      "requirements",
+      "implementation",
+      "source provenance",
+      "change writeback"
+    ]
+  },
+  "entities": [
+    {
+      "stableExternalId": "BA-QA-005",
+      "typeId": "Requirement",
+      "name": "首次开发纵切闭环",
+      "description": "一次做出真实纵向可运行闭环，保留后续扩展边界",
+      "properties": {
+        "origin": "V1.2",
+        "priority": "P0",
+        "acceptanceId": "AT-QA-005",
+        "disposition": "clarify",
+        "taskIds": "T38;T43;T44",
+        "testIds": "AT-QA-005;AT-T38;AT-T43;AT-T44",
+        "acceptance": "从创建项目到发布再反馈变更能端到端执行",
+        "sourceRevision": "95783495c5f79838b03330997d4f4f701bd7966e"
+      },
+      "categoryAssignments": [
+        "SelfProject"
+      ],
+      "applicableContext": {
+        "project": "BusinessAtlas-Self"
+      },
+      "verificationStatus": "documented_intent",
+      "sourceIds": [
+        "SRC-3d525e33a1fcd69efc8b"
+      ]
+    },
+    {
+      "stableExternalId": "ENG-KNW-001",
+      "typeId": "Requirement",
+      "name": "每个 PR 都需要知识交付",
+      "description": "PR 包含 KnowledgeChange+API/数据/源/测试映射且 CI 检查",
+      "properties": {
+        "origin": "V1.2",
+        "priority": "P0",
+        "acceptanceId": "AT-ENG-KNW-001",
+        "disposition": "retain",
+        "taskIds": "T31;T32;T38",
+        "testIds": "AT-ENG-KNW-001;AT-T31;AT-T32;AT-T38",
+        "acceptance": "无知识变更或明确无影响证明的 PR 被拒",
+        "sourceRevision": "95783495c5f79838b03330997d4f4f701bd7966e"
+      },
+      "categoryAssignments": [
+        "SelfProject"
+      ],
+      "applicableContext": {
+        "project": "BusinessAtlas-Self"
+      },
+      "verificationStatus": "documented_intent",
+      "sourceIds": [
+        "SRC-3d525e33a1fcd69efc8b"
+      ]
+    },
+    {
+      "stableExternalId": "ENG-KNW-002",
+      "typeId": "Requirement",
+      "name": "项目自举知识双层策略",
+      "description": "Git bootstrap AKP→正式 Self Project 迁移→双向对账",
+      "properties": {
+        "origin": "V1.2",
+        "priority": "P0",
+        "acceptanceId": "AT-ENG-KNW-002",
+        "disposition": "retain",
+        "taskIds": "T31;T38",
+        "testIds": "AT-ENG-KNW-002;AT-T31;AT-T38",
+        "acceptance": "Self 项目从真实当前源码初始化并核对 hash",
+        "sourceRevision": "95783495c5f79838b03330997d4f4f701bd7966e"
+      },
+      "categoryAssignments": [
+        "SelfProject"
+      ],
+      "applicableContext": {
+        "project": "BusinessAtlas-Self"
+      },
+      "verificationStatus": "documented_intent",
+      "sourceIds": [
+        "SRC-3d525e33a1fcd69efc8b"
+      ]
+    },
+    {
+      "stableExternalId": "ENG-KNW-004",
+      "typeId": "Requirement",
+      "name": "代码提交与知识来源绑定",
+      "description": "Source anchor 包含 commitSha/path/locator，校验存在与哈希",
+      "properties": {
+        "origin": "V1.2",
+        "priority": "P0",
+        "acceptanceId": "AT-ENG-KNW-004",
+        "disposition": "retain",
+        "taskIds": "T31;T32;T38",
+        "testIds": "AT-ENG-KNW-004;AT-T31;AT-T32;AT-T38",
+        "acceptance": "修改 API 时在平台可跳到对应代码提交",
+        "sourceRevision": "95783495c5f79838b03330997d4f4f701bd7966e"
+      },
+      "categoryAssignments": [
+        "SelfProject"
+      ],
+      "applicableContext": {
+        "project": "BusinessAtlas-Self"
+      },
+      "verificationStatus": "documented_intent",
+      "sourceIds": [
+        "SRC-3d525e33a1fcd69efc8b"
+      ]
+    },
+    {
+      "stableExternalId": "PD-32",
+      "typeId": "Requirement",
+      "name": "开发知识同步提交、合并后 Manifest、发布与部署对账",
+      "description": "开发知识同步提交、合并后 Manifest、发布与部署对账",
+      "properties": {
+        "origin": "P1.0",
+        "priority": "核心",
+        "acceptanceId": "AT-P10",
+        "disposition": "implement",
+        "taskIds": "T31;T32;T36;T38;T39;T43",
+        "testIds": "AT-P10;AT-T31;AT-T32;AT-T36;AT-T38;AT-T39;AT-T43",
+        "acceptance": "真实 PR 候选不含未来 SHA，合并后准确绑定；各状态独立可核验",
+        "sourceRevision": "95783495c5f79838b03330997d4f4f701bd7966e"
+      },
+      "categoryAssignments": [
+        "SelfProject"
+      ],
+      "applicableContext": {
+        "project": "BusinessAtlas-Self"
+      },
+      "verificationStatus": "documented_intent",
+      "sourceIds": [
+        "SRC-3d525e33a1fcd69efc8b"
+      ]
+    },
+    {
+      "stableExternalId": "PD-33",
+      "typeId": "Requirement",
+      "name": "Self Project 的真实知识资产与开发持续更新",
+      "description": "Self Project 的真实知识资产与开发持续更新",
+      "properties": {
+        "origin": "P1.0",
+        "priority": "核心",
+        "acceptanceId": "AT-P14",
+        "disposition": "implement",
+        "taskIds": "T31;T38;T43",
+        "testIds": "AT-P14;AT-T31;AT-T38;AT-T43",
+        "acceptance": "系统内展示自身真实功能、规范、实现、版本、决议、来源，不是固定演示资料",
+        "sourceRevision": "95783495c5f79838b03330997d4f4f701bd7966e"
+      },
+      "categoryAssignments": [
+        "SelfProject"
+      ],
+      "applicableContext": {
+        "project": "BusinessAtlas-Self"
+      },
+      "verificationStatus": "documented_intent",
+      "sourceIds": [
+        "SRC-3d525e33a1fcd69efc8b"
+      ]
+    },
+    {
+      "stableExternalId": "PD-38",
+      "typeId": "Requirement",
+      "name": "全部产品旅程与知识资产真实可用",
+      "description": "全部产品旅程与知识资产真实可用",
+      "properties": {
+        "origin": "P1.0",
+        "priority": "核心",
+        "acceptanceId": "AT-P01..14;G7",
+        "disposition": "implement",
+        "taskIds": "T01;T38;T39;T40;T41;T42;T43;T44",
+        "testIds": "AT-P01..14;G7;AT-T01;AT-T38;AT-T39;AT-T40;AT-T41;AT-T42;AT-T43;AT-T44",
+        "acceptance": "下述认知任务、真实变更、端到端审批和交付通过；保留明确未达标项",
+        "sourceRevision": "95783495c5f79838b03330997d4f4f701bd7966e"
+      },
+      "categoryAssignments": [
+        "SelfProject"
+      ],
+      "applicableContext": {
+        "project": "BusinessAtlas-Self"
+      },
+      "verificationStatus": "documented_intent",
+      "sourceIds": [
+        "SRC-3d525e33a1fcd69efc8b"
+      ]
+    },
+    {
+      "stableExternalId": "T38",
+      "typeId": "Milestone",
+      "name": "真实Self Project导入与发布",
+      "description": "从真实仓库PR/source构建自我知识，经过人审核发布，第二次真需求变更回写",
+      "properties": {
+        "acceptance": "真实源码、PR、测试、审批、版本可追溯；非原型假数据",
+        "dependsOn": [
+          "T31",
+          "T35",
+          "T36",
+          "T37"
+        ],
+        "requirementIds": [
+          "BA-QA-005",
+          "ENG-KNW-001",
+          "ENG-KNW-002",
+          "ENG-KNW-004",
+          "PD-32",
+          "PD-33",
+          "PD-38"
+        ],
+        "sourceRevision": "95783495c5f79838b03330997d4f4f701bd7966e"
+      },
+      "categoryAssignments": [
+        "SelfProject"
+      ],
+      "applicableContext": {
+        "project": "BusinessAtlas-Self"
+      },
+      "verificationStatus": "documented_intent",
+      "sourceIds": [
+        "SRC-679a787c8ac2af15fb85"
+      ]
+    },
+    {
+      "stableExternalId": "IMPL-693364a11e0fb22fd6fd",
+      "typeId": "Implementation",
+      "name": "apps/web/src/features/delivery/DeliveryWorkspace.tsx",
+      "description": "Exact source file observed in the Business Atlas repository; this import does not claim human approval.",
+      "properties": {
+        "path": "apps/web/src/features/delivery/DeliveryWorkspace.tsx",
+        "commitSha": "95783495c5f79838b03330997d4f4f701bd7966e",
+        "contentSha256": "7c65cc71386cb32ae83b526877aa004dcba0f7fc473de2bbe1129ddfa3b23026",
+        "gitBlobSha": "4843574f503a80d1446fd9be2784191f9b89e148"
+      },
+      "categoryAssignments": [
+        "SelfProject"
+      ],
+      "applicableContext": {
+        "project": "BusinessAtlas-Self"
+      },
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-693364a11e0fb22fd6fd"
+      ]
+    },
+    {
+      "stableExternalId": "IMPL-30eb69d40527dd5b9148",
+      "typeId": "Implementation",
+      "name": "apps/web/src/features/task/TaskWorkspace.tsx",
+      "description": "Exact source file observed in the Business Atlas repository; this import does not claim human approval.",
+      "properties": {
+        "path": "apps/web/src/features/task/TaskWorkspace.tsx",
+        "commitSha": "95783495c5f79838b03330997d4f4f701bd7966e",
+        "contentSha256": "fe3b858eaa93ff143c0e855e5e251616cbd5a8bf127eadcf6f5d4f40ecf0e661",
+        "gitBlobSha": "d8b318bb4e55b0ccb7b691ccfdd97050545701ec"
+      },
+      "categoryAssignments": [
+        "SelfProject"
+      ],
+      "applicableContext": {
+        "project": "BusinessAtlas-Self"
+      },
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-30eb69d40527dd5b9148"
+      ]
+    },
+    {
+      "stableExternalId": "IMPL-30867b549449a6fa45fe",
+      "typeId": "Implementation",
+      "name": "apps/web/src/features/task/labels.ts",
+      "description": "Exact source file observed in the Business Atlas repository; this import does not claim human approval.",
+      "properties": {
+        "path": "apps/web/src/features/task/labels.ts",
+        "commitSha": "95783495c5f79838b03330997d4f4f701bd7966e",
+        "contentSha256": "5f25856e05ec59b8bb12d3724ba5fe083b99ac77e1df43e3ecd3c0312f758a0b",
+        "gitBlobSha": "4c3e57940e333f659b18f5d05d7ea679687d91ad"
+      },
+      "categoryAssignments": [
+        "SelfProject"
+      ],
+      "applicableContext": {
+        "project": "BusinessAtlas-Self"
+      },
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-30867b549449a6fa45fe"
+      ]
+    },
+    {
+      "stableExternalId": "IMPL-44decff659436a16ccda",
+      "typeId": "Implementation",
+      "name": "apps/web/src/main.tsx",
+      "description": "Exact source file observed in the Business Atlas repository; this import does not claim human approval.",
+      "properties": {
+        "path": "apps/web/src/main.tsx",
+        "commitSha": "95783495c5f79838b03330997d4f4f701bd7966e",
+        "contentSha256": "396defc34662f5d139a164f944f320ebe0fb93cb2d05eb3aba16ae296bc25d57",
+        "gitBlobSha": "15b9960b09dfa131f311da496ef6fcd58352d603"
+      },
+      "categoryAssignments": [
+        "SelfProject"
+      ],
+      "applicableContext": {
+        "project": "BusinessAtlas-Self"
+      },
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-44decff659436a16ccda"
+      ]
+    },
+    {
+      "stableExternalId": "IMPL-1813bd5d9824e80bc2f9",
+      "typeId": "Implementation",
+      "name": "apps/web/src/shared/api.ts",
+      "description": "Exact source file observed in the Business Atlas repository; this import does not claim human approval.",
+      "properties": {
+        "path": "apps/web/src/shared/api.ts",
+        "commitSha": "95783495c5f79838b03330997d4f4f701bd7966e",
+        "contentSha256": "f3c45d0927c6da08e3778449ac526d9c323d859069f241e75b2be572a17aeefc",
+        "gitBlobSha": "048f7d16bed545bf61c038a9683756580adb6f3f"
+      },
+      "categoryAssignments": [
+        "SelfProject"
+      ],
+      "applicableContext": {
+        "project": "BusinessAtlas-Self"
+      },
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-1813bd5d9824e80bc2f9"
+      ]
+    },
+    {
+      "stableExternalId": "IMPL-8695905e235830a84306",
+      "typeId": "Implementation",
+      "name": "apps/web/src/styles.css",
+      "description": "Exact source file observed in the Business Atlas repository; this import does not claim human approval.",
+      "properties": {
+        "path": "apps/web/src/styles.css",
+        "commitSha": "95783495c5f79838b03330997d4f4f701bd7966e",
+        "contentSha256": "20eef5e3a9592b897f4413656c1fd5f41759668161e57697d7775e78ac09e00d",
+        "gitBlobSha": "d4072d9d30df2472e446e5b6441323c4ce81297b"
+      },
+      "categoryAssignments": [
+        "SelfProject"
+      ],
+      "applicableContext": {
+        "project": "BusinessAtlas-Self"
+      },
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-8695905e235830a84306"
+      ]
+    },
+    {
+      "stableExternalId": "IMPL-d1dac3c6f3014c0aa922",
+      "typeId": "Implementation",
+      "name": "contracts/openapi.yaml",
+      "description": "Exact source file observed in the Business Atlas repository; this import does not claim human approval.",
+      "properties": {
+        "path": "contracts/openapi.yaml",
+        "commitSha": "95783495c5f79838b03330997d4f4f701bd7966e",
+        "contentSha256": "af16e1fa6ed1f5304d7a7bed7cfe519a48401692bd4898c9b8bd7d3cd4727350",
+        "gitBlobSha": "3901d73cc58be248243ee57b294da74b1f6e9cf0"
+      },
+      "categoryAssignments": [
+        "SelfProject"
+      ],
+      "applicableContext": {
+        "project": "BusinessAtlas-Self"
+      },
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-d1dac3c6f3014c0aa922"
+      ]
+    },
+    {
+      "stableExternalId": "IMPL-d03084648a609c92f27e",
+      "typeId": "Implementation",
+      "name": "scripts/ci/checkout_candidate.sh",
+      "description": "Exact source file observed in the Business Atlas repository; this import does not claim human approval.",
+      "properties": {
+        "path": "scripts/ci/checkout_candidate.sh",
+        "commitSha": "95783495c5f79838b03330997d4f4f701bd7966e",
+        "contentSha256": "82da3861162dfb7692e7fa7b94a73daee8232ce11d3fdf1aef620b059e336455",
+        "gitBlobSha": "9ee4aca79ce6db8158b92d5f1efc3f27dfa7cce5"
+      },
+      "categoryAssignments": [
+        "SelfProject"
+      ],
+      "applicableContext": {
+        "project": "BusinessAtlas-Self"
+      },
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-d03084648a609c92f27e"
+      ]
+    },
+    {
+      "stableExternalId": "IMPL-d94d11c011723c3c0a71",
+      "typeId": "Implementation",
+      "name": "scripts/ci/verify",
+      "description": "Exact source file observed in the Business Atlas repository; this import does not claim human approval.",
+      "properties": {
+        "path": "scripts/ci/verify",
+        "commitSha": "95783495c5f79838b03330997d4f4f701bd7966e",
+        "contentSha256": "fdddcbc4a78891ff92d93b4d77d9917f96f78a43853f8e2e04369c272833e5be",
+        "gitBlobSha": "16e60d9f5741e6633f70de5a58435cbb74a92862"
+      },
+      "categoryAssignments": [
+        "SelfProject"
+      ],
+      "applicableContext": {
+        "project": "BusinessAtlas-Self"
+      },
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-d94d11c011723c3c0a71"
+      ]
+    },
+    {
+      "stableExternalId": "IMPL-7b9045dd13fd6da1c8ec",
+      "typeId": "Implementation",
+      "name": "scripts/ci/verify_context.sh",
+      "description": "Exact source file observed in the Business Atlas repository; this import does not claim human approval.",
+      "properties": {
+        "path": "scripts/ci/verify_context.sh",
+        "commitSha": "95783495c5f79838b03330997d4f4f701bd7966e",
+        "contentSha256": "47307f27010199695a4fcba09d9710507092dd109349d403f2f3eb380fdc2fbc",
+        "gitBlobSha": "2934b29b5112fc4b9ed13a731e88aa3bcfa073b6"
+      },
+      "categoryAssignments": [
+        "SelfProject"
+      ],
+      "applicableContext": {
+        "project": "BusinessAtlas-Self"
+      },
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-7b9045dd13fd6da1c8ec"
+      ]
+    },
+    {
+      "stableExternalId": "IMPL-e05d139ed5cf2cbe0ba6",
+      "typeId": "Implementation",
+      "name": "scripts/knowledge/candidate_build.py",
+      "description": "Exact source file observed in the Business Atlas repository; this import does not claim human approval.",
+      "properties": {
+        "path": "scripts/knowledge/candidate_build.py",
+        "commitSha": "95783495c5f79838b03330997d4f4f701bd7966e",
+        "contentSha256": "47289846540d99179ce0a49ab9516ae0186a0dbcd1f72c48b0314d206bdf5d0e",
+        "gitBlobSha": "6d7cdf3889ab95aa1436d4b7287502bb95f0d5ea"
+      },
+      "categoryAssignments": [
+        "SelfProject"
+      ],
+      "applicableContext": {
+        "project": "BusinessAtlas-Self"
+      },
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-e05d139ed5cf2cbe0ba6"
+      ]
+    },
+    {
+      "stableExternalId": "IMPL-666a1e1366b5f8d310ad",
+      "typeId": "Implementation",
+      "name": "scripts/knowledge/ci_context.py",
+      "description": "Exact source file observed in the Business Atlas repository; this import does not claim human approval.",
+      "properties": {
+        "path": "scripts/knowledge/ci_context.py",
+        "commitSha": "95783495c5f79838b03330997d4f4f701bd7966e",
+        "contentSha256": "b73d0ef607b61698e553c0a3434652e6e90afe7e1441de2cb62a0d8005907c68",
+        "gitBlobSha": "2dd53e6d13e6db3ef3332fd04d68d53399b54d0f"
+      },
+      "categoryAssignments": [
+        "SelfProject"
+      ],
+      "applicableContext": {
+        "project": "BusinessAtlas-Self"
+      },
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-666a1e1366b5f8d310ad"
+      ]
+    },
+    {
+      "stableExternalId": "IMPL-f706b7eb092f117ba0da",
+      "typeId": "Implementation",
+      "name": "scripts/knowledge/delivery.py",
+      "description": "Exact source file observed in the Business Atlas repository; this import does not claim human approval.",
+      "properties": {
+        "path": "scripts/knowledge/delivery.py",
+        "commitSha": "95783495c5f79838b03330997d4f4f701bd7966e",
+        "contentSha256": "34c1c8b93d5feb9e19e83453eef7ad17fe34ab20f7aaa812d57cbfcd79cf0dd0",
+        "gitBlobSha": "d5e410163459ca7f0e1670064ec1a91a4f5edfea"
+      },
+      "categoryAssignments": [
+        "SelfProject"
+      ],
+      "applicableContext": {
+        "project": "BusinessAtlas-Self"
+      },
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-f706b7eb092f117ba0da"
+      ]
+    },
+    {
+      "stableExternalId": "IMPL-0a657f946a01f165267e",
+      "typeId": "Implementation",
+      "name": "scripts/knowledge/test_candidate_build.py",
+      "description": "Exact source file observed in the Business Atlas repository; this import does not claim human approval.",
+      "properties": {
+        "path": "scripts/knowledge/test_candidate_build.py",
+        "commitSha": "95783495c5f79838b03330997d4f4f701bd7966e",
+        "contentSha256": "d5fd1ea31c5c97ea07fb55ec7c495c6cfc34c3ff70c749c2cc8a495b6dfa62d6",
+        "gitBlobSha": "788b31f64067acb0663dd022ca274077fa5c8c0a"
+      },
+      "categoryAssignments": [
+        "SelfProject"
+      ],
+      "applicableContext": {
+        "project": "BusinessAtlas-Self"
+      },
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-0a657f946a01f165267e"
+      ]
+    },
+    {
+      "stableExternalId": "IMPL-b8b4da15c6eb01a62bff",
+      "typeId": "Implementation",
+      "name": "src/Modules/ContractDelivery/Delivery/KnowledgeDeliveryProtocol.cs",
+      "description": "Exact source file observed in the Business Atlas repository; this import does not claim human approval.",
+      "properties": {
+        "path": "src/Modules/ContractDelivery/Delivery/KnowledgeDeliveryProtocol.cs",
+        "commitSha": "95783495c5f79838b03330997d4f4f701bd7966e",
+        "contentSha256": "2bf42db14ad73ec6aa83771cebf5dd0965fa14daad943c99a1d0e0d77edd21f2",
+        "gitBlobSha": "262b60fe7e4b7234913c9b3a4639c69c3654a10e"
+      },
+      "categoryAssignments": [
+        "SelfProject"
+      ],
+      "applicableContext": {
+        "project": "BusinessAtlas-Self"
+      },
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-b8b4da15c6eb01a62bff"
+      ]
+    },
+    {
+      "stableExternalId": "IMPL-a97d0a309e95e2b81b2f",
+      "typeId": "Implementation",
+      "name": "src/Modules/ContractDelivery/Infrastructure/PostgresContractDeliveryStore.cs",
+      "description": "Exact source file observed in the Business Atlas repository; this import does not claim human approval.",
+      "properties": {
+        "path": "src/Modules/ContractDelivery/Infrastructure/PostgresContractDeliveryStore.cs",
+        "commitSha": "95783495c5f79838b03330997d4f4f701bd7966e",
+        "contentSha256": "7a241880214ca2ff3ca6f72251111001e42f2da2814664ea4258c95e2f9e0b3f",
+        "gitBlobSha": "f3ffee74a6d9f68b6e6e4808a8a6cc69f4b42d6c"
+      },
+      "categoryAssignments": [
+        "SelfProject"
+      ],
+      "applicableContext": {
+        "project": "BusinessAtlas-Self"
+      },
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-a97d0a309e95e2b81b2f"
+      ]
+    },
+    {
+      "stableExternalId": "IMPL-5d69e999710c21f21513",
+      "typeId": "Implementation",
+      "name": "tests/Contract/ArchitectureReferenceTests.cs",
+      "description": "Exact source file observed in the Business Atlas repository; this import does not claim human approval.",
+      "properties": {
+        "path": "tests/Contract/ArchitectureReferenceTests.cs",
+        "commitSha": "95783495c5f79838b03330997d4f4f701bd7966e",
+        "contentSha256": "78f904ab48578fe12d90b6f7348eb056d9618c1eeaefbd6e5d458b5504e3317c",
+        "gitBlobSha": "3a655390d6037fb9937711aabbe350b5cff690ab"
+      },
+      "categoryAssignments": [
+        "SelfProject"
+      ],
+      "applicableContext": {
+        "project": "BusinessAtlas-Self"
+      },
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-5d69e999710c21f21513"
+      ]
+    },
+    {
+      "stableExternalId": "SELF-CHANGE-3400a48f291b-95783495c5f7",
+      "typeId": "Observation",
+      "name": "Self Project change 3400a48f291b → 95783495c5f7",
+      "description": "A later real repository change derived from the exact Git commit interval. It requires independent review before publication.",
+      "properties": {
+        "baseCommitSha": "3400a48f291be9d626306780d9d989426ff764af",
+        "headCommitSha": "95783495c5f79838b03330997d4f4f701bd7966e",
+        "changedPaths": [
+          "apps/web/src/features/delivery/DeliveryWorkspace.tsx",
+          "apps/web/src/features/task/TaskWorkspace.tsx",
+          "apps/web/src/features/task/labels.ts",
+          "apps/web/src/main.tsx",
+          "apps/web/src/shared/api.ts",
+          "apps/web/src/styles.css"
+        ],
+        "changeCount": 6
+      },
+      "categoryAssignments": [
+        "SelfProject"
+      ],
+      "applicableContext": {
+        "project": "BusinessAtlas-Self"
+      },
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-693364a11e0fb22fd6fd",
+        "SRC-30eb69d40527dd5b9148",
+        "SRC-30867b549449a6fa45fe",
+        "SRC-44decff659436a16ccda",
+        "SRC-1813bd5d9824e80bc2f9",
+        "SRC-8695905e235830a84306"
+      ]
+    }
+  ],
+  "assertions": [],
+  "businessStructures": {},
+  "technicalStructures": {
+    "codeRevision": "95783495c5f79838b03330997d4f4f701bd7966e",
+    "architectureRevision": "95783495c5f79838b03330997d4f4f701bd7966e"
+  },
+  "sources": [
+    {
+      "sourceId": "SRC-0ae3bf09f6d23c9bbc81",
+      "sourceType": "git",
+      "path": "BusinessAtlas.slnx",
+      "uri": "git:95783495c5f79838b03330997d4f4f701bd7966e:BusinessAtlas.slnx",
+      "revision": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "contentHash": "9a7693d2c683810034843a3015047fd3329abb8129fcc64853241ecd82b6beec",
+      "captureMethod": "git show 95783495c5f79838b03330997d4f4f701bd7966e:BusinessAtlas.slnx; git blob 7474d27a419bcecfe946b6b6cb2d474a2cb708f8"
+    },
+    {
+      "sourceId": "SRC-b335630551682c19a781",
+      "sourceType": "git",
+      "path": "README.md",
+      "uri": "git:95783495c5f79838b03330997d4f4f701bd7966e:README.md",
+      "revision": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "contentHash": "d4bf46ca100e6c22e40d6d3252a8c770a49a39558cb39c8bc493aef031354c23",
+      "captureMethod": "git show 95783495c5f79838b03330997d4f4f701bd7966e:README.md; git blob 0405e977798a0a5824654cd566971d1bb013cfa1"
+    },
+    {
+      "sourceId": "SRC-693364a11e0fb22fd6fd",
+      "sourceType": "git",
+      "path": "apps/web/src/features/delivery/DeliveryWorkspace.tsx",
+      "uri": "git:95783495c5f79838b03330997d4f4f701bd7966e:apps/web/src/features/delivery/DeliveryWorkspace.tsx",
+      "revision": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "contentHash": "7c65cc71386cb32ae83b526877aa004dcba0f7fc473de2bbe1129ddfa3b23026",
+      "captureMethod": "git show 95783495c5f79838b03330997d4f4f701bd7966e:apps/web/src/features/delivery/DeliveryWorkspace.tsx; git blob 4843574f503a80d1446fd9be2784191f9b89e148"
+    },
+    {
+      "sourceId": "SRC-30eb69d40527dd5b9148",
+      "sourceType": "git",
+      "path": "apps/web/src/features/task/TaskWorkspace.tsx",
+      "uri": "git:95783495c5f79838b03330997d4f4f701bd7966e:apps/web/src/features/task/TaskWorkspace.tsx",
+      "revision": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "contentHash": "fe3b858eaa93ff143c0e855e5e251616cbd5a8bf127eadcf6f5d4f40ecf0e661",
+      "captureMethod": "git show 95783495c5f79838b03330997d4f4f701bd7966e:apps/web/src/features/task/TaskWorkspace.tsx; git blob d8b318bb4e55b0ccb7b691ccfdd97050545701ec"
+    },
+    {
+      "sourceId": "SRC-30867b549449a6fa45fe",
+      "sourceType": "git",
+      "path": "apps/web/src/features/task/labels.ts",
+      "uri": "git:95783495c5f79838b03330997d4f4f701bd7966e:apps/web/src/features/task/labels.ts",
+      "revision": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "contentHash": "5f25856e05ec59b8bb12d3724ba5fe083b99ac77e1df43e3ecd3c0312f758a0b",
+      "captureMethod": "git show 95783495c5f79838b03330997d4f4f701bd7966e:apps/web/src/features/task/labels.ts; git blob 4c3e57940e333f659b18f5d05d7ea679687d91ad"
+    },
+    {
+      "sourceId": "SRC-44decff659436a16ccda",
+      "sourceType": "git",
+      "path": "apps/web/src/main.tsx",
+      "uri": "git:95783495c5f79838b03330997d4f4f701bd7966e:apps/web/src/main.tsx",
+      "revision": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "contentHash": "396defc34662f5d139a164f944f320ebe0fb93cb2d05eb3aba16ae296bc25d57",
+      "captureMethod": "git show 95783495c5f79838b03330997d4f4f701bd7966e:apps/web/src/main.tsx; git blob 15b9960b09dfa131f311da496ef6fcd58352d603"
+    },
+    {
+      "sourceId": "SRC-1813bd5d9824e80bc2f9",
+      "sourceType": "git",
+      "path": "apps/web/src/shared/api.ts",
+      "uri": "git:95783495c5f79838b03330997d4f4f701bd7966e:apps/web/src/shared/api.ts",
+      "revision": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "contentHash": "f3c45d0927c6da08e3778449ac526d9c323d859069f241e75b2be572a17aeefc",
+      "captureMethod": "git show 95783495c5f79838b03330997d4f4f701bd7966e:apps/web/src/shared/api.ts; git blob 048f7d16bed545bf61c038a9683756580adb6f3f"
+    },
+    {
+      "sourceId": "SRC-8695905e235830a84306",
+      "sourceType": "git",
+      "path": "apps/web/src/styles.css",
+      "uri": "git:95783495c5f79838b03330997d4f4f701bd7966e:apps/web/src/styles.css",
+      "revision": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "contentHash": "20eef5e3a9592b897f4413656c1fd5f41759668161e57697d7775e78ac09e00d",
+      "captureMethod": "git show 95783495c5f79838b03330997d4f4f701bd7966e:apps/web/src/styles.css; git blob d4072d9d30df2472e446e5b6441323c4ce81297b"
+    },
+    {
+      "sourceId": "SRC-7915b9b726a397ae7ba6",
+      "sourceType": "git",
+      "path": "azure-pipelines.yml",
+      "uri": "git:95783495c5f79838b03330997d4f4f701bd7966e:azure-pipelines.yml",
+      "revision": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "contentHash": "edc103f0458608681e2da32860b0fba5e807d5613466808011224b2b92a4d3f0",
+      "captureMethod": "git show 95783495c5f79838b03330997d4f4f701bd7966e:azure-pipelines.yml; git blob 984ca603cfad23b195f4a0b21a812ea40857cb3c"
+    },
+    {
+      "sourceId": "SRC-d1dac3c6f3014c0aa922",
+      "sourceType": "git",
+      "path": "contracts/openapi.yaml",
+      "uri": "git:95783495c5f79838b03330997d4f4f701bd7966e:contracts/openapi.yaml",
+      "revision": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "contentHash": "af16e1fa6ed1f5304d7a7bed7cfe519a48401692bd4898c9b8bd7d3cd4727350",
+      "captureMethod": "git show 95783495c5f79838b03330997d4f4f701bd7966e:contracts/openapi.yaml; git blob 3901d73cc58be248243ee57b294da74b1f6e9cf0"
+    },
+    {
+      "sourceId": "SRC-0be867668ea0e93e1214",
+      "sourceType": "git",
+      "path": "docs/baselines/T1.0/01_技术实施/01_目标架构与范围.md",
+      "uri": "git:95783495c5f79838b03330997d4f4f701bd7966e:docs/baselines/T1.0/01_技术实施/01_目标架构与范围.md",
+      "revision": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "contentHash": "01e74d2f62c3051050861b5e6e2ba00d8ab613b8ab876146946c28e5c7e23881",
+      "captureMethod": "git show 95783495c5f79838b03330997d4f4f701bd7966e:docs/baselines/T1.0/01_技术实施/01_目标架构与范围.md; git blob 6f7a330ea029e7361f6993f79dacf802748768e2"
+    },
+    {
+      "sourceId": "SRC-b60e80dd82cff6e9fd81",
+      "sourceType": "git",
+      "path": "docs/baselines/T1.0/01_技术实施/08_导入与工程知识交付.md",
+      "uri": "git:95783495c5f79838b03330997d4f4f701bd7966e:docs/baselines/T1.0/01_技术实施/08_导入与工程知识交付.md",
+      "revision": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "contentHash": "02f09dcec62e5ee0dfcfb5b8451b78e593e162f51254a985314b38a98090601e",
+      "captureMethod": "git show 95783495c5f79838b03330997d4f4f701bd7966e:docs/baselines/T1.0/01_技术实施/08_导入与工程知识交付.md; git blob 018fbb36d35565f8eda16050cf2af464b3efd86f"
+    },
+    {
+      "sourceId": "SRC-3d525e33a1fcd69efc8b",
+      "sourceType": "git",
+      "path": "docs/baselines/T1.0/03_开发执行/requirements-trace.csv",
+      "uri": "git:95783495c5f79838b03330997d4f4f701bd7966e:docs/baselines/T1.0/03_开发执行/requirements-trace.csv",
+      "revision": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "contentHash": "6363701cd7ed5ee32030715389c3192aa747e8318759f0d045600e014a939596",
+      "captureMethod": "git show 95783495c5f79838b03330997d4f4f701bd7966e:docs/baselines/T1.0/03_开发执行/requirements-trace.csv; git blob 1a346a127a4469e357ef99c1f35ae47589ffc647"
+    },
+    {
+      "sourceId": "SRC-679a787c8ac2af15fb85",
+      "sourceType": "git",
+      "path": "docs/baselines/T1.0/03_开发执行/task-dag.json",
+      "uri": "git:95783495c5f79838b03330997d4f4f701bd7966e:docs/baselines/T1.0/03_开发执行/task-dag.json",
+      "revision": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "contentHash": "33917a5cbedfb33a5d289bad4d5cd6517bd0691c3523db3b6efb4939254b4ea1",
+      "captureMethod": "git show 95783495c5f79838b03330997d4f4f701bd7966e:docs/baselines/T1.0/03_开发执行/task-dag.json; git blob 382fb9831b6e5f06e3a05f1d8351cf02c06b76df"
+    },
+    {
+      "sourceId": "SRC-d03084648a609c92f27e",
+      "sourceType": "git",
+      "path": "scripts/ci/checkout_candidate.sh",
+      "uri": "git:95783495c5f79838b03330997d4f4f701bd7966e:scripts/ci/checkout_candidate.sh",
+      "revision": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "contentHash": "82da3861162dfb7692e7fa7b94a73daee8232ce11d3fdf1aef620b059e336455",
+      "captureMethod": "git show 95783495c5f79838b03330997d4f4f701bd7966e:scripts/ci/checkout_candidate.sh; git blob 9ee4aca79ce6db8158b92d5f1efc3f27dfa7cce5"
+    },
+    {
+      "sourceId": "SRC-d94d11c011723c3c0a71",
+      "sourceType": "git",
+      "path": "scripts/ci/verify",
+      "uri": "git:95783495c5f79838b03330997d4f4f701bd7966e:scripts/ci/verify",
+      "revision": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "contentHash": "fdddcbc4a78891ff92d93b4d77d9917f96f78a43853f8e2e04369c272833e5be",
+      "captureMethod": "git show 95783495c5f79838b03330997d4f4f701bd7966e:scripts/ci/verify; git blob 16e60d9f5741e6633f70de5a58435cbb74a92862"
+    },
+    {
+      "sourceId": "SRC-7b9045dd13fd6da1c8ec",
+      "sourceType": "git",
+      "path": "scripts/ci/verify_context.sh",
+      "uri": "git:95783495c5f79838b03330997d4f4f701bd7966e:scripts/ci/verify_context.sh",
+      "revision": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "contentHash": "47307f27010199695a4fcba09d9710507092dd109349d403f2f3eb380fdc2fbc",
+      "captureMethod": "git show 95783495c5f79838b03330997d4f4f701bd7966e:scripts/ci/verify_context.sh; git blob 2934b29b5112fc4b9ed13a731e88aa3bcfa073b6"
+    },
+    {
+      "sourceId": "SRC-e05d139ed5cf2cbe0ba6",
+      "sourceType": "git",
+      "path": "scripts/knowledge/candidate_build.py",
+      "uri": "git:95783495c5f79838b03330997d4f4f701bd7966e:scripts/knowledge/candidate_build.py",
+      "revision": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "contentHash": "47289846540d99179ce0a49ab9516ae0186a0dbcd1f72c48b0314d206bdf5d0e",
+      "captureMethod": "git show 95783495c5f79838b03330997d4f4f701bd7966e:scripts/knowledge/candidate_build.py; git blob 6d7cdf3889ab95aa1436d4b7287502bb95f0d5ea"
+    },
+    {
+      "sourceId": "SRC-666a1e1366b5f8d310ad",
+      "sourceType": "git",
+      "path": "scripts/knowledge/ci_context.py",
+      "uri": "git:95783495c5f79838b03330997d4f4f701bd7966e:scripts/knowledge/ci_context.py",
+      "revision": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "contentHash": "b73d0ef607b61698e553c0a3434652e6e90afe7e1441de2cb62a0d8005907c68",
+      "captureMethod": "git show 95783495c5f79838b03330997d4f4f701bd7966e:scripts/knowledge/ci_context.py; git blob 2dd53e6d13e6db3ef3332fd04d68d53399b54d0f"
+    },
+    {
+      "sourceId": "SRC-f706b7eb092f117ba0da",
+      "sourceType": "git",
+      "path": "scripts/knowledge/delivery.py",
+      "uri": "git:95783495c5f79838b03330997d4f4f701bd7966e:scripts/knowledge/delivery.py",
+      "revision": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "contentHash": "34c1c8b93d5feb9e19e83453eef7ad17fe34ab20f7aaa812d57cbfcd79cf0dd0",
+      "captureMethod": "git show 95783495c5f79838b03330997d4f4f701bd7966e:scripts/knowledge/delivery.py; git blob d5e410163459ca7f0e1670064ec1a91a4f5edfea"
+    },
+    {
+      "sourceId": "SRC-0a657f946a01f165267e",
+      "sourceType": "git",
+      "path": "scripts/knowledge/test_candidate_build.py",
+      "uri": "git:95783495c5f79838b03330997d4f4f701bd7966e:scripts/knowledge/test_candidate_build.py",
+      "revision": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "contentHash": "d5fd1ea31c5c97ea07fb55ec7c495c6cfc34c3ff70c749c2cc8a495b6dfa62d6",
+      "captureMethod": "git show 95783495c5f79838b03330997d4f4f701bd7966e:scripts/knowledge/test_candidate_build.py; git blob 788b31f64067acb0663dd022ca274077fa5c8c0a"
+    },
+    {
+      "sourceId": "SRC-b8b4da15c6eb01a62bff",
+      "sourceType": "git",
+      "path": "src/Modules/ContractDelivery/Delivery/KnowledgeDeliveryProtocol.cs",
+      "uri": "git:95783495c5f79838b03330997d4f4f701bd7966e:src/Modules/ContractDelivery/Delivery/KnowledgeDeliveryProtocol.cs",
+      "revision": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "contentHash": "2bf42db14ad73ec6aa83771cebf5dd0965fa14daad943c99a1d0e0d77edd21f2",
+      "captureMethod": "git show 95783495c5f79838b03330997d4f4f701bd7966e:src/Modules/ContractDelivery/Delivery/KnowledgeDeliveryProtocol.cs; git blob 262b60fe7e4b7234913c9b3a4639c69c3654a10e"
+    },
+    {
+      "sourceId": "SRC-a97d0a309e95e2b81b2f",
+      "sourceType": "git",
+      "path": "src/Modules/ContractDelivery/Infrastructure/PostgresContractDeliveryStore.cs",
+      "uri": "git:95783495c5f79838b03330997d4f4f701bd7966e:src/Modules/ContractDelivery/Infrastructure/PostgresContractDeliveryStore.cs",
+      "revision": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "contentHash": "7a241880214ca2ff3ca6f72251111001e42f2da2814664ea4258c95e2f9e0b3f",
+      "captureMethod": "git show 95783495c5f79838b03330997d4f4f701bd7966e:src/Modules/ContractDelivery/Infrastructure/PostgresContractDeliveryStore.cs; git blob f3ffee74a6d9f68b6e6e4808a8a6cc69f4b42d6c"
+    },
+    {
+      "sourceId": "SRC-5d69e999710c21f21513",
+      "sourceType": "git",
+      "path": "tests/Contract/ArchitectureReferenceTests.cs",
+      "uri": "git:95783495c5f79838b03330997d4f4f701bd7966e:tests/Contract/ArchitectureReferenceTests.cs",
+      "revision": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "contentHash": "78f904ab48578fe12d90b6f7348eb056d9618c1eeaefbd6e5d458b5504e3317c",
+      "captureMethod": "git show 95783495c5f79838b03330997d4f4f701bd7966e:tests/Contract/ArchitectureReferenceTests.cs; git blob 3a655390d6037fb9937711aabbe350b5cff690ab"
+    }
+  ],
+  "unknownsAndConflicts": [
+    {
+      "id": "SELF-APPROVAL-95783495c5f7",
+      "kind": "unverified-inference",
+      "title": "Candidate requires human review",
+      "description": "Import and observed source facts do not constitute approval or a published baseline.",
+      "relatedExternalIds": [
+        "T38"
+      ],
+      "status": "open",
+      "blocksFormal": false
+    }
+  ],
+  "importProvenance": {
+    "agentRunId": "self-project-git-collector",
+    "toolExecutionRefs": [
+      "git rev-parse 95783495c5f79838b03330997d4f4f701bd7966e",
+      "git ls-tree 95783495c5f79838b03330997d4f4f701bd7966e",
+      "git diff 3400a48f291be9d626306780d9d989426ff764af 95783495c5f79838b03330997d4f4f701bd7966e"
+    ],
+    "sourceFileRevisions": {
+      "BusinessAtlas.slnx": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "README.md": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "apps/web/src/features/delivery/DeliveryWorkspace.tsx": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "apps/web/src/features/task/TaskWorkspace.tsx": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "apps/web/src/features/task/labels.ts": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "apps/web/src/main.tsx": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "apps/web/src/shared/api.ts": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "apps/web/src/styles.css": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "azure-pipelines.yml": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "contracts/openapi.yaml": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "docs/baselines/T1.0/01_技术实施/01_目标架构与范围.md": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "docs/baselines/T1.0/01_技术实施/08_导入与工程知识交付.md": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "docs/baselines/T1.0/03_开发执行/requirements-trace.csv": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "docs/baselines/T1.0/03_开发执行/task-dag.json": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "scripts/ci/checkout_candidate.sh": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "scripts/ci/verify": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "scripts/ci/verify_context.sh": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "scripts/knowledge/candidate_build.py": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "scripts/knowledge/ci_context.py": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "scripts/knowledge/delivery.py": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "scripts/knowledge/test_candidate_build.py": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "src/Modules/ContractDelivery/Delivery/KnowledgeDeliveryProtocol.cs": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "src/Modules/ContractDelivery/Infrastructure/PostgresContractDeliveryStore.cs": "95783495c5f79838b03330997d4f4f701bd7966e",
+      "tests/Contract/ArchitectureReferenceTests.cs": "95783495c5f79838b03330997d4f4f701bd7966e"
+    },
+    "extractedAt": "2026-11-22T03:46:00Z",
+    "extractionStrategy": "Exact Git object reads with SHA-256 and Git blob identities; no synthetic business facts"
+  }
+}
