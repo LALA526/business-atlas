@@ -47,12 +47,14 @@ def append_event(path, event):
 
 
 def base_url():
-    value = os.environ.get("ATLAS_BASE_URL", "https://192.168.10.10:15809").rstrip("/")
+    config_path = Path.home() / "atlas-deploy/product/runtime-config.json"
+    configured = json.loads(config_path.read_text()).get("applicationUrl") if config_path.exists() else None
+    value = os.environ.get("ATLAS_BASE_URL", configured or "https://192.168.10.10:15809").rstrip("/")
     parsed = urlsplit(value)
     if parsed.scheme != "https" or not parsed.hostname or parsed.path or parsed.query or parsed.fragment:
         raise ValueError("ATLAS_BASE_URL must be an HTTPS origin without a path")
-    if (parsed.port or 443) != 15809:
-        raise ValueError("The supplied Compose/Caddy runtime requires port 15809")
+    if (parsed.port or 443) not in (443, 15809):
+        raise ValueError("The public HTTPS origin must use port 443 or the direct runtime port 15809")
     return value
 
 
@@ -108,7 +110,8 @@ def https_get(opener, url):
 
 
 def check_health(ca_cert, authority, local_url):
-    context = ssl.create_default_context(cafile=str(ca_cert))
+    context = ssl.create_default_context()
+    context.load_verify_locations(cafile=str(ca_cert))
     opener = urllib.request.build_opener(
         urllib.request.ProxyHandler({}), urllib.request.HTTPSHandler(context=context),
         urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar())
