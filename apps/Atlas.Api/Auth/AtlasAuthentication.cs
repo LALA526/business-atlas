@@ -38,7 +38,8 @@ public static class AtlasAuthentication
         services.AddAuthentication(options =>
         {
             options.DefaultScheme = SmartScheme;
-            options.DefaultChallengeScheme = OidcScheme;
+            // API/session probes return 401; only /auth/login starts the interactive OIDC flow.
+            options.DefaultChallengeScheme = SmartScheme;
             options.DefaultSignOutScheme = CookieScheme;
         })
         .AddPolicyScheme(SmartScheme, "Atlas browser or API credential", options =>
