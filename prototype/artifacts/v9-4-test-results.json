@@ -1,0 +1,91 @@
+{
+  "generatedAt": "2026-11-17T00:40:50.415Z",
+  "passed": 21,
+  "total": 21,
+  "results": [
+    {
+      "name": "规则正例、反例和未知输入均由真实条件计算",
+      "status": "PASS"
+    },
+    {
+      "name": "未确认优先级和未批准规则不会形成确定业务结论",
+      "status": "PASS"
+    },
+    {
+      "name": "历史基线保持不变且历史规则不被新修订污染",
+      "status": "PASS"
+    },
+    {
+      "name": "七阶段 Flow 的节点、条件、回流和规则引用完整",
+      "status": "PASS"
+    },
+    {
+      "name": "有效绑定的目标、观察、代码、环境和证据支持一致结论",
+      "status": "PASS"
+    },
+    {
+      "name": "代码版本变化使旧符合性自动失效",
+      "status": "PASS"
+    },
+    {
+      "name": "目标规则修订变化使符合性待复核",
+      "status": "PASS"
+    },
+    {
+      "name": "观察修订变化使符合性待复核",
+      "status": "PASS"
+    },
+    {
+      "name": "证据修订变化使符合性待复核",
+      "status": "PASS"
+    },
+    {
+      "name": "缺少完整版本绑定的旧标签不能继续宣称一致",
+      "status": "PASS"
+    },
+    {
+      "name": "只读角色不能创建 Task 或候选决定",
+      "status": "PASS"
+    },
+    {
+      "name": "信息不足只创建待澄清需求且不生成空影响审计表",
+      "status": "PASS"
+    },
+    {
+      "name": "开发可提出候选，但批准前不创建知识草稿",
+      "status": "PASS"
+    },
+    {
+      "name": "Owner 批准后形成真实 DefineRule 草稿而非状态字符串",
+      "status": "PASS"
+    },
+    {
+      "name": "拒绝候选不创建知识草稿且不能按已变更验收",
+      "status": "PASS"
+    },
+    {
+      "name": "非 Owner 不能提交或发布基线",
+      "status": "PASS"
+    },
+    {
+      "name": "发布会更新知识、Manifest 和 Task 状态而不修改旧基线",
+      "status": "PASS"
+    },
+    {
+      "name": "模拟交付经契约复核和人工影响确认后可完成内部验收",
+      "status": "PASS"
+    },
+    {
+      "name": "项目保存重开后知识、Task 与旧 VisualView 数据仍可恢复",
+      "status": "PASS"
+    },
+    {
+      "name": "完整 AKP 仅在显式导入时写入草稿",
+      "status": "PASS"
+    },
+    {
+      "name": "构建无绘图运行、无 Self 快照且体积和模块数显著下降",
+      "status": "PASS"
+    }
+  ]
+}

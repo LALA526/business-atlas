@@ -1,0 +1,122 @@
+{
+  "acceptedAt": "2026-11-17T00:38:58.822Z",
+  "mode": "file://",
+  "checks": [
+    {
+      "name": "文字阅读无绘图且目的清晰",
+      "passed": true,
+      "evidence": {
+        "svg": 0,
+        "tables": 1,
+        "purpose": "质检员保存异常时，在一次受控处理中创建缺陷、隔离批次并发布业务事件。\n\n主要使用者\n质检员、生产班组长\n业务结果\n待明确"
+      }
+    },
+    {
+      "name": "规则正例由真实条件评估",
+      "passed": true,
+      "evidence": "允许登记并隔离\n\n(批次状态 精确等于 生产中 且 检验依据 精确等于 完整)，命中“允许登记并隔离”。\n\n查看逐条判断轨迹"
+    },
+    {
+      "name": "简单描述只形成待澄清需求",
+      "passed": true,
+      "evidence": "避免旧批次版本覆盖新的异常登记，希望增加预期版本匹配前提\n\n质量异常登记与批次隔离\n查看关联业务\n\n待澄清需求\n本次想改变什么\n\n避免旧批次版本覆盖新的异常登记，希望增加预期版本匹配前提\n\n目标行为和验收方式待澄清\n\n这里只展示当前有依据的内容，不会补写未知事实。\n\n目前已确认什么\n异常登记与隔离前置校验\nv1.1 · 已批准规范\n异常登记保存事务的当前观察\n当前观察\n有依据的影响候选\n\n仅基于现有知识，未执行真实仓库调查。\n\n• 质量异常登记与批次隔离：从目标业务行为开始定义变化，不以用户点名的文件或参数作为完整边界。\n\n• 异常登记必须原子隔离受影响批次：由语义路径形成的候选影响；需要进一步证据判断必须修改、无需修改或转其他 Task。\n\n• 质量异常登记台：由语义路径形成的候选影响；需要进一步证据判断必须修改、无需修改或转其他 Task。\n\n• 登记质量异常：由语义路径形成的候选影响；需要进一步证据判断必须修改、无需修改或转其他 Task。\n\n查看全部 21 条候选与处理记录\n还需要解决什么\n\n当前没有单独的业务决定。\n\n• 目标行为、保留约束与验收方式待澄清\n\n旧路径与兼容需要人工复核\n下一步与交付状态\n尚未闭合\n提出业务变化\n记录模拟开发与测试\n生成 / 复核知识契约\n导出任务记录\n检查并验收\n\n尚未记录实现与测试。\n\n当前还不能完成的原因（31）\n版本与知识交付详情"
+    },
+    {
+      "name": "候选保存但未批准",
+      "passed": true,
+      "evidence": "生产中、检验依据完整且预期版本匹配时才允许登记；未命中与异常沿用原规范\n\n建议：生产中、检验依据完整且预期版本匹配时才允许登记；未命中与异常沿用原规范。候选建议需结合影响调查和验收案例复核。\n\n业务决定待批准\n\n需要业务 Owner 批准或拒绝，当前角色只能查看。"
+    },
+    {
+      "name": "Owner 批准生成真实知识草稿",
+      "passed": true,
+      "evidence": true
+    },
+    {
+      "name": "发布形成新基线并更新 Task 知识状态",
+      "passed": true,
+      "evidence": {
+        "baseline": "BL-PRJ-00003-CS-002",
+        "task": "knowledge-approved-contract-review-required"
+      }
+    },
+    {
+      "name": "模拟 Task 完成内部验收",
+      "passed": true,
+      "evidence": "fully-delivered"
+    },
+    {
+      "name": "AKP 文件导入进入草稿",
+      "passed": true,
+      "evidence": {
+        "draft": true,
+        "entities": 2,
+        "proposals": [
+          {
+            "id": "IMP-PRJ-00003-0001",
+            "status": "committed"
+          }
+        ],
+        "toasts": [
+          "知识已写入草稿，请审核发布"
+        ]
+      }
+    },
+    {
+      "name": "重开后草稿与 Task 均保留",
+      "passed": true,
+      "evidence": true
+    },
+    {
+      "name": "1280 无整页横向溢出",
+      "passed": true,
+      "evidence": {
+        "document": 1280,
+        "body": 1280,
+        "viewport": 1280
+      }
+    },
+    {
+      "name": "800 无整页横向溢出",
+      "passed": true,
+      "evidence": {
+        "document": 785,
+        "body": 785,
+        "viewport": 800
+      }
+    },
+    {
+      "name": "无控制台错误",
+      "passed": true,
+      "evidence": []
+    },
+    {
+      "name": "无外部网络请求",
+      "passed": true,
+      "evidence": []
+    }
+  ],
+  "widths": [
+    {
+      "width": 1280,
+      "height": 800,
+      "document": 1280,
+      "body": 1280,
+      "viewport": 1280
+    },
+    {
+      "width": 800,
+      "height": 600,
+      "document": 785,
+      "body": 785,
+      "viewport": 800
+    }
+  ],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "screenshots": [
+    "01-text-reading.png",
+    "02-knowledge-published.png",
+    "03-task-completed.png"
+  ],
+  "independentHumanTester": false
+}

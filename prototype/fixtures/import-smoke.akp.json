@@ -1,0 +1,101 @@
+{
+  "manifest": {
+    "formatVersion": "AKP/0.1",
+    "packageId": "AKP-SMOKE-V94",
+    "sourceProjectId": "BUSINESS-ATLAS-SELF",
+    "projectName": "V9.4 import smoke",
+    "generatedAt": "2026-11-15T00:00:00.000Z",
+    "producer": {
+      "kind": "external-agent",
+      "identity": "OpenCode Kimi K3.1 Pro source analysis",
+      "model": "k3.1-pro",
+      "provider": "kimi-code-plan-cn"
+    },
+    "sourceRevision": "git-start:unknown;working-tree-sha256:7e2a94576035c7cfc70f613ff9271c3d8bfcf3b304d8b2f9f71b9e3fda54dc5d",
+    "importPurpose": "以 Business Atlas 自身真实源码验证最小知识接入、阅读、问答和工程追踪",
+    "declaredScope": [
+      "当前工作区实际前端源码",
+      "V3–V9 测试与构建",
+      "明确未实现的生产能力边界"
+    ]
+  },
+  "entities": [
+    {
+      "stableExternalId": "SELF-FEAT-WORKSPACE",
+      "typeId": "Feature",
+      "name": "统一项目认知工作空间",
+      "description": "项目目录、认知工作台、投影、协作和阅读围绕同一知识身份。",
+      "properties": {},
+      "categoryAssignments": [
+        "business.features"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-APP"
+      ],
+      "sensitivity": "internal",
+      "extra": {
+        "acceptance": [
+          "对应实现模块与测试可定位",
+          "能力边界不冒充生产系统"
+        ],
+        "maturity": "prototype"
+      }
+    }
+  ],
+  "assertions": [],
+  "businessStructures": {
+    "actions": [],
+    "decisions": [],
+    "events": [],
+    "flows": [],
+    "transitions": [],
+    "rules": [],
+    "constraints": []
+  },
+  "technicalStructures": {
+    "systems": [],
+    "components": [],
+    "frameworks": [],
+    "dependencies": [],
+    "apis": [],
+    "dataEntities": [],
+    "configurations": [],
+    "environments": [],
+    "architectureDecisions": [],
+    "architectureRevision": "smoke-r1",
+    "codeRevision": "smoke-code",
+    "dependencyVersions": {},
+    "deploymentVersion": null,
+    "runtimeConfiguration": null
+  },
+  "sources": [
+    {
+      "sourceId": "SRC-SELF-APP",
+      "sourceType": "source-file",
+      "path": "src/v6-app.js",
+      "uri": "workspace://src/v6-app.js",
+      "revision": "git-start:unknown;content-sha256:f06ed2a26a375550e2b824a266ae3afefaf394465c232366da6922ae2de52981",
+      "contentHash": "sha256:f06ed2a26a375550e2b824a266ae3afefaf394465c232366da6922ae2de52981",
+      "lineRange": {
+        "start": 63,
+        "end": 66
+      },
+      "anchor": "function v9Api",
+      "excerpt": "  function authorizedRecords(kind) { return V9Access.listRecords(M(), readContext(), kind).data; }\n  function v9Api() { return { M, Ctx, store, state, currentEntities, authorizedRecords, readContext, projectionOptions, workspaceActionContext, assistantProvider, permission, save, go, openStudio, render, renderOverlay, modal, closeModal, toast, pageHead, button }; }\n  function render() {\n    V91UI.syncContext(v9Api());",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    }
+  ],
+  "unknownsAndConflicts": [],
+  "importProvenance": {
+    "agentRunId": "RUN-SMOKE-V94",
+    "toolExecutionRefs": [],
+    "sourceFileRevisions": {
+      "src/v6-app.js": "git-start:unknown;content-sha256:f06ed2a26a375550e2b824a266ae3afefaf394465c232366da6922ae2de52981"
+    },
+    "extractedAt": "2026-11-15T00:00:00.000Z",
+    "extractionStrategy": "外部分析 Agent 使用 read/grep/shell 定位真实源码，再以锚点、行范围、内容哈希和显式未知生成 AKP；不按名称猜测业务规范"
+  }
+}

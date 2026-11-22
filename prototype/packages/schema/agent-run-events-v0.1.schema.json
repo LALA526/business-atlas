@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://business-atlas.local/schemas/agent-run-events-v0.1.schema.json",
+  "title": "Business Atlas Agent Run Events v0.1",
+  "oneOf": [
+    { "$ref": "#/$defs/run" },
+    { "type": "array", "items": { "anyOf": [{ "$ref": "#/$defs/run" }, { "$ref": "#/$defs/event" }] }, "minItems": 1 }
+  ],
+  "$defs": {
+    "sourceRef": {
+      "type": "object",
+      "properties": { "resourceId": { "type": "string" }, "sourceId": { "type": "string" }, "locator": {}, "path": { "type": "string" } }
+    },
+    "event": {
+      "type": "object",
+      "required": ["type", "content"],
+      "properties": {
+        "eventId": { "type": "string" },
+        "at": { "type": "string" },
+        "type": { "enum": ["task", "plan", "tool-call", "observation", "inference", "proposal", "question", "outcome"] },
+        "content": { "type": "string" },
+        "toolCallId": { "type": "string" },
+        "sourceRefs": { "type": "array", "items": { "$ref": "#/$defs/sourceRef" } },
+        "confidence": { "type": ["number", "string", "null"] }
+      }
+    },
+    "toolCall": {
+      "type": "object",
+      "required": ["toolCallId", "toolName", "status"],
+      "properties": {
+        "toolCallId": { "type": "string" },
+        "provider": { "type": "string" },
+        "server": { "type": ["string", "null"] },
+        "toolName": { "type": "string" },
+        "startedAt": { "type": ["string", "null"] },
+        "completedAt": { "type": ["string", "null"] },
+        "status": { "enum": ["started", "completed", "failed", "cancelled"] },
+        "inputSummary": { "type": "string" },
+        "outputSummary": { "type": "string" },
+        "referencedResources": { "type": "array" },
+        "error": { "type": "string" },
+        "sourceAnchors": { "type": "array" }
+      }
+    },
+    "run": {
+      "type": "object",
+      "required": ["runId", "taskId", "agentIdentity", "executionEvents", "simulated"],
+      "properties": {
+        "runId": { "type": "string" },
+        "projectId": { "type": "string" },
+        "taskId": { "type": "string" },
+        "agentIdentity": { "type": "string" },
+        "model": { "type": ["string", "null"] },
+        "provider": { "type": ["string", "null"] },
+        "startTime": { "type": ["string", "null"] },
+        "endTime": { "type": ["string", "null"] },
+        "status": { "type": "string" },
+        "simulated": { "type": "boolean", "description": "true 必须在 UI 显示模拟执行记录；外部真实执行为 false。" },
+        "userInstructions": { "type": "string" },
+        "executionEvents": { "type": "array", "items": { "$ref": "#/$defs/event" } },
+        "toolCalls": { "type": "array", "items": { "$ref": "#/$defs/toolCall" } },
+        "sourceRefs": { "type": "array", "items": { "$ref": "#/$defs/sourceRef" } },
+        "proposedKnowledge": { "type": "array", "items": { "type": "object" } },
+        "unresolvedQuestions": { "type": "array" },
+        "outcome": { "type": "string" },
+        "reviewStatus": { "enum": ["pending", "requires-human-review", "approved", "rejected"] },
+        "importProposalId": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

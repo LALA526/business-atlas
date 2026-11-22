@@ -1,0 +1,4 @@
+{"runId":"RUN-V91-SMOKE","taskId":"TASK-V91-SMOKE","agentIdentity":"V9.1 acceptance external agent","simulated":true,"userInstructions":"验证任务内 Agent Run JSONL 导入","executionEvents":[],"toolCalls":[],"sourceRefs":[],"proposedKnowledge":[],"unresolvedQuestions":[],"reviewStatus":"pending"}
+{"eventId":"EV-V91-1","type":"tool-call","toolCallId":"TC-V91-1","content":"读取一个受控示例文件","sourceRefs":[]}
+{"eventId":"EV-V91-2","type":"observation","content":"观察到示例组件","sourceRefs":[]}
+{"eventId":"EV-V91-3","type":"inference","content":"这是明确标注的模拟执行记录，不形成批准事实","sourceRefs":[]}

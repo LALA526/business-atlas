@@ -1,0 +1,31 @@
+{
+  "output": "dist\\business-atlas-v9.4.html",
+  "sha256": "52f02c1c08c56f4975757d73c70bcd90ca98768def01278af151865bd196073e",
+  "bytes": 889641,
+  "scripts": [
+    "v4-core.js",
+    "src/v5-core.js",
+    "src/project-factory.js",
+    "src/v9-applicability.js",
+    "src/write-access.js",
+    "src/v6-core.js",
+    "src/v6-projection.js",
+    "src/v7-framework.js",
+    "src/v8-read.js",
+    "src/v9-access.js",
+    "src/v9-model.js",
+    "src/decision.js",
+    "src/demo-model.js",
+    "src/v9-akp.js",
+    "src/v9-services.js",
+    "src/ui-utils.js",
+    "src/knowledge-reading.js",
+    "src/task.js",
+    "src/app-pages.js",
+    "fixtures/demo-projects.js",
+    "src/v6-app.js"
+  ],
+  "styles": [
+    "src/app.css"
+  ]
+}

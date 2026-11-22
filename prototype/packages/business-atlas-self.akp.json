@@ -1,0 +1,3723 @@
+{
+  "manifest": {
+    "formatVersion": "AKP/0.1",
+    "packageId": "AKP-BUSINESS-ATLAS-SELF-001",
+    "sourceProjectId": "BUSINESS-ATLAS-SELF",
+    "projectName": "Business Atlas — Self Knowledge",
+    "generatedAt": "2026-11-15T00:00:00.000Z",
+    "producer": {
+      "kind": "external-agent",
+      "identity": "OpenCode Kimi K3.1 Pro source analysis",
+      "model": "k3.1-pro",
+      "provider": "kimi-code-plan-cn"
+    },
+    "sourceRevision": "git-start:unknown;working-tree-sha256:7e2a94576035c7cfc70f613ff9271c3d8bfcf3b304d8b2f9f71b9e3fda54dc5d",
+    "importPurpose": "以 Business Atlas 自身真实源码验证最小知识接入、阅读、问答和工程追踪",
+    "declaredScope": [
+      "当前工作区实际前端源码",
+      "V3–V9 测试与构建",
+      "明确未实现的生产能力边界"
+    ]
+  },
+  "entities": [
+    {
+      "stableExternalId": "SELF-PROJECT",
+      "typeId": "Project",
+      "name": "Business Atlas — Self Knowledge",
+      "description": "一个实际存在的离线前端原型代码库；以统一认知语法帮助人和 AI 建立、理解、维护和使用复杂软件项目知识，不是生产系统。",
+      "properties": {
+        "maturity": "offline-front-end-prototype",
+        "production": false
+      },
+      "categoryAssignments": [
+        "project.introduction",
+        "project.scope"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "documented_intent",
+      "sourceIds": [
+        "SRC-SELF-README",
+        "SRC-SELF-DESIGN"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-FEAT-WORKSPACE",
+      "typeId": "Feature",
+      "name": "统一项目认知工作空间",
+      "description": "项目目录、认知工作台、投影、协作和阅读围绕同一知识身份。",
+      "properties": {},
+      "categoryAssignments": [
+        "business.features"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-APP"
+      ],
+      "sensitivity": "internal",
+      "extra": {
+        "acceptance": [
+          "对应实现模块与测试可定位",
+          "能力边界不冒充生产系统"
+        ],
+        "maturity": "prototype"
+      }
+    },
+    {
+      "stableExternalId": "SELF-FEAT-CATALOG",
+      "typeId": "Feature",
+      "name": "五维项目知识目录",
+      "description": "项目、业务、系统、知识资产、协作治理五个维度及可配置分类解析。",
+      "properties": {},
+      "categoryAssignments": [
+        "business.features"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-DIMENSIONS"
+      ],
+      "sensitivity": "internal",
+      "extra": {
+        "acceptance": [
+          "对应实现模块与测试可定位",
+          "能力边界不冒充生产系统"
+        ],
+        "maturity": "prototype"
+      }
+    },
+    {
+      "stableExternalId": "SELF-FEAT-SCHEMA",
+      "typeId": "Feature",
+      "name": "Schema 驱动知识创建",
+      "description": "稳定类型、字段校验、通用表单与自定义知识类型复用统一 Command。",
+      "properties": {},
+      "categoryAssignments": [
+        "business.features"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-SCHEMA"
+      ],
+      "sensitivity": "internal",
+      "extra": {
+        "acceptance": [
+          "对应实现模块与测试可定位",
+          "能力边界不冒充生产系统"
+        ],
+        "maturity": "prototype"
+      }
+    },
+    {
+      "stableExternalId": "SELF-FEAT-COMMAND",
+      "typeId": "Feature",
+      "name": "原子知识命令与草稿",
+      "description": "Command 在暂存工作区校验并一次提交，失败回滚并支持 Undo。",
+      "properties": {},
+      "categoryAssignments": [
+        "business.features"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-TRANSACTION"
+      ],
+      "sensitivity": "internal",
+      "extra": {
+        "acceptance": [
+          "对应实现模块与测试可定位",
+          "能力边界不冒充生产系统"
+        ],
+        "maturity": "prototype"
+      }
+    },
+    {
+      "stableExternalId": "SELF-FEAT-READ",
+      "typeId": "Feature",
+      "name": "统一知识访问边界",
+      "description": "实体、关系、治理记录、问答、图形与契约按项目、版本、权限和适用性读取。",
+      "properties": {},
+      "categoryAssignments": [
+        "business.features"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-ACCESS"
+      ],
+      "sensitivity": "internal",
+      "extra": {
+        "acceptance": [
+          "对应实现模块与测试可定位",
+          "能力边界不冒充生产系统"
+        ],
+        "maturity": "prototype"
+      }
+    },
+    {
+      "stableExternalId": "SELF-FEAT-APPLICABILITY",
+      "typeId": "Feature",
+      "name": "环境与组织适用性判断",
+      "description": "适用、不适用、未知和冲突分离，支持项目自定义维度。",
+      "properties": {},
+      "categoryAssignments": [
+        "business.features"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-APPLICABILITY"
+      ],
+      "sensitivity": "internal",
+      "extra": {
+        "acceptance": [
+          "对应实现模块与测试可定位",
+          "能力边界不冒充生产系统"
+        ],
+        "maturity": "prototype"
+      }
+    },
+    {
+      "stableExternalId": "SELF-FEAT-AKP",
+      "typeId": "Feature",
+      "name": "老项目知识包接入",
+      "description": "外部 Agent 整理老项目业务知识并生成 AKP；平台校验、预览、人工确认后进入草稿，不自动逆向仓库。",
+      "properties": {},
+      "categoryAssignments": [
+        "business.features"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-AKP"
+      ],
+      "sensitivity": "internal",
+      "extra": {
+        "acceptance": [
+          "对应实现模块与测试可定位",
+          "能力边界不冒充生产系统"
+        ],
+        "maturity": "prototype"
+      }
+    },
+    {
+      "stableExternalId": "SELF-FEAT-QA",
+      "typeId": "Feature",
+      "name": "角色化可追溯问答",
+      "description": "新人、BA、开发、测试、售前与 Agent 通过确定性查询获得带版本、适用条件和来源的解释。",
+      "properties": {},
+      "categoryAssignments": [
+        "business.features"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-SERVICES"
+      ],
+      "sensitivity": "internal",
+      "extra": {
+        "acceptance": [
+          "对应实现模块与测试可定位",
+          "能力边界不冒充生产系统"
+        ],
+        "maturity": "prototype"
+      }
+    },
+    {
+      "stableExternalId": "SELF-FEAT-FEEDBACK",
+      "typeId": "Feature",
+      "name": "项目反馈处理闭环",
+      "description": "反馈从实际上下文进入分流、Change Set 或任务、实施验收和关闭。",
+      "properties": {},
+      "categoryAssignments": [
+        "business.features"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-FEEDBACK"
+      ],
+      "sensitivity": "internal",
+      "extra": {
+        "acceptance": [
+          "对应实现模块与测试可定位",
+          "能力边界不冒充生产系统"
+        ],
+        "maturity": "prototype"
+      }
+    },
+    {
+      "stableExternalId": "SELF-FEAT-AGENT",
+      "typeId": "Feature",
+      "name": "Agent 执行证据与知识提案",
+      "description": "导入外部 JSON/JSONL 工具调用、观察、推断、来源和提案，人工复核前不成为批准事实。",
+      "properties": {},
+      "categoryAssignments": [
+        "business.features"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-AGENT"
+      ],
+      "sensitivity": "internal",
+      "extra": {
+        "acceptance": [
+          "对应实现模块与测试可定位",
+          "能力边界不冒充生产系统"
+        ],
+        "maturity": "prototype"
+      }
+    },
+    {
+      "stableExternalId": "SELF-FEAT-VISUAL",
+      "typeId": "Feature",
+      "name": "统一知识图文阅读",
+      "description": "业务流程、状态、架构、数据、时序和界面热点从统一模型投影，Mermaid/ASCII 仅作表达。",
+      "properties": {},
+      "categoryAssignments": [
+        "business.features"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-VISUAL"
+      ],
+      "sensitivity": "internal",
+      "extra": {
+        "acceptance": [
+          "对应实现模块与测试可定位",
+          "能力边界不冒充生产系统"
+        ],
+        "maturity": "prototype"
+      }
+    },
+    {
+      "stableExternalId": "SELF-FEAT-BASELINE",
+      "typeId": "Feature",
+      "name": "不可变知识基线",
+      "description": "对象、断言和流程修订绑定批准快照；后续活动不回写旧基线。",
+      "properties": {},
+      "categoryAssignments": [
+        "business.features"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-PUBLISH"
+      ],
+      "sensitivity": "internal",
+      "extra": {
+        "acceptance": [
+          "对应实现模块与测试可定位",
+          "能力边界不冒充生产系统"
+        ],
+        "maturity": "prototype"
+      }
+    },
+    {
+      "stableExternalId": "SELF-FEAT-BUILD",
+      "typeId": "Feature",
+      "name": "离线单文件构建",
+      "description": "全部运行脚本和样式内联，无外部网络资源，可通过 file:// 打开并校验重建一致性。",
+      "properties": {},
+      "categoryAssignments": [
+        "business.features"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-BUILD"
+      ],
+      "sensitivity": "internal",
+      "extra": {
+        "acceptance": [
+          "对应实现模块与测试可定位",
+          "能力边界不冒充生产系统"
+        ],
+        "maturity": "prototype"
+      }
+    },
+    {
+      "stableExternalId": "SELF-FEAT-DECISION",
+      "typeId": "Feature",
+      "name": "业务决策链与确定性案例评估",
+      "description": "Context、Inputs、Preconditions、Evaluation、Priority、Branch、Outcome、Default、Exception、Evidence 共用同一规则语义；缺失和冲突不默认成功。",
+      "properties": {},
+      "categoryAssignments": [
+        "business.features"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-DECISION-V93"
+      ],
+      "sensitivity": "internal",
+      "extra": {
+        "acceptance": [
+          "对应实现模块与测试可定位",
+          "能力边界不冒充生产系统"
+        ],
+        "maturity": "prototype"
+      }
+    },
+    {
+      "stableExternalId": "SELF-FEAT-CONFORMANCE",
+      "typeId": "Feature",
+      "name": "目标规范、当前观察与技术机制对照",
+      "description": "三类事实独立关联，符合性绑定规则、观察、代码版本和证据；技术行为不自动成为批准目标。",
+      "properties": {},
+      "categoryAssignments": [
+        "business.features"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-READING-V93"
+      ],
+      "sensitivity": "internal",
+      "extra": {
+        "acceptance": [
+          "对应实现模块与测试可定位",
+          "能力边界不冒充生产系统"
+        ],
+        "maturity": "prototype"
+      }
+    },
+    {
+      "stableExternalId": "SELF-FEAT-TASK-SEMANTIC",
+      "typeId": "Feature",
+      "name": "Task 业务语义合同与完整影响调查",
+      "description": "新需求引用批准规则版本形成候选变化，逐项记录影响路径、证据、确认状态和处理决定。",
+      "properties": {},
+      "categoryAssignments": [
+        "business.features"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-TASK-V93"
+      ],
+      "sensitivity": "internal",
+      "extra": {
+        "acceptance": [
+          "对应实现模块与测试可定位",
+          "能力边界不冒充生产系统"
+        ],
+        "maturity": "prototype"
+      }
+    },
+    {
+      "stableExternalId": "SELF-FEAT-DELIVERY-V12",
+      "typeId": "Feature",
+      "name": "开发知识同步交付与版本对账",
+      "description": "PR 候选知识、合并后 Delivery Manifest、测试、批准基线和部署版本分别关联，代码合并不等于知识批准。",
+      "properties": {},
+      "categoryAssignments": [
+        "business.features"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-TASK-V93"
+      ],
+      "sensitivity": "internal",
+      "extra": {
+        "acceptance": [
+          "对应实现模块与测试可定位",
+          "能力边界不冒充生产系统"
+        ],
+        "maturity": "prototype"
+      }
+    },
+    {
+      "stableExternalId": "SELF-SYSTEM",
+      "typeId": "System",
+      "name": "Business Atlas 离线前端原型",
+      "description": "浏览器内运行的模块化 JavaScript 原型，构建为单文件 HTML；没有生产后台。",
+      "properties": {},
+      "categoryAssignments": [
+        "system.systems",
+        "project.system-overview"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-APP",
+        "SRC-SELF-BUILD"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-COMP-FRAMEWORK",
+      "typeId": "Component",
+      "name": "目录框架模块",
+      "description": "src/v7-framework.js：五维目录、分类、覆盖与可信状态。",
+      "properties": {
+        "responsibility": "src/v7-framework.js：五维目录、分类、覆盖与可信状态。",
+        "codePaths": [
+          "src/v7-framework.js"
+        ]
+      },
+      "categoryAssignments": [
+        "system.modules",
+        "system.architecture"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-DIMENSIONS"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-COMP-SCHEMA",
+      "typeId": "Component",
+      "name": "Schema Registry 模块",
+      "description": "v4-core.js：核心类型、注册、字段校验与通用知识身份。",
+      "properties": {
+        "responsibility": "v4-core.js：核心类型、注册、字段校验与通用知识身份。",
+        "codePaths": [
+          "v4-core.js"
+        ]
+      },
+      "categoryAssignments": [
+        "system.modules",
+        "system.architecture"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-SCHEMA"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-COMP-COMMAND",
+      "typeId": "Component",
+      "name": "Knowledge Command 模块",
+      "description": "src/v6-core.js：命令、暂存事务、Change Set、发布与协作。",
+      "properties": {
+        "responsibility": "src/v6-core.js：命令、暂存事务、Change Set、发布与协作。",
+        "codePaths": [
+          "src/v6-core.js"
+        ]
+      },
+      "categoryAssignments": [
+        "system.modules",
+        "system.architecture"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-COMMANDS"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-COMP-DRAFT",
+      "typeId": "Component",
+      "name": "Draft Workspace 与版本模块",
+      "description": "src/v6-core.js：实体/断言/流程草稿、Undo、不可变修订和基线。",
+      "properties": {
+        "responsibility": "src/v6-core.js：实体/断言/流程草稿、Undo、不可变修订和基线。",
+        "codePaths": [
+          "src/v6-core.js"
+        ]
+      },
+      "categoryAssignments": [
+        "system.modules",
+        "system.architecture"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-TRANSACTION"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-COMP-READ",
+      "typeId": "Component",
+      "name": "Read Context 与 Catalog Resolver",
+      "description": "src/v8-read.js：统一上下文、目录解析、覆盖和上下文缓存。",
+      "properties": {
+        "responsibility": "src/v8-read.js：统一上下文、目录解析、覆盖和上下文缓存。",
+        "codePaths": [
+          "src/v8-read.js"
+        ]
+      },
+      "categoryAssignments": [
+        "system.modules",
+        "system.architecture"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-READ"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-COMP-ACCESS",
+      "typeId": "Component",
+      "name": "Knowledge Access Boundary",
+      "description": "src/v9-access.js：结果协议、授权记录、契约视图、修订事件与安全持久化。",
+      "properties": {
+        "responsibility": "src/v9-access.js：结果协议、授权记录、契约视图、修订事件与安全持久化。",
+        "codePaths": [
+          "src/v9-access.js"
+        ]
+      },
+      "categoryAssignments": [
+        "system.modules",
+        "system.architecture"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-ACCESS"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-COMP-APPLICABILITY",
+      "typeId": "Component",
+      "name": "Applicability Evaluator",
+      "description": "src/v9-applicability.js：维度组合、缺失上下文、冲突和两种使用模式。",
+      "properties": {
+        "responsibility": "src/v9-applicability.js：维度组合、缺失上下文、冲突和两种使用模式。",
+        "codePaths": [
+          "src/v9-applicability.js"
+        ]
+      },
+      "categoryAssignments": [
+        "system.modules",
+        "system.architecture"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-APPLICABILITY"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-COMP-PROJECTION",
+      "typeId": "Component",
+      "name": "Projection Engine",
+      "description": "src/v6-projection.js：必要依赖闭包、焦点事实和正式任务契约。",
+      "properties": {
+        "responsibility": "src/v6-projection.js：必要依赖闭包、焦点事实和正式任务契约。",
+        "codePaths": [
+          "src/v6-projection.js"
+        ]
+      },
+      "categoryAssignments": [
+        "system.modules",
+        "system.architecture"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-PROJECTION"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-COMP-AKP",
+      "typeId": "Component",
+      "name": "AKP 导入模块",
+      "description": "src/v9-akp.js：真实解析、校验、稳定映射、预览、原子草稿提交和撤销。",
+      "properties": {
+        "responsibility": "src/v9-akp.js：真实解析、校验、稳定映射、预览、原子草稿提交和撤销。",
+        "codePaths": [
+          "src/v9-akp.js"
+        ]
+      },
+      "categoryAssignments": [
+        "system.modules",
+        "system.architecture"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-AKP"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-COMP-QA",
+      "typeId": "Component",
+      "name": "确定性知识问答模块",
+      "description": "src/v9-services.js：五类意图、角色化解释、引用、限制与追问。",
+      "properties": {
+        "responsibility": "src/v9-services.js：五类意图、角色化解释、引用、限制与追问。",
+        "codePaths": [
+          "src/v9-services.js"
+        ]
+      },
+      "categoryAssignments": [
+        "system.modules",
+        "system.architecture"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-SERVICES"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-COMP-FEEDBACK",
+      "typeId": "Component",
+      "name": "反馈闭环模块",
+      "description": "src/v9-services.js：反馈、分流、转变更/任务与结果关闭。",
+      "properties": {
+        "responsibility": "src/v9-services.js：反馈、分流、转变更/任务与结果关闭。",
+        "codePaths": [
+          "src/v9-services.js"
+        ]
+      },
+      "categoryAssignments": [
+        "system.modules",
+        "system.architecture"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-FEEDBACK"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-COMP-AGENT",
+      "typeId": "Component",
+      "name": "Agent Run 记录模块",
+      "description": "src/v9-services.js：JSON/JSONL、工具摘要、来源、脱敏与待确认问题。",
+      "properties": {
+        "responsibility": "src/v9-services.js：JSON/JSONL、工具摘要、来源、脱敏与待确认问题。",
+        "codePaths": [
+          "src/v9-services.js"
+        ]
+      },
+      "categoryAssignments": [
+        "system.modules",
+        "system.architecture"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-AGENT"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-COMP-VISUAL",
+      "typeId": "Component",
+      "name": "语义图形投影模块",
+      "description": "src/v9-services.js 与 src/v9-ui.js：模型驱动 SVG、同步焦点、热点与文本导出。",
+      "properties": {
+        "responsibility": "src/v9-services.js 与 src/v9-ui.js：模型驱动 SVG、同步焦点、热点与文本导出。",
+        "codePaths": [
+          "src/v9-services.js"
+        ]
+      },
+      "categoryAssignments": [
+        "system.modules",
+        "system.architecture"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-VISUAL"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-COMP-APP",
+      "typeId": "Component",
+      "name": "单页工作空间模块",
+      "description": "src/v6-app.js 与 src/v9-ui.js：项目、目录、导入、问答、反馈、Agent 与图形交互。",
+      "properties": {
+        "responsibility": "src/v6-app.js 与 src/v9-ui.js：项目、目录、导入、问答、反馈、Agent 与图形交互。",
+        "codePaths": [
+          "src/v6-app.js"
+        ]
+      },
+      "categoryAssignments": [
+        "system.modules",
+        "system.architecture"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-APP"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-COMP-BUILD",
+      "typeId": "Component",
+      "name": "单文件构建模块",
+      "description": "build.js：按固定模块顺序内联源码与样式并拒绝外部资源。",
+      "properties": {
+        "responsibility": "build.js：按固定模块顺序内联源码与样式并拒绝外部资源。",
+        "codePaths": [
+          "build.js"
+        ]
+      },
+      "categoryAssignments": [
+        "system.modules",
+        "system.architecture"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-BUILD"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-COMP-TESTS",
+      "typeId": "Component",
+      "name": "自动化验收模块",
+      "description": "tests：V3–V9 规则、权限、版本、导入、反馈、图形和破坏性回归。",
+      "properties": {
+        "responsibility": "tests：V3–V9 规则、权限、版本、导入、反馈、图形和破坏性回归。",
+        "codePaths": [
+          "tests/v9-acceptance.test.js"
+        ]
+      },
+      "categoryAssignments": [
+        "system.modules",
+        "system.architecture"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-TEST-V9"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-COMP-DECISION-V93",
+      "typeId": "Component",
+      "name": "业务决策评估器",
+      "description": "src/v9-3-decision.js：授权、批准状态、适用性、类型化条件、三值逻辑、冲突和来源轨迹。",
+      "properties": {
+        "responsibility": "src/v9-3-decision.js：授权、批准状态、适用性、类型化条件、三值逻辑、冲突和来源轨迹。",
+        "codePaths": [
+          "src/v9-3-decision.js"
+        ]
+      },
+      "categoryAssignments": [
+        "system.modules",
+        "system.architecture"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-DECISION-V93"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-COMP-READING-V93",
+      "typeId": "Component",
+      "name": "业务认知投影模块",
+      "description": "src/v9-3-reading.js：决策、符合性、Flow 语义守恒和三视角受控投影。",
+      "properties": {
+        "responsibility": "src/v9-3-reading.js：决策、符合性、Flow 语义守恒和三视角受控投影。",
+        "codePaths": [
+          "src/v9-3-reading.js"
+        ]
+      },
+      "categoryAssignments": [
+        "system.modules",
+        "system.architecture"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-READING-V93"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-COMP-TASK-V93",
+      "typeId": "Component",
+      "name": "Task 语义与交付闭环模块",
+      "description": "src/v9-3-task.js：Task Semantic Contract、Impact Investigation 和 V1.2 交付核对。",
+      "properties": {
+        "responsibility": "src/v9-3-task.js：Task Semantic Contract、Impact Investigation 和 V1.2 交付核对。",
+        "codePaths": [
+          "src/v9-3-task.js"
+        ]
+      },
+      "categoryAssignments": [
+        "system.modules",
+        "system.architecture"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-TASK-V93"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-COMP-UI-V93",
+      "typeId": "Component",
+      "name": "决策优先阅读与任务交互",
+      "description": "src/v9-3-ui.js：条件—判断—结果、案例模拟、三视角、影响调查和版本对账。",
+      "properties": {
+        "responsibility": "src/v9-3-ui.js：条件—判断—结果、案例模拟、三视角、影响调查和版本对账。",
+        "codePaths": [
+          "src/v9-3-ui.js"
+        ]
+      },
+      "categoryAssignments": [
+        "system.modules",
+        "system.architecture"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-UI-V93"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-TECH-JS",
+      "typeId": "Technology",
+      "name": "JavaScript（无前端框架）",
+      "description": "UMD 风格内部模块、DOM 和 SVG；未使用 React/Vue 等前端框架。",
+      "properties": {
+        "version": "浏览器 ES2022 子集"
+      },
+      "categoryAssignments": [
+        "system.technology"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-APP"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-TECH-HTML-CSS",
+      "typeId": "Technology",
+      "name": "HTML / CSS / 内置 SVG",
+      "description": "单文件页面、样式和图形，无外部字体、CDN 或图形运行库。",
+      "properties": {},
+      "categoryAssignments": [
+        "system.technology"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-UI",
+        "SRC-SELF-VISUAL"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-RUNTIME-BROWSER",
+      "typeId": "Runtime",
+      "name": "Chromium 浏览器运行时",
+      "description": "实际浏览器验收目标；file:// 离线打开，localStorage 持久化。",
+      "properties": {
+        "version": "OpenCode Chromium / local Chrome"
+      },
+      "categoryAssignments": [
+        "system.environments",
+        "system.technology"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-STORAGE"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-RUNTIME-NODE",
+      "typeId": "Runtime",
+      "name": "Node.js 构建与测试运行时",
+      "description": "仅使用 Node 内置 fs/path/assert/crypto 等模块；当前实测 v24.21.0。",
+      "properties": {
+        "version": "24.21.0"
+      },
+      "categoryAssignments": [
+        "system.technology"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-BUILD",
+        "SRC-SELF-TEST-V9"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-FRAMEWORK-NONE",
+      "typeId": "Framework",
+      "name": "无应用前端框架",
+      "description": "项目刻意保持无 npm 运行依赖的原生 JavaScript 原型。",
+      "properties": {
+        "version": "none",
+        "runtime": "browser"
+      },
+      "categoryAssignments": [
+        "system.technology"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-APP",
+        "SRC-SELF-BUILD"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-DEP-NODE-BUILTIN",
+      "typeId": "Dependency",
+      "name": "Node.js 内置模块",
+      "description": "构建与测试使用 node:fs、node:path、node:crypto、node:assert；无第三方包。",
+      "properties": {
+        "packageName": "node:*",
+        "version": "Node.js 24.21.0",
+        "compatibility": "构建和测试，不是浏览器运行依赖"
+      },
+      "categoryAssignments": [
+        "system.technology"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-BUILD",
+        "SRC-SELF-TEST-V9"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-BUILD-PIPELINE",
+      "typeId": "BuildPipeline",
+      "name": "Node 单文件重建流水线",
+      "description": "源码提取 → Self AKP → 实际导入器生成 Self 项目 → 模块内联 → SHA-256 重建比对。",
+      "properties": {
+        "entry": "node scripts/extract-self-knowledge.js && node scripts/prepare-self-project.js && node build.js",
+        "output": "dist/business-atlas-v9.3.html"
+      },
+      "categoryAssignments": [
+        "system.build"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-BUILD"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-DEPLOY-FILE",
+      "typeId": "DeploymentUnit",
+      "name": "离线 HTML 浏览器运行单元",
+      "description": "dist/business-atlas-v9.3.html 的本地 file:// 运行；不是生产部署拓扑。",
+      "properties": {
+        "release": "prototype-v9",
+        "topology": "single HTML + browser local storage; no server"
+      },
+      "categoryAssignments": [
+        "system.environments",
+        "system.deployment"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-BUILD",
+        "SRC-SELF-STORAGE"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-DATA-STORE",
+      "typeId": "DataEntity",
+      "name": "浏览器本地项目快照",
+      "description": "store.projects、contexts 和 storageVersion 保存在 business-atlas-v9 localStorage；容量失败显式提示并允许导出备份。",
+      "properties": {
+        "tableName": "localStorage:business-atlas-v9",
+        "fields": [
+          {
+            "name": "projects",
+            "type": "object",
+            "description": "项目、草稿、历史、反馈与执行记录"
+          }
+        ],
+        "lifecycle": "浏览器本地，非生产数据库"
+      },
+      "categoryAssignments": [
+        "system.data",
+        "system.data-flow"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-STORAGE"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-DATA-AKP",
+      "typeId": "DataEntity",
+      "name": "AKP JSON 知识包文件",
+      "description": "外部交换数据，经非可信输入检查、Schema/引用校验和人工预览后才进入草稿。",
+      "properties": {
+        "tableName": "file:AKP/0.1 JSON",
+        "fields": [
+          {
+            "name": "manifest",
+            "type": "object",
+            "description": "项目与提取 provenance"
+          }
+        ]
+      },
+      "categoryAssignments": [
+        "system.data"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-AKP-SCHEMA",
+        "SRC-SELF-AKP"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-API-ACCESS",
+      "typeId": "API",
+      "name": "Knowledge Access JavaScript API",
+      "description": "内部 readEntity/listEntities/readRelations/readRecord/readContract 接口；不是 HTTP 或 MCP Server。",
+      "properties": {
+        "method": "JS",
+        "path": "AtlasV9Access.read*(project, readContext, id)",
+        "failure": "OK/NOT_FOUND/FORBIDDEN/VERSION_UNAVAILABLE/CONTEXT_INSUFFICIENT/APPLICABILITY_UNKNOWN/DATA_INTEGRITY_ERROR"
+      },
+      "categoryAssignments": [
+        "system.apis"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-ACCESS"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-API-AKP",
+      "typeId": "API",
+      "name": "AKP Import JavaScript API",
+      "description": "stagePackage → previewImport → commitImport → 既有 ProposeChange/PublishRevision；不是 HTTP 服务。",
+      "properties": {
+        "method": "JS",
+        "path": "AtlasV9AKP.stagePackage/commitImport",
+        "failure": "校验失败或任一命令失败时原子回滚"
+      },
+      "categoryAssignments": [
+        "system.apis"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-AKP"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-ADR-UNIFIED",
+      "typeId": "ArchitectureDecision",
+      "name": "统一知识而非多套事实库",
+      "description": "目录、问答、反馈、Agent 提案、图形和导入共享实体、断言、来源与版本。",
+      "properties": {
+        "status": "accepted",
+        "decision": "统一知识而非多套事实库",
+        "rationale": "目录、问答、反馈、Agent 提案、图形和导入共享实体、断言、来源与版本。",
+        "consequences": "正式开发必须保留对应不变量并验证真实系统边界。"
+      },
+      "categoryAssignments": [
+        "system.decisions",
+        "assets.decisions"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "documented_intent",
+      "sourceIds": [
+        "SRC-SELF-PROJECTION"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-ADR-COMMAND",
+      "typeId": "ArchitectureDecision",
+      "name": "所有知识写入遵守 Command Transaction",
+      "description": "导入和反馈转变更复用暂存工作区与 Change Set，失败原子回滚。",
+      "properties": {
+        "status": "accepted",
+        "decision": "所有知识写入遵守 Command Transaction",
+        "rationale": "导入和反馈转变更复用暂存工作区与 Change Set，失败原子回滚。",
+        "consequences": "正式开发必须保留对应不变量并验证真实系统边界。"
+      },
+      "categoryAssignments": [
+        "system.decisions",
+        "assets.decisions"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "documented_intent",
+      "sourceIds": [
+        "SRC-SELF-TRANSACTION"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-ADR-BASELINE",
+      "typeId": "ArchitectureDecision",
+      "name": "批准基线不可变且协作历史分离",
+      "description": "旧基线保存当时知识快照，后续反馈、导入和 Agent 活动不能回写。",
+      "properties": {
+        "status": "accepted",
+        "decision": "批准基线不可变且协作历史分离",
+        "rationale": "旧基线保存当时知识快照，后续反馈、导入和 Agent 活动不能回写。",
+        "consequences": "正式开发必须保留对应不变量并验证真实系统边界。"
+      },
+      "categoryAssignments": [
+        "system.decisions",
+        "assets.decisions"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "documented_intent",
+      "sourceIds": [
+        "SRC-SELF-DESIGN"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-ADR-FACT-LEVEL",
+      "typeId": "ArchitectureDecision",
+      "name": "源码观察不自动升级为批准业务规范",
+      "description": "Observed、Documented Intent、Inferred、Unknown、Conflicting 分别保存。",
+      "properties": {
+        "status": "accepted",
+        "decision": "源码观察不自动升级为批准业务规范",
+        "rationale": "Observed、Documented Intent、Inferred、Unknown、Conflicting 分别保存。",
+        "consequences": "正式开发必须保留对应不变量并验证真实系统边界。"
+      },
+      "categoryAssignments": [
+        "system.decisions",
+        "assets.decisions"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "documented_intent",
+      "sourceIds": [
+        "SRC-SELF-AKP"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-ADR-OFFLINE",
+      "typeId": "ArchitectureDecision",
+      "name": "离线单文件与零运行依赖",
+      "description": "原型验证交互与工程约束，不在本轮引入后台、前端框架或外部图形引擎。",
+      "properties": {
+        "status": "accepted",
+        "decision": "离线单文件与零运行依赖",
+        "rationale": "原型验证交互与工程约束，不在本轮引入后台、前端框架或外部图形引擎。",
+        "consequences": "正式开发必须保留对应不变量并验证真实系统边界。"
+      },
+      "categoryAssignments": [
+        "system.decisions",
+        "assets.decisions"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "documented_intent",
+      "sourceIds": [
+        "SRC-SELF-BUILD"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-ADR-MODULES",
+      "typeId": "ArchitectureDecision",
+      "name": "模块化原型边界为未来模块化单体保留",
+      "description": "访问、适用性、导入、协作、投影和 UI 分文件；本轮不开发微服务或生产后台。",
+      "properties": {
+        "status": "accepted",
+        "decision": "模块化原型边界为未来模块化单体保留",
+        "rationale": "访问、适用性、导入、协作、投影和 UI 分文件；本轮不开发微服务或生产后台。",
+        "consequences": "正式开发必须保留对应不变量并验证真实系统边界。"
+      },
+      "categoryAssignments": [
+        "system.decisions",
+        "assets.decisions"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "documented_intent",
+      "sourceIds": [
+        "SRC-SELF-APP"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-ADR-THREE-FACTS",
+      "typeId": "ArchitectureDecision",
+      "name": "目标规范、当前行为与技术机制不可混同",
+      "description": "技术观察和源码机制只能支持实现符合性判断，未经业务 Owner 批准不得成为目标规范。",
+      "properties": {
+        "status": "accepted",
+        "decision": "目标规范、当前行为与技术机制不可混同",
+        "rationale": "技术观察和源码机制只能支持实现符合性判断，未经业务 Owner 批准不得成为目标规范。",
+        "consequences": "正式开发必须保留对应不变量并验证真实系统边界。"
+      },
+      "categoryAssignments": [
+        "system.decisions",
+        "assets.decisions"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "documented_intent",
+      "sourceIds": [
+        "SRC-SELF-READING-V93"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-ADR-TASK-REFS",
+      "typeId": "ArchitectureDecision",
+      "name": "Task 引用规则版本而不复制规范",
+      "description": "Task Semantic Contract 保存基线引用与候选差异，历史基线保持不可变，候选决策必须独立批准。",
+      "properties": {
+        "status": "accepted",
+        "decision": "Task 引用规则版本而不复制规范",
+        "rationale": "Task Semantic Contract 保存基线引用与候选差异，历史基线保持不可变，候选决策必须独立批准。",
+        "consequences": "正式开发必须保留对应不变量并验证真实系统边界。"
+      },
+      "categoryAssignments": [
+        "system.decisions",
+        "assets.decisions"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "documented_intent",
+      "sourceIds": [
+        "SRC-SELF-TASK-V93"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-CONV-OFFLINE",
+      "typeId": "EngineeringConvention",
+      "name": "无外部运行资源与可重复构建",
+      "description": "核心脚本和样式内联；构建产物 SHA-256 必须与干净重建一致。",
+      "properties": {
+        "scope": "全部单文件交付",
+        "verification": "node build.js + clean rebuild SHA-256"
+      },
+      "categoryAssignments": [
+        "system.decisions",
+        "assets.conventions"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "documented_intent",
+      "sourceIds": [
+        "SRC-SELF-BUILD"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-CONV-TESTS",
+      "typeId": "EngineeringConvention",
+      "name": "既有测试继续执行且不得删除失败检查",
+      "description": "V3–V8 回归与 V9 权限、破坏性导入和浏览器旅程共同验收。",
+      "properties": {
+        "scope": "每次交付",
+        "verification": "Node 全量测试 + Chromium 五条旅程"
+      },
+      "categoryAssignments": [
+        "system.decisions",
+        "governance.acceptance"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "documented_intent",
+      "sourceIds": [
+        "SRC-SELF-TEST-V8",
+        "SRC-SELF-TEST-V9"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-TEST-BASELINE",
+      "typeId": "Test",
+      "name": "历史基线不可变回归",
+      "description": "V8 SHA-256 基线测试与 V9 后续活动测试验证旧批准快照不被修改。",
+      "properties": {
+        "command": "node tests/v8-acceptance.test.js && node tests/v9-acceptance.test.js",
+        "coverageScope": "初始化、发布、反馈、Agent、导入和布局",
+        "expected": "旧基线 digest 不变"
+      },
+      "categoryAssignments": [
+        "governance.acceptance"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-TEST-V8"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-TEST-AKP",
+      "typeId": "Test",
+      "name": "AKP 重复导入与原子失败回归",
+      "description": "验证稳定外部 ID、无效引用、危险输入、无部分草稿和人工发布。",
+      "properties": {
+        "command": "node tests/v9-acceptance.test.js",
+        "coverageScope": "AKP 解析、预览、提交、撤销、发布",
+        "expected": "重复不重复、失败无部分写入"
+      },
+      "categoryAssignments": [
+        "governance.acceptance"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-TEST-V9"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-TEST-ACCESS",
+      "typeId": "Test",
+      "name": "跨入口权限与适用性回归",
+      "description": "验证直接 ID、关系、契约、问答和图形的授权，以及生产/测试/未知条件。",
+      "properties": {
+        "command": "node tests/v9-acceptance.test.js",
+        "coverageScope": "权限、环境、版本与用途",
+        "expected": "无衍生泄露，未知不默认适用"
+      },
+      "categoryAssignments": [
+        "governance.acceptance"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-ACCESS",
+        "SRC-SELF-APPLICABILITY"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-TEST-V93",
+      "typeId": "Test",
+      "name": "V9.3 业务认知与交付闭环回归",
+      "description": "覆盖条件求值、符合性、Task 语义、影响闭合、Flow 图形、权限、版本与导出。",
+      "properties": {
+        "command": "node tests/v9-3-acceptance.test.js",
+        "coverageScope": "55 项指定语义验收及浏览器旅程",
+        "expected": "明确条件可判断，未知不伪造；实现、测试、知识与审批相互追溯"
+      },
+      "categoryAssignments": [
+        "governance.acceptance"
+      ],
+      "applicableContext": {},
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-TEST-V93"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-CONFIG-STORAGE",
+      "typeId": "Configuration",
+      "name": "浏览器本地存储配置",
+      "description": "business-atlas-v9；仅存少量项目数据，图片和大型日志受容量限制。",
+      "properties": {
+        "dataType": "text",
+        "defaultValue": "business-atlas-v9",
+        "effectiveWhen": "离线浏览器原型",
+        "configVersion": "v9"
+      },
+      "categoryAssignments": [
+        "system.config"
+      ],
+      "applicableContext": {
+        "environment": "browser-local",
+        "systemVersion": "v9"
+      },
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-STORAGE"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    },
+    {
+      "stableExternalId": "SELF-ENV-BROWSER",
+      "typeId": "Environment",
+      "name": "本地浏览器原型环境",
+      "description": "唯一明确实现的运行环境；生产部署环境未知。",
+      "properties": {
+        "region": "local-user-browser",
+        "release": "v9-prototype",
+        "configVersion": "v9"
+      },
+      "categoryAssignments": [
+        "system.environments"
+      ],
+      "applicableContext": {
+        "environment": "browser-local"
+      },
+      "verificationStatus": "observed",
+      "sourceIds": [
+        "SRC-SELF-STORAGE",
+        "SRC-SELF-BUILD"
+      ],
+      "sensitivity": "internal",
+      "extra": {}
+    }
+  ],
+  "assertions": [
+    {
+      "stableExternalId": "SELF-REL-SYSTEM-PROJECT",
+      "subject": "SELF-SYSTEM",
+      "predicate": "references",
+      "object": "SELF-PROJECT",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-APP",
+          "locator": {
+            "path": "src/v6-app.js",
+            "lineRange": {
+              "start": 63,
+              "end": 66
+            },
+            "anchor": "function v9Api"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "离线前端原型承载 Self Knowledge 项目认知"
+    },
+    {
+      "stableExternalId": "SELF-REL-SYSTEM-CATALOG",
+      "subject": "SELF-SYSTEM",
+      "predicate": "contains",
+      "object": "SELF-COMP-FRAMEWORK",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-DIMENSIONS",
+          "locator": {
+            "path": "src/v7-framework.js",
+            "lineRange": {
+              "start": 12,
+              "end": 15
+            },
+            "anchor": "const DIMENSIONS"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "五维目录属于同一系统"
+    },
+    {
+      "stableExternalId": "SELF-REL-SYSTEM-COMMAND",
+      "subject": "SELF-SYSTEM",
+      "predicate": "contains",
+      "object": "SELF-COMP-COMMAND",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-COMMANDS",
+          "locator": {
+            "path": "src/v6-core.js",
+            "lineRange": {
+              "start": 14,
+              "end": 17
+            },
+            "anchor": "const COMMANDS"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "Command 属于同一系统"
+    },
+    {
+      "stableExternalId": "SELF-REL-SYSTEM-READ",
+      "subject": "SELF-SYSTEM",
+      "predicate": "contains",
+      "object": "SELF-COMP-READ",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-READ",
+          "locator": {
+            "path": "src/v8-read.js",
+            "lineRange": {
+              "start": 85,
+              "end": 88
+            },
+            "anchor": "function context"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "Read Context 与目录读取"
+    },
+    {
+      "stableExternalId": "SELF-REL-SYSTEM-ACCESS",
+      "subject": "SELF-SYSTEM",
+      "predicate": "contains",
+      "object": "SELF-COMP-ACCESS",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-ACCESS",
+          "locator": {
+            "path": "src/v9-access.js",
+            "lineRange": {
+              "start": 45,
+              "end": 48
+            },
+            "anchor": "function readEntity"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "统一访问边界"
+    },
+    {
+      "stableExternalId": "SELF-REL-SYSTEM-AKP",
+      "subject": "SELF-SYSTEM",
+      "predicate": "contains",
+      "object": "SELF-COMP-AKP",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-AKP",
+          "locator": {
+            "path": "src/v9-akp.js",
+            "lineRange": {
+              "start": 140,
+              "end": 143
+            },
+            "anchor": "function commitImport"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "AKP 导入组件"
+    },
+    {
+      "stableExternalId": "SELF-REL-SYSTEM-APP",
+      "subject": "SELF-SYSTEM",
+      "predicate": "contains",
+      "object": "SELF-COMP-APP",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-APP",
+          "locator": {
+            "path": "src/v6-app.js",
+            "lineRange": {
+              "start": 63,
+              "end": 66
+            },
+            "anchor": "function v9Api"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "工作空间 UI"
+    },
+    {
+      "stableExternalId": "SELF-REL-SYSTEM-BUILD",
+      "subject": "SELF-SYSTEM",
+      "predicate": "contains",
+      "object": "SELF-COMP-BUILD",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-BUILD",
+          "locator": {
+            "path": "build.js",
+            "lineRange": {
+              "start": 7,
+              "end": 10
+            },
+            "anchor": "const files ="
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "构建组件"
+    },
+    {
+      "stableExternalId": "SELF-REL-IMPLEMENT-0",
+      "subject": "SELF-COMP-FRAMEWORK",
+      "predicate": "implements",
+      "object": "SELF-FEAT-CATALOG",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-DIMENSIONS",
+          "locator": {
+            "path": "src/v7-framework.js",
+            "lineRange": {
+              "start": 12,
+              "end": 15
+            },
+            "anchor": "const DIMENSIONS"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "stableExternalId": "SELF-REL-IMPLEMENT-1",
+      "subject": "SELF-COMP-SCHEMA",
+      "predicate": "implements",
+      "object": "SELF-FEAT-SCHEMA",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-SCHEMA",
+          "locator": {
+            "path": "v4-core.js",
+            "lineRange": {
+              "start": 138,
+              "end": 141
+            },
+            "anchor": "function registerType"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "stableExternalId": "SELF-REL-IMPLEMENT-2",
+      "subject": "SELF-COMP-COMMAND",
+      "predicate": "implements",
+      "object": "SELF-FEAT-COMMAND",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-COMMANDS",
+          "locator": {
+            "path": "src/v6-core.js",
+            "lineRange": {
+              "start": 14,
+              "end": 17
+            },
+            "anchor": "const COMMANDS"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "stableExternalId": "SELF-REL-IMPLEMENT-3",
+      "subject": "SELF-COMP-DRAFT",
+      "predicate": "implements",
+      "object": "SELF-FEAT-COMMAND",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-TRANSACTION",
+          "locator": {
+            "path": "src/v6-core.js",
+            "lineRange": {
+              "start": 139,
+              "end": 142
+            },
+            "anchor": "function mutate"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "stableExternalId": "SELF-REL-IMPLEMENT-4",
+      "subject": "SELF-COMP-READ",
+      "predicate": "implements",
+      "object": "SELF-FEAT-READ",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-READ",
+          "locator": {
+            "path": "src/v8-read.js",
+            "lineRange": {
+              "start": 85,
+              "end": 88
+            },
+            "anchor": "function context"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "stableExternalId": "SELF-REL-IMPLEMENT-5",
+      "subject": "SELF-COMP-ACCESS",
+      "predicate": "implements",
+      "object": "SELF-FEAT-READ",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-ACCESS",
+          "locator": {
+            "path": "src/v9-access.js",
+            "lineRange": {
+              "start": 45,
+              "end": 48
+            },
+            "anchor": "function readEntity"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "stableExternalId": "SELF-REL-IMPLEMENT-6",
+      "subject": "SELF-COMP-APPLICABILITY",
+      "predicate": "implements",
+      "object": "SELF-FEAT-APPLICABILITY",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-APPLICABILITY",
+          "locator": {
+            "path": "src/v9-applicability.js",
+            "lineRange": {
+              "start": 36,
+              "end": 39
+            },
+            "anchor": "function evaluate"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "stableExternalId": "SELF-REL-IMPLEMENT-7",
+      "subject": "SELF-COMP-PROJECTION",
+      "predicate": "implements",
+      "object": "SELF-FEAT-WORKSPACE",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-PROJECTION",
+          "locator": {
+            "path": "src/v6-projection.js",
+            "lineRange": {
+              "start": 15,
+              "end": 18
+            },
+            "anchor": "function projectKnowledge"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "stableExternalId": "SELF-REL-IMPLEMENT-8",
+      "subject": "SELF-COMP-AKP",
+      "predicate": "implements",
+      "object": "SELF-FEAT-AKP",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-AKP",
+          "locator": {
+            "path": "src/v9-akp.js",
+            "lineRange": {
+              "start": 140,
+              "end": 143
+            },
+            "anchor": "function commitImport"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "stableExternalId": "SELF-REL-IMPLEMENT-9",
+      "subject": "SELF-COMP-QA",
+      "predicate": "implements",
+      "object": "SELF-FEAT-QA",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-SERVICES",
+          "locator": {
+            "path": "src/v9-services.js",
+            "lineRange": {
+              "start": 65,
+              "end": 68
+            },
+            "anchor": "function ask"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "stableExternalId": "SELF-REL-IMPLEMENT-10",
+      "subject": "SELF-COMP-FEEDBACK",
+      "predicate": "implements",
+      "object": "SELF-FEAT-FEEDBACK",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-FEEDBACK",
+          "locator": {
+            "path": "src/v9-services.js",
+            "lineRange": {
+              "start": 127,
+              "end": 130
+            },
+            "anchor": "function createFeedback"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "stableExternalId": "SELF-REL-IMPLEMENT-11",
+      "subject": "SELF-COMP-AGENT",
+      "predicate": "implements",
+      "object": "SELF-FEAT-AGENT",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-AGENT",
+          "locator": {
+            "path": "src/v9-services.js",
+            "lineRange": {
+              "start": 167,
+              "end": 170
+            },
+            "anchor": "function parseAgentRun"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "stableExternalId": "SELF-REL-IMPLEMENT-12",
+      "subject": "SELF-COMP-VISUAL",
+      "predicate": "implements",
+      "object": "SELF-FEAT-VISUAL",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-VISUAL",
+          "locator": {
+            "path": "src/v9-services.js",
+            "lineRange": {
+              "start": 209,
+              "end": 212
+            },
+            "anchor": "function projectView"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "stableExternalId": "SELF-REL-IMPLEMENT-13",
+      "subject": "SELF-COMP-APP",
+      "predicate": "implements",
+      "object": "SELF-FEAT-WORKSPACE",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-APP",
+          "locator": {
+            "path": "src/v6-app.js",
+            "lineRange": {
+              "start": 63,
+              "end": 66
+            },
+            "anchor": "function v9Api"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "stableExternalId": "SELF-REL-IMPLEMENT-14",
+      "subject": "SELF-COMP-BUILD",
+      "predicate": "implements",
+      "object": "SELF-FEAT-BUILD",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-BUILD",
+          "locator": {
+            "path": "build.js",
+            "lineRange": {
+              "start": 7,
+              "end": 10
+            },
+            "anchor": "const files ="
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "stableExternalId": "SELF-REL-IMPLEMENT-15",
+      "subject": "SELF-COMP-TESTS",
+      "predicate": "implements",
+      "object": "SELF-FEAT-BASELINE",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-TEST-V9",
+          "locator": {
+            "path": "tests/v9-acceptance.test.js",
+            "lineRange": {
+              "start": 57,
+              "end": 60
+            },
+            "anchor": "test('V9-19"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "stableExternalId": "SELF-REL-IMPLEMENT-16",
+      "subject": "SELF-COMP-DECISION-V93",
+      "predicate": "implements",
+      "object": "SELF-FEAT-DECISION",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-DECISION-V93",
+          "locator": {
+            "path": "src/v9-3-decision.js",
+            "lineRange": {
+              "start": 93,
+              "end": 96
+            },
+            "anchor": "function evaluateRule"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "stableExternalId": "SELF-REL-IMPLEMENT-17",
+      "subject": "SELF-COMP-READING-V93",
+      "predicate": "implements",
+      "object": "SELF-FEAT-CONFORMANCE",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-READING-V93",
+          "locator": {
+            "path": "src/v9-3-reading.js",
+            "lineRange": {
+              "start": 57,
+              "end": 60
+            },
+            "anchor": "function decisionProjection"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "stableExternalId": "SELF-REL-IMPLEMENT-18",
+      "subject": "SELF-COMP-TASK-V93",
+      "predicate": "implements",
+      "object": "SELF-FEAT-TASK-SEMANTIC",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-TASK-V93",
+          "locator": {
+            "path": "src/v9-3-task.js",
+            "lineRange": {
+              "start": 173,
+              "end": 176
+            },
+            "anchor": "function evaluateDelivery"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "stableExternalId": "SELF-REL-IMPLEMENT-19",
+      "subject": "SELF-COMP-UI-V93",
+      "predicate": "implements",
+      "object": "SELF-FEAT-DECISION",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-UI-V93",
+          "locator": {
+            "path": "src/v9-3-ui.js",
+            "lineRange": {
+              "start": 81,
+              "end": 84
+            },
+            "anchor": "function readingWorkbench"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "stableExternalId": "SELF-REL-USES-JS-0",
+      "subject": "SELF-COMP-ACCESS",
+      "predicate": "uses",
+      "object": "SELF-TECH-JS",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-ACCESS",
+          "locator": {
+            "path": "src/v9-access.js",
+            "lineRange": {
+              "start": 45,
+              "end": 48
+            },
+            "anchor": "function readEntity"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "直接由 JavaScript 模块实现"
+    },
+    {
+      "stableExternalId": "SELF-REL-USES-JS-1",
+      "subject": "SELF-COMP-AKP",
+      "predicate": "uses",
+      "object": "SELF-TECH-JS",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-AKP",
+          "locator": {
+            "path": "src/v9-akp.js",
+            "lineRange": {
+              "start": 140,
+              "end": 143
+            },
+            "anchor": "function commitImport"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "直接由 JavaScript 模块实现"
+    },
+    {
+      "stableExternalId": "SELF-REL-USES-JS-2",
+      "subject": "SELF-COMP-QA",
+      "predicate": "uses",
+      "object": "SELF-TECH-JS",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-SERVICES",
+          "locator": {
+            "path": "src/v9-services.js",
+            "lineRange": {
+              "start": 65,
+              "end": 68
+            },
+            "anchor": "function ask"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "直接由 JavaScript 模块实现"
+    },
+    {
+      "stableExternalId": "SELF-REL-USES-JS-3",
+      "subject": "SELF-COMP-FEEDBACK",
+      "predicate": "uses",
+      "object": "SELF-TECH-JS",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-FEEDBACK",
+          "locator": {
+            "path": "src/v9-services.js",
+            "lineRange": {
+              "start": 127,
+              "end": 130
+            },
+            "anchor": "function createFeedback"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "直接由 JavaScript 模块实现"
+    },
+    {
+      "stableExternalId": "SELF-REL-USES-JS-4",
+      "subject": "SELF-COMP-AGENT",
+      "predicate": "uses",
+      "object": "SELF-TECH-JS",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-AGENT",
+          "locator": {
+            "path": "src/v9-services.js",
+            "lineRange": {
+              "start": 167,
+              "end": 170
+            },
+            "anchor": "function parseAgentRun"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "直接由 JavaScript 模块实现"
+    },
+    {
+      "stableExternalId": "SELF-REL-USES-JS-5",
+      "subject": "SELF-COMP-VISUAL",
+      "predicate": "uses",
+      "object": "SELF-TECH-JS",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-VISUAL",
+          "locator": {
+            "path": "src/v9-services.js",
+            "lineRange": {
+              "start": 209,
+              "end": 212
+            },
+            "anchor": "function projectView"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "直接由 JavaScript 模块实现"
+    },
+    {
+      "stableExternalId": "SELF-REL-USES-JS-6",
+      "subject": "SELF-COMP-APP",
+      "predicate": "uses",
+      "object": "SELF-TECH-JS",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-APP",
+          "locator": {
+            "path": "src/v6-app.js",
+            "lineRange": {
+              "start": 63,
+              "end": 66
+            },
+            "anchor": "function v9Api"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "直接由 JavaScript 模块实现"
+    },
+    {
+      "stableExternalId": "SELF-REL-USES-JS-7",
+      "subject": "SELF-COMP-DECISION-V93",
+      "predicate": "uses",
+      "object": "SELF-TECH-JS",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-DECISION-V93",
+          "locator": {
+            "path": "src/v9-3-decision.js",
+            "lineRange": {
+              "start": 93,
+              "end": 96
+            },
+            "anchor": "function evaluateRule"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "直接由 JavaScript 模块实现"
+    },
+    {
+      "stableExternalId": "SELF-REL-USES-JS-8",
+      "subject": "SELF-COMP-READING-V93",
+      "predicate": "uses",
+      "object": "SELF-TECH-JS",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-READING-V93",
+          "locator": {
+            "path": "src/v9-3-reading.js",
+            "lineRange": {
+              "start": 57,
+              "end": 60
+            },
+            "anchor": "function decisionProjection"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "直接由 JavaScript 模块实现"
+    },
+    {
+      "stableExternalId": "SELF-REL-USES-JS-9",
+      "subject": "SELF-COMP-TASK-V93",
+      "predicate": "uses",
+      "object": "SELF-TECH-JS",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-TASK-V93",
+          "locator": {
+            "path": "src/v9-3-task.js",
+            "lineRange": {
+              "start": 173,
+              "end": 176
+            },
+            "anchor": "function evaluateDelivery"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "直接由 JavaScript 模块实现"
+    },
+    {
+      "stableExternalId": "SELF-REL-USES-JS-10",
+      "subject": "SELF-COMP-UI-V93",
+      "predicate": "uses",
+      "object": "SELF-TECH-JS",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-UI-V93",
+          "locator": {
+            "path": "src/v9-3-ui.js",
+            "lineRange": {
+              "start": 81,
+              "end": 84
+            },
+            "anchor": "function readingWorkbench"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "直接由 JavaScript 模块实现"
+    },
+    {
+      "stableExternalId": "SELF-REL-FRAMEWORK-DEP",
+      "subject": "SELF-FRAMEWORK-NONE",
+      "predicate": "dependsOn",
+      "object": "SELF-DEP-NODE-BUILTIN",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-BUILD",
+          "locator": {
+            "path": "build.js",
+            "lineRange": {
+              "start": 7,
+              "end": 10
+            },
+            "anchor": "const files ="
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "仅构建和测试依赖 Node 内置模块；浏览器无第三方运行依赖"
+    },
+    {
+      "stableExternalId": "SELF-REL-DEPLOY-HOSTS",
+      "subject": "SELF-DEPLOY-FILE",
+      "predicate": "hosts",
+      "object": "SELF-COMP-APP",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-BUILD",
+          "locator": {
+            "path": "build.js",
+            "lineRange": {
+              "start": 7,
+              "end": 10
+            },
+            "anchor": "const files ="
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "离线 HTML 承载工作空间，不代表生产部署"
+    },
+    {
+      "stableExternalId": "SELF-REL-ACCESS-EXPOSES",
+      "subject": "SELF-COMP-ACCESS",
+      "predicate": "exposes",
+      "object": "SELF-API-ACCESS",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-ACCESS",
+          "locator": {
+            "path": "src/v9-access.js",
+            "lineRange": {
+              "start": 45,
+              "end": 48
+            },
+            "anchor": "function readEntity"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "内部 JavaScript 读取接口"
+    },
+    {
+      "stableExternalId": "SELF-REL-AKP-EXPOSES",
+      "subject": "SELF-COMP-AKP",
+      "predicate": "exposes",
+      "object": "SELF-API-AKP",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-AKP",
+          "locator": {
+            "path": "src/v9-akp.js",
+            "lineRange": {
+              "start": 140,
+              "end": 143
+            },
+            "anchor": "function commitImport"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "内部 JavaScript 导入接口"
+    },
+    {
+      "stableExternalId": "SELF-REL-APP-WRITES",
+      "subject": "SELF-COMP-APP",
+      "predicate": "writes",
+      "object": "SELF-DATA-STORE",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-STORAGE",
+          "locator": {
+            "path": "src/v9-access.js",
+            "lineRange": {
+              "start": 231,
+              "end": 234
+            },
+            "anchor": "function safePersist"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "浏览器本地快照写入"
+    },
+    {
+      "stableExternalId": "SELF-REL-APP-READS",
+      "subject": "SELF-COMP-APP",
+      "predicate": "reads",
+      "object": "SELF-DATA-STORE",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-STORAGE",
+          "locator": {
+            "path": "src/v9-access.js",
+            "lineRange": {
+              "start": 231,
+              "end": 234
+            },
+            "anchor": "function safePersist"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "刷新后恢复项目快照"
+    },
+    {
+      "stableExternalId": "SELF-REL-AKP-READS",
+      "subject": "SELF-COMP-AKP",
+      "predicate": "reads",
+      "object": "SELF-DATA-AKP",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-AKP",
+          "locator": {
+            "path": "src/v9-akp.js",
+            "lineRange": {
+              "start": 140,
+              "end": 143
+            },
+            "anchor": "function commitImport"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "读取非可信 AKP JSON 文件"
+    },
+    {
+      "stableExternalId": "SELF-REL-BUILD-OUTPUT",
+      "subject": "SELF-BUILD-PIPELINE",
+      "predicate": "contains",
+      "object": "SELF-DEPLOY-FILE",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-BUILD",
+          "locator": {
+            "path": "build.js",
+            "lineRange": {
+              "start": 7,
+              "end": 10
+            },
+            "anchor": "const files ="
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "构建产物为离线 HTML 运行单元"
+    },
+    {
+      "stableExternalId": "SELF-REL-ADR-0",
+      "subject": "SELF-ADR-UNIFIED",
+      "predicate": "constrains",
+      "object": "SELF-COMP-APP",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-PROJECTION",
+          "locator": {
+            "path": "src/v6-projection.js",
+            "lineRange": {
+              "start": 15,
+              "end": 18
+            },
+            "anchor": "function projectKnowledge"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "已记录设计决策约束对应实现"
+    },
+    {
+      "stableExternalId": "SELF-REL-ADR-1",
+      "subject": "SELF-ADR-COMMAND",
+      "predicate": "constrains",
+      "object": "SELF-COMP-APP",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-TRANSACTION",
+          "locator": {
+            "path": "src/v6-core.js",
+            "lineRange": {
+              "start": 139,
+              "end": 142
+            },
+            "anchor": "function mutate"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "已记录设计决策约束对应实现"
+    },
+    {
+      "stableExternalId": "SELF-REL-ADR-2",
+      "subject": "SELF-ADR-BASELINE",
+      "predicate": "constrains",
+      "object": "SELF-COMP-DRAFT",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-DESIGN",
+          "locator": {
+            "path": "docs/v8-design.md",
+            "lineRange": {
+              "start": 30,
+              "end": 33
+            },
+            "anchor": "## 3. Baseline Invariant"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "已记录设计决策约束对应实现"
+    },
+    {
+      "stableExternalId": "SELF-REL-ADR-3",
+      "subject": "SELF-ADR-FACT-LEVEL",
+      "predicate": "constrains",
+      "object": "SELF-COMP-AKP",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-AKP",
+          "locator": {
+            "path": "src/v9-akp.js",
+            "lineRange": {
+              "start": 140,
+              "end": 143
+            },
+            "anchor": "function commitImport"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "已记录设计决策约束对应实现"
+    },
+    {
+      "stableExternalId": "SELF-REL-ADR-4",
+      "subject": "SELF-ADR-OFFLINE",
+      "predicate": "constrains",
+      "object": "SELF-COMP-BUILD",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-BUILD",
+          "locator": {
+            "path": "build.js",
+            "lineRange": {
+              "start": 7,
+              "end": 10
+            },
+            "anchor": "const files ="
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "已记录设计决策约束对应实现"
+    },
+    {
+      "stableExternalId": "SELF-REL-ADR-5",
+      "subject": "SELF-ADR-MODULES",
+      "predicate": "constrains",
+      "object": "SELF-COMP-APP",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-APP",
+          "locator": {
+            "path": "src/v6-app.js",
+            "lineRange": {
+              "start": 63,
+              "end": 66
+            },
+            "anchor": "function v9Api"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "已记录设计决策约束对应实现"
+    },
+    {
+      "stableExternalId": "SELF-REL-ADR-6",
+      "subject": "SELF-ADR-THREE-FACTS",
+      "predicate": "constrains",
+      "object": "SELF-COMP-APP",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-READING-V93",
+          "locator": {
+            "path": "src/v9-3-reading.js",
+            "lineRange": {
+              "start": 57,
+              "end": 60
+            },
+            "anchor": "function decisionProjection"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "已记录设计决策约束对应实现"
+    },
+    {
+      "stableExternalId": "SELF-REL-ADR-7",
+      "subject": "SELF-ADR-TASK-REFS",
+      "predicate": "constrains",
+      "object": "SELF-COMP-APP",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-TASK-V93",
+          "locator": {
+            "path": "src/v9-3-task.js",
+            "lineRange": {
+              "start": 173,
+              "end": 176
+            },
+            "anchor": "function evaluateDelivery"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "已记录设计决策约束对应实现"
+    },
+    {
+      "stableExternalId": "SELF-REL-TEST-BASELINE",
+      "subject": "SELF-TEST-BASELINE",
+      "predicate": "verifies",
+      "object": "SELF-FEAT-BASELINE",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-TEST-V8",
+          "locator": {
+            "path": "tests/v8-acceptance.test.js",
+            "lineRange": {
+              "start": 42,
+              "end": 45
+            },
+            "anchor": "test('V8-07"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "测试验证基线不可变"
+    },
+    {
+      "stableExternalId": "SELF-REL-TEST-AKP",
+      "subject": "SELF-TEST-AKP",
+      "predicate": "verifies",
+      "object": "SELF-FEAT-AKP",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-TEST-V9",
+          "locator": {
+            "path": "tests/v9-acceptance.test.js",
+            "lineRange": {
+              "start": 57,
+              "end": 60
+            },
+            "anchor": "test('V9-19"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "测试验证知识导入"
+    },
+    {
+      "stableExternalId": "SELF-REL-TEST-ACCESS",
+      "subject": "SELF-TEST-ACCESS",
+      "predicate": "verifies",
+      "object": "SELF-FEAT-READ",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-ACCESS",
+          "locator": {
+            "path": "src/v9-access.js",
+            "lineRange": {
+              "start": 45,
+              "end": 48
+            },
+            "anchor": "function readEntity"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "测试验证统一访问与适用性"
+    },
+    {
+      "stableExternalId": "SELF-REL-TEST-V93-DECISION",
+      "subject": "SELF-TEST-V93",
+      "predicate": "verifies",
+      "object": "SELF-FEAT-DECISION",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-TEST-V93",
+          "locator": {
+            "path": "tests/v9-3-acceptance.test.js",
+            "lineRange": {
+              "start": 42,
+              "end": 45
+            },
+            "anchor": "test('V9.3-01"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "V9.3 测试验证业务决策与案例"
+    },
+    {
+      "stableExternalId": "SELF-REL-TEST-V93-TASK",
+      "subject": "SELF-TEST-V93",
+      "predicate": "verifies",
+      "object": "SELF-FEAT-TASK-SEMANTIC",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-TEST-V93",
+          "locator": {
+            "path": "tests/v9-3-acceptance.test.js",
+            "lineRange": {
+              "start": 42,
+              "end": 45
+            },
+            "anchor": "test('V9.3-01"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "V9.3 测试验证任务语义与完整影响"
+    },
+    {
+      "stableExternalId": "SELF-REL-TEST-V93-DELIVERY",
+      "subject": "SELF-TEST-V93",
+      "predicate": "verifies",
+      "object": "SELF-FEAT-DELIVERY-V12",
+      "qualifiers": {
+        "applicableContext": {}
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-TEST-V93",
+          "locator": {
+            "path": "tests/v9-3-acceptance.test.js",
+            "lineRange": {
+              "start": 42,
+              "end": 45
+            },
+            "anchor": "test('V9.3-01"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "V9.3 测试验证知识交付与版本对账"
+    },
+    {
+      "stableExternalId": "SELF-REL-CONFIG-APP",
+      "subject": "SELF-CONFIG-STORAGE",
+      "predicate": "affects",
+      "object": "SELF-COMP-APP",
+      "qualifiers": {
+        "environment": "browser-local",
+        "businessScope": "offline-prototype",
+        "configVersion": "v9",
+        "applicableContext": {
+          "environment": "browser-local",
+          "businessScope": "offline-prototype",
+          "configurationVersion": "v9"
+        }
+      },
+      "sourceRefs": [
+        {
+          "sourceId": "SRC-SELF-STORAGE",
+          "locator": {
+            "path": "src/v9-access.js",
+            "lineRange": {
+              "start": 231,
+              "end": 234
+            },
+            "anchor": "function safePersist"
+          }
+        }
+      ],
+      "verificationStatus": "observed",
+      "explanation": "浏览器存储键与容量策略影响应用持久化"
+    }
+  ],
+  "businessStructures": {
+    "actions": [],
+    "decisions": [],
+    "events": [],
+    "flows": [],
+    "transitions": [],
+    "rules": [],
+    "constraints": [
+      "SELF-ADR-UNIFIED",
+      "SELF-ADR-COMMAND",
+      "SELF-ADR-BASELINE",
+      "SELF-ADR-FACT-LEVEL",
+      "SELF-ADR-OFFLINE",
+      "SELF-ADR-MODULES",
+      "SELF-ADR-THREE-FACTS",
+      "SELF-ADR-TASK-REFS"
+    ]
+  },
+  "technicalStructures": {
+    "systems": [
+      "SELF-SYSTEM"
+    ],
+    "components": [
+      "SELF-COMP-FRAMEWORK",
+      "SELF-COMP-SCHEMA",
+      "SELF-COMP-COMMAND",
+      "SELF-COMP-DRAFT",
+      "SELF-COMP-READ",
+      "SELF-COMP-ACCESS",
+      "SELF-COMP-APPLICABILITY",
+      "SELF-COMP-PROJECTION",
+      "SELF-COMP-AKP",
+      "SELF-COMP-QA",
+      "SELF-COMP-FEEDBACK",
+      "SELF-COMP-AGENT",
+      "SELF-COMP-VISUAL",
+      "SELF-COMP-APP",
+      "SELF-COMP-BUILD",
+      "SELF-COMP-TESTS",
+      "SELF-COMP-DECISION-V93",
+      "SELF-COMP-READING-V93",
+      "SELF-COMP-TASK-V93",
+      "SELF-COMP-UI-V93"
+    ],
+    "frameworks": [
+      "SELF-FRAMEWORK-NONE"
+    ],
+    "dependencies": [
+      "SELF-DEP-NODE-BUILTIN"
+    ],
+    "apis": [
+      "SELF-API-ACCESS",
+      "SELF-API-AKP"
+    ],
+    "dataEntities": [
+      "SELF-DATA-STORE",
+      "SELF-DATA-AKP"
+    ],
+    "configurations": [
+      "SELF-CONFIG-STORAGE"
+    ],
+    "environments": [
+      "SELF-ENV-BROWSER"
+    ],
+    "architectureDecisions": [
+      "SELF-ADR-UNIFIED",
+      "SELF-ADR-COMMAND",
+      "SELF-ADR-BASELINE",
+      "SELF-ADR-FACT-LEVEL",
+      "SELF-ADR-OFFLINE",
+      "SELF-ADR-MODULES",
+      "SELF-ADR-THREE-FACTS",
+      "SELF-ADR-TASK-REFS"
+    ],
+    "architectureRevision": "arch-working:7e2a94576035c7cf",
+    "codeRevision": "working:7e2a94576035c7cfc70f613ff9271c3d8bfcf3b304d8b2f9f71b9e3fda54dc5d",
+    "dependencyVersions": {
+      "node": "24.21.0",
+      "npmRuntimeDependencies": "0"
+    },
+    "deploymentVersion": null,
+    "runtimeConfiguration": {
+      "storageKey": "business-atlas-v9",
+      "production": false
+    }
+  },
+  "sources": [
+    {
+      "sourceId": "SRC-SELF-README",
+      "sourceType": "source-file",
+      "path": "README.md",
+      "uri": "workspace://README.md",
+      "revision": "git-start:unknown;content-sha256:b0a3b0fd4ed3632d8dcce9d70c50c831835e25eb5cc26328e492215c47da19a8",
+      "contentHash": "sha256:b0a3b0fd4ed3632d8dcce9d70c50c831835e25eb5cc26328e492215c47da19a8",
+      "lineRange": {
+        "start": 1,
+        "end": 3
+      },
+      "anchor": "# Business Atlas V9",
+      "excerpt": "# Business Atlas V9.3\n\nV9.3 在完整保留 V9.2 知识、导入、权限、版本和协作能力的基础上，纠正核心业务认知：不仅能管理知识对象，还能解释业务判断、区分目标与实现、验证案例、分析需求影响，并把代码、测试、知识和交付闭环连接起来。",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    },
+    {
+      "sourceId": "SRC-SELF-DESIGN",
+      "sourceType": "design-document",
+      "path": "docs/v8-design.md",
+      "uri": "workspace://docs/v8-design.md",
+      "revision": "git-start:unknown;content-sha256:3cb94f06709389d529683703e56ab3413d92114146b6ac7ed5cddf518c5282b4",
+      "contentHash": "sha256:3cb94f06709389d529683703e56ab3413d92114146b6ac7ed5cddf518c5282b4",
+      "lineRange": {
+        "start": 30,
+        "end": 33
+      },
+      "anchor": "## 3. Baseline Invariant",
+      "excerpt": "\n## 3. Baseline Invariant\n\n历史基线不可变。首次创建演示种子可形成一致初始快照；运行时不得通过初始化函数补充事实或修改历史绑定。",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    },
+    {
+      "sourceId": "SRC-SELF-DIMENSIONS",
+      "sourceType": "source-file",
+      "path": "src/v7-framework.js",
+      "uri": "workspace://src/v7-framework.js",
+      "revision": "git-start:unknown;content-sha256:fc25439b74516c51fd8f0aa4c0b89e3783a331956163253a63c92e91aac5daa1",
+      "contentHash": "sha256:fc25439b74516c51fd8f0aa4c0b89e3783a331956163253a63c92e91aac5daa1",
+      "lineRange": {
+        "start": 12,
+        "end": 15
+      },
+      "anchor": "const DIMENSIONS",
+      "excerpt": "  'use strict';\n  const DIMENSIONS = [\n    { dimension: 'project', name: '项目认知', description: '项目是什么、为什么存在、边界与整体全貌', order: 10 },\n    { dimension: 'business', name: '业务认知', description: '业务怎样发生，软件如何支撑业务', order: 20 },",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    },
+    {
+      "sourceId": "SRC-SELF-SCHEMA",
+      "sourceType": "source-file",
+      "path": "v4-core.js",
+      "uri": "workspace://v4-core.js",
+      "revision": "git-start:unknown;content-sha256:378e14c1b577265f31acf1c49c7ea8646a78a53cc20136b26fa6f2e2785b1337",
+      "contentHash": "sha256:378e14c1b577265f31acf1c49c7ea8646a78a53cc20136b26fa6f2e2785b1337",
+      "lineRange": {
+        "start": 138,
+        "end": 141
+      },
+      "anchor": "function registerType",
+      "excerpt": "  function schemaFor(project, typeId) { return project.schemaRegistry?.[typeId] || coreSchemas()[typeId] || null; }\n  function registerType(project, definition) {\n    if (!definition?.id || !/^[A-Za-z][A-Za-z0-9]+$/.test(definition.id)) throw new Error('类型 ID 需使用英文字母开头的稳定标识');\n    if (!definition.name) throw new Error('类型名称不能为空');",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    },
+    {
+      "sourceId": "SRC-SELF-COMMANDS",
+      "sourceType": "source-file",
+      "path": "src/v6-core.js",
+      "uri": "workspace://src/v6-core.js",
+      "revision": "git-start:unknown;content-sha256:aa9bdfd7cc2805f6bdfcf976fad3b2582b3c5d4decb57e9eca87246ab6add07b",
+      "contentHash": "sha256:aa9bdfd7cc2805f6bdfcf976fad3b2582b3c5d4decb57e9eca87246ab6add07b",
+      "lineRange": {
+        "start": 14,
+        "end": 17
+      },
+      "anchor": "const COMMANDS",
+      "excerpt": "  const PREFIX = { Project: 'PRJ', Domain: 'DOM', Capability: 'CAP', Feature: 'FEAT', Scenario: 'SCN', Action: 'ACT', Actor: 'ACTOR', Rule: 'RULE', BusinessObject: 'OBJ', Surface: 'UI', API: 'API', DataEntity: 'DATA', Configuration: 'CFG', Event: 'EVT', Term: 'TERM', Resource: 'SRC', Requirement: 'REQ', System: 'SYS', Module: 'MOD', Exception: 'EXC' };\n  const COMMANDS = {\n    CreateEntity: { label: '创建知识对象', types: ['*'], schema: ['typeId', 'name', 'description'], permission: 'editor' },\n    SetProperty: { label: '设置业务属性', types: ['*'], schema: ['entityId', 'path', 'value'], permission: 'editor' },",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    },
+    {
+      "sourceId": "SRC-SELF-TRANSACTION",
+      "sourceType": "source-file",
+      "path": "src/v6-core.js",
+      "uri": "workspace://src/v6-core.js",
+      "revision": "git-start:unknown;content-sha256:aa9bdfd7cc2805f6bdfcf976fad3b2582b3c5d4decb57e9eca87246ab6add07b",
+      "contentHash": "sha256:aa9bdfd7cc2805f6bdfcf976fad3b2582b3c5d4decb57e9eca87246ab6add07b",
+      "lineRange": {
+        "start": 139,
+        "end": 142
+      },
+      "anchor": "function mutate",
+      "excerpt": "  }\n  function mutate(p, command, input, fn) {\n    const ws = workspace(p); if (ws.status !== 'draft') throw new Error('当前变更集已锁定，请创建新的业务变更');\n    const originalSequences = clone(p.identitySequences || {}), staging = clone(ws), previousWorkspace = p.draftWorkspace;",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    },
+    {
+      "sourceId": "SRC-SELF-PUBLISH",
+      "sourceType": "source-file",
+      "path": "src/v6-core.js",
+      "uri": "workspace://src/v6-core.js",
+      "revision": "git-start:unknown;content-sha256:aa9bdfd7cc2805f6bdfcf976fad3b2582b3c5d4decb57e9eca87246ab6add07b",
+      "contentHash": "sha256:aa9bdfd7cc2805f6bdfcf976fad3b2582b3c5d4decb57e9eca87246ab6add07b",
+      "lineRange": {
+        "start": 311,
+        "end": 314
+      },
+      "anchor": "function publishRevision",
+      "excerpt": "  }\n  function publishRevision(p, input = {}) {\n    if (!input.__atomic) {\n      const staging = clone(p);",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    },
+    {
+      "sourceId": "SRC-SELF-READ",
+      "sourceType": "source-file",
+      "path": "src/v8-read.js",
+      "uri": "workspace://src/v8-read.js",
+      "revision": "git-start:unknown;content-sha256:26072964005311d1b14ce62adaaa3917103549b96549dddd8f8ca78c31a4b52a",
+      "contentHash": "sha256:26072964005311d1b14ce62adaaa3917103549b96549dddd8f8ca78c31a4b52a",
+      "lineRange": {
+        "start": 85,
+        "end": 88
+      },
+      "anchor": "function context",
+      "excerpt": "  };\n  function context(p, input = {}) {\n    const versionMode = input.versionMode || 'published', baselineId = input.baselineId || p.versionLayers.baseline;\n    return Object.freeze({ projectId: p.meta.id, baselineId, versionMode, draftWorkspaceId: input.draftWorkspaceId || (versionMode === 'draft' ? p.draftWorkspace?.id || null : null), permissionContext: input.permissionContext || { role: 'reader', clearance: 'restricted' }, applicableContext: Object.freeze(clone(input.applicableContext || {})), applicabilityMode: input.applicabilityMode || 'explore', readPurpose: input.readPurpose || 'understand', timeMode: input.timeMode || (versionMode === 'historical' ? 'as-approved' : 'current-activity'), asOf: input.asOf || input.applicableContext?.asOf || null });",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    },
+    {
+      "sourceId": "SRC-SELF-CATALOG",
+      "sourceType": "source-file",
+      "path": "src/v8-read.js",
+      "uri": "workspace://src/v8-read.js",
+      "revision": "git-start:unknown;content-sha256:26072964005311d1b14ce62adaaa3917103549b96549dddd8f8ca78c31a4b52a",
+      "contentHash": "sha256:26072964005311d1b14ce62adaaa3917103549b96549dddd8f8ca78c31a4b52a",
+      "lineRange": {
+        "start": 199,
+        "end": 202
+      },
+      "anchor": "function resolveCatalog",
+      "excerpt": "  }\n  function resolveCatalog(p, ctx, input = {}) {\n    const category = F.categoryById(p, input.categoryId); if (!category) return null;\n    const query = String(input.query || '').toLowerCase(), status = input.status || 'all';",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    },
+    {
+      "sourceId": "SRC-SELF-PROJECTION",
+      "sourceType": "source-file",
+      "path": "src/v6-projection.js",
+      "uri": "workspace://src/v6-projection.js",
+      "revision": "git-start:unknown;content-sha256:55525df4b6bab96c81406f5860b1f58482b2f7675f842d6468a69c7be8d27730",
+      "contentHash": "sha256:55525df4b6bab96c81406f5860b1f58482b2f7675f842d6468a69c7be8d27730",
+      "lineRange": {
+        "start": 15,
+        "end": 18
+      },
+      "anchor": "function projectKnowledge",
+      "excerpt": "  const CAUSAL_PREDICATES = new Set(['triggers', 'produces', 'transitions', 'changes']);\n  function projectKnowledge(p, rootId, options = {}) {\n    const root = C.getEntity(p, rootId, options);\n    if (!root) return { ok: false, code: 'NOT_FOUND', errors: ['指定知识对象不存在于当前版本范围'], root: null, nodes: [], assertions: [], missing: [{ id: rootId, reason: '对象或修订不存在' }] };",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    },
+    {
+      "sourceId": "SRC-SELF-ACCESS",
+      "sourceType": "source-file",
+      "path": "src/v9-access.js",
+      "uri": "workspace://src/v9-access.js",
+      "revision": "git-start:unknown;content-sha256:d9a7e0c3ff49b1f9f8cdc0e36890a8d4a639c520c264eed128d73a98478c37cf",
+      "contentHash": "sha256:d9a7e0c3ff49b1f9f8cdc0e36890a8d4a639c520c264eed128d73a98478c37cf",
+      "lineRange": {
+        "start": 45,
+        "end": 48
+      },
+      "anchor": "function readEntity",
+      "excerpt": "  }\n  function readEntity(project, ctx, id) {\n    if (!id || ctx.projectId !== project.meta.id) return result('NOT_FOUND');\n    const baseline = ctx.versionMode === 'draft' ? null : C.baselineById(project, ctx.baselineId);",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    },
+    {
+      "sourceId": "SRC-SELF-APPLICABILITY",
+      "sourceType": "source-file",
+      "path": "src/v9-applicability.js",
+      "uri": "workspace://src/v9-applicability.js",
+      "revision": "git-start:unknown;content-sha256:2877d17df5bdf7ca443245f63afda5a00e8b19249a93b8c15dbfbbc50821a81e",
+      "contentHash": "sha256:2877d17df5bdf7ca443245f63afda5a00e8b19249a93b8c15dbfbbc50821a81e",
+      "lineRange": {
+        "start": 36,
+        "end": 39
+      },
+      "anchor": "function evaluate",
+      "excerpt": "  }\n  function evaluate(item, context = {}, project = null) {\n    const condition = conditionOf(item), missing = [], mismatches = [], compared = [];\n    if (item?.verificationStatus === 'conflicted' || item?.applicabilityStatus === 'conflict' || condition.conflict === true || item?.qualifiers?.applicabilityConflict === true) {",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    },
+    {
+      "sourceId": "SRC-SELF-AKP",
+      "sourceType": "source-file",
+      "path": "src/v9-akp.js",
+      "uri": "workspace://src/v9-akp.js",
+      "revision": "git-start:unknown;content-sha256:a6889eac35925a8c6579c9d7b00c01aa7563040157717c618fff0aafa69d250d",
+      "contentHash": "sha256:a6889eac35925a8c6579c9d7b00c01aa7563040157717c618fff0aafa69d250d",
+      "lineRange": {
+        "start": 140,
+        "end": 143
+      },
+      "anchor": "function commitImport",
+      "excerpt": "  function replaceProject(target, staging) { Object.keys(target).forEach(key => delete target[key]); Object.assign(target, staging); }\n  function commitImport(project, proposalId, options = {}) {\n    const original = (project.importProposals || []).find(item => item.proposalId === proposalId);\n    if (!original) return { ok: false, errors: ['导入提案不存在'] };",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    },
+    {
+      "sourceId": "SRC-SELF-SERVICES",
+      "sourceType": "source-file",
+      "path": "src/v9-services.js",
+      "uri": "workspace://src/v9-services.js",
+      "revision": "git-start:unknown;content-sha256:3e5e89877c5a3b3e74e81bad23292ae48949bf8338d09e1133fc2608790300da",
+      "contentHash": "sha256:3e5e89877c5a3b3e74e81bad23292ae48949bf8338d09e1133fc2608790300da",
+      "lineRange": {
+        "start": 65,
+        "end": 68
+      },
+      "anchor": "function ask",
+      "excerpt": "  }\n  function ask(project, ctx, input = {}) {\n    const query = escText(input.text), intent = input.intent || inferIntent(query), role = input.role || 'newcomer';\n    if (!query) return { ok: false, code: 'CONTEXT_INSUFFICIENT', guidance: '请输入问题，或先选择问题意图和知识对象。', intent };",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    },
+    {
+      "sourceId": "SRC-SELF-FEEDBACK",
+      "sourceType": "source-file",
+      "path": "src/v9-services.js",
+      "uri": "workspace://src/v9-services.js",
+      "revision": "git-start:unknown;content-sha256:3e5e89877c5a3b3e74e81bad23292ae48949bf8338d09e1133fc2608790300da",
+      "contentHash": "sha256:3e5e89877c5a3b3e74e81bad23292ae48949bf8338d09e1133fc2608790300da",
+      "lineRange": {
+        "start": 127,
+        "end": 130
+      },
+      "anchor": "function createFeedback",
+      "excerpt": "  }\n  function createFeedback(project, input = {}) {\n    if (!escText(input.title) || !escText(input.description)) throw new Error('反馈标题与描述不能为空');\n    const categories = ['product-experience', 'business-correction', 'technical-correction', 'knowledge-gap', 'system-defect', 'agent-issue', 'capability-request'];",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    },
+    {
+      "sourceId": "SRC-SELF-AGENT",
+      "sourceType": "source-file",
+      "path": "src/v9-services.js",
+      "uri": "workspace://src/v9-services.js",
+      "revision": "git-start:unknown;content-sha256:3e5e89877c5a3b3e74e81bad23292ae48949bf8338d09e1133fc2608790300da",
+      "contentHash": "sha256:3e5e89877c5a3b3e74e81bad23292ae48949bf8338d09e1133fc2608790300da",
+      "lineRange": {
+        "start": 167,
+        "end": 170
+      },
+      "anchor": "function parseAgentRun",
+      "excerpt": "  }\n  function parseAgentRun(input, project) {\n    let records;\n    try { records = typeof input === 'string' ? (input.trim().split(/\\r?\\n/).filter(line => line.trim()).length > 1 ? input.split(/\\r?\\n/).filter(line => line.trim()).map(line => JSON.parse(line)) : [JSON.parse(input)]) : [clone(input)]; }",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    },
+    {
+      "sourceId": "SRC-SELF-VISUAL",
+      "sourceType": "source-file",
+      "path": "src/v9-services.js",
+      "uri": "workspace://src/v9-services.js",
+      "revision": "git-start:unknown;content-sha256:3e5e89877c5a3b3e74e81bad23292ae48949bf8338d09e1133fc2608790300da",
+      "contentHash": "sha256:3e5e89877c5a3b3e74e81bad23292ae48949bf8338d09e1133fc2608790300da",
+      "lineRange": {
+        "start": 209,
+        "end": 212
+      },
+      "anchor": "function projectView",
+      "excerpt": "  }\n  function projectView(project, ctx, viewOrId) {\n    const view = typeof viewOrId === 'string' ? project.visualViews.find(item => item.viewId === viewOrId) : viewOrId;\n    if (!view) return { ok: false, code: 'NOT_FOUND', errors: ['图形视图不存在'] };",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    },
+    {
+      "sourceId": "SRC-SELF-APP",
+      "sourceType": "source-file",
+      "path": "src/v6-app.js",
+      "uri": "workspace://src/v6-app.js",
+      "revision": "git-start:unknown;content-sha256:f06ed2a26a375550e2b824a266ae3afefaf394465c232366da6922ae2de52981",
+      "contentHash": "sha256:f06ed2a26a375550e2b824a266ae3afefaf394465c232366da6922ae2de52981",
+      "lineRange": {
+        "start": 63,
+        "end": 66
+      },
+      "anchor": "function v9Api",
+      "excerpt": "  function authorizedRecords(kind) { return V9Access.listRecords(M(), readContext(), kind).data; }\n  function v9Api() { return { M, Ctx, store, state, currentEntities, authorizedRecords, readContext, projectionOptions, workspaceActionContext, assistantProvider, permission, save, go, openStudio, render, renderOverlay, modal, closeModal, toast, pageHead, button }; }\n  function render() {\n    V91UI.syncContext(v9Api());",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    },
+    {
+      "sourceId": "SRC-SELF-UI",
+      "sourceType": "source-file",
+      "path": "src/v9-ui.js",
+      "uri": "workspace://src/v9-ui.js",
+      "revision": "git-start:unknown;content-sha256:1b766524e8ca9f0dedba6fab356f187607afefe31856ee347f5bf7dc331e1df1",
+      "contentHash": "sha256:1b766524e8ca9f0dedba6fab356f187607afefe31856ee347f5bf7dc331e1df1",
+      "lineRange": {
+        "start": 28,
+        "end": 31
+      },
+      "anchor": "function renderImports",
+      "excerpt": "  }\n  function renderImports(api) {\n    const m = api.M(), proposals = m.importProposals || [], packages = m.knowledgePackages || [];\n    return `${head('真实项目知识接入', 'AKP v0.1：外部 Agent 整理知识，平台校验、预览、人工确认后进入同一草稿与治理。', button('下载 Self AKP 示例', 'download-self-akp') + button('导出项目备份', 'export-backup'))}${contextBar(api)}<section class=\"v9-import-drop\"><div><span class=\"v5-eyebrow\">01 · SELECT & VALIDATE</span><h2>选择 Atlas Knowledge Package</h2><p>单个 JSON，最大 8 MiB。HTML、SVG、脚本与工具文本一律作为非可信输入；不会自动执行。</p><input id=\"akp-file\" type=\"file\" accept=\".json,.akp,application/json\"><label class=\"v9-check\"><input id=\"import-sensitive-confirm\" type=\"checkbox\"> 我已检查来源路径、敏感信息和导出边界</label></div><div class=\"v9-format\"><b>AKP/0.1</b><span>Manifest</span><span>Entities + Assertions</span><span>Business + Technical Structures</span><span>Sources + Unknowns + Provenance</span></div></section><section class=\"v9-proposals\"><div class=\"v9-section-head\"><h2>导入提案与变更预览</h2><span>${proposals.length} 次记录 · 重复导入按稳定外部 ID 识别</span></div>${proposals.map(proposal => importProposal(api, proposal)).join('') || V.empty('尚未选择知识包', '导入后先查看新增、更新候选、重复、冲突、未知和无效引用。')}</section><section class=\"v9-import-history\"><h2>已接入知识包与来源</h2>${packages.map(pack => `<article><code>${esc(pack.packageId)}</code><b>${esc(pack.manifest.projectName)}</b><p>${esc(pack.manifest.importPurpose)} · ${esc(pack.manifest.sourceRevision)}</p><small>${esc(pack.provenance.extractionStrategy)} · ${esc(pack.status)}</small></article>`).join('') || '<p>尚无知识包写入记录。</p>'}</section>`;",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    },
+    {
+      "sourceId": "SRC-SELF-MODEL",
+      "sourceType": "source-file",
+      "path": "src/v9-model.js",
+      "uri": "workspace://src/v9-model.js",
+      "revision": "git-start:unknown;content-sha256:9844050180ffb3d8c1cab06c27c8b04e88b06468a83e987b75fa56b07f918fb5",
+      "contentHash": "sha256:9844050180ffb3d8c1cab06c27c8b04e88b06468a83e987b75fa56b07f918fb5",
+      "lineRange": {
+        "start": 12,
+        "end": 15
+      },
+      "anchor": "const TYPES",
+      "excerpt": "  'use strict';\n  const TYPES = [\n    ['ArchitectureDecision', '架构决策（ADR）', '系统认知', 'ADR', [['status', '决策状态', 'enum', ['proposed', 'accepted', 'superseded', 'deprecated']], ['decision', '决策内容', 'longtext'], ['rationale', '选型依据', 'longtext'], ['consequences', '影响与代价', 'longtext']]],\n    ['Technology', '编程语言与技术', '系统认知', 'TECH', [['version', '技术版本', 'text']]],",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    },
+    {
+      "sourceId": "SRC-SELF-BUILD",
+      "sourceType": "source-file",
+      "path": "build.js",
+      "uri": "workspace://build.js",
+      "revision": "git-start:unknown;content-sha256:6573d5665233c6d4234302e5bac3191f9e8c5962f83500c0b4d9b310b02bbc74",
+      "contentHash": "sha256:6573d5665233c6d4234302e5bac3191f9e8c5962f83500c0b4d9b310b02bbc74",
+      "lineRange": {
+        "start": 7,
+        "end": 10
+      },
+      "anchor": "const files =",
+      "excerpt": "const read = file => fs.readFileSync(path.join(root, file), 'utf8');\nconst files = [\n  'engine.js', 'model.js', 'v4-core.js', 'v4-model.js',\n  'src/v5-core.js', 'src/v5-model.js', 'src/v5-views.js',",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    },
+    {
+      "sourceId": "SRC-SELF-TEST-V8",
+      "sourceType": "source-file",
+      "path": "tests/v8-acceptance.test.js",
+      "uri": "workspace://tests/v8-acceptance.test.js",
+      "revision": "git-start:unknown;content-sha256:6ee748d44f0d8769871dcc0cbd26c09fa28f224d0c6b21ef836995254877333f",
+      "contentHash": "sha256:6ee748d44f0d8769871dcc0cbd26c09fa28f224d0c6b21ef836995254877333f",
+      "lineRange": {
+        "start": 42,
+        "end": 45
+      },
+      "anchor": "test('V8-07",
+      "excerpt": "});\ntest('V8-07 · 发布新基线不会改写任何旧基线', () => { const {p}=published(),before=p.baselines.map(digest);C.workspace(p);C.execute(p,'SetProperty',{entityId:p.meta.id,path:'description',value:'新的项目说明'});V6F.publish(p,'新基线');assert.deepEqual(p.baselines.slice(0,-1).map(digest),before); });\ntest('V8-08 · 修改其他项目不会污染当前项目基线', () => { const projects=F.initProjects(C.createProjectSet()),a=projects['PRJ-00001'],b=projects['PRJ-00002'],before=digest(b.baselines[0]);C.execute(a,'CreateEntity',{typeId:'Term',name:'仅审批术语'});assert.equal(digest(b.baselines[0]),before);assert(!C.getEntity(b,'TERM-00001-0001',{draft:true})); });\ntest('V8-09 · 52 个分类都有数据来源、检查器和覆盖策略', () => { assert.equal(F.CATEGORIES.length,52);F.CATEGORIES.forEach(cat=>{const policy=R.policyFor(cat);assert(policy.recordKind);assert(policy.dataSource.length);assert(policy.inspectorProfile);assert(policy.completenessPolicy.length>0);assert(policy.statusPolicy);}); });",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    },
+    {
+      "sourceId": "SRC-SELF-TEST-V9",
+      "sourceType": "source-file",
+      "path": "tests/v9-acceptance.test.js",
+      "uri": "workspace://tests/v9-acceptance.test.js",
+      "revision": "git-start:unknown;content-sha256:bd7c028770ac34990f7d4ccdbddaf73b3aebc0033c3a3fadf25aae0ebdfbc944",
+      "contentHash": "sha256:bd7c028770ac34990f7d4ccdbddaf73b3aebc0033c3a3fadf25aae0ebdfbc944",
+      "lineRange": {
+        "start": 57,
+        "end": 60
+      },
+      "anchor": "test('V9-19",
+      "excerpt": "test('V9-18 · AKP 原子提交失败不留部分草稿', () => { const p = C.createBlankProject('PRJ-ATOMIC', 'Atomic', 'atomic'); M.initProject(p); const pack = samplePackage(), staged = AKP.stagePackage(p, pack), before = digest(p); staged.proposal.package.assertions[0].predicate = 'notRegistered'; const result = AKP.commitImport(p, staged.proposal.proposalId); assert.equal(result.ok, false); assert(result.atomicRollback); assert(!p.importProposals[0].draftWorkspaceId); assert.equal(p.draftWorkspace.operations.length, 0); });\ntest('V9-19 · 重复导入同一知识包不重复创建对象或断言', () => { const { p } = imported(), entities = Object.keys(p.draftWorkspace.entities).length, assertions = Object.keys(p.draftWorkspace.assertions).length; const staged = AKP.stagePackage(p, samplePackage()); const result = AKP.commitImport(p, staged.proposal.proposalId); assert(result.ok); assert.equal(Object.keys(p.draftWorkspace.entities).length, entities); assert.equal(Object.keys(p.draftWorkspace.assertions).length, assertions); });\ntest('V9-20 · AKP 五类事实等级与未知记录完整保留', () => { const { p } = imported(); assert.equal(p.draftWorkspace.entities['FEAT-DEMO-AKP'].factKind, 'observed'); assert.equal(p.draftWorkspace.assertions['AST-REL-DEMO-IMPLEMENT'].verificationStatus, 'unverified'); assert(p.unknowns.some(item => item.id === 'UNK-DEMO-DEPLOY')); assert(!p.baselines.some(b => b.entries['FEAT-DEMO-AKP'])); });\ntest('V9-21 · 未发布导入可撤销且不产生部分知识', () => { const { p, proposal } = imported(); const result = AKP.discardImport(p, proposal.proposalId); assert(result.ok); assert(!p.draftWorkspace.entities['FEAT-DEMO-AKP']); assert(!p.draftWorkspace.assertions['AST-REL-DEMO-IMPLEMENT']); assert.equal(p.importProposals.find(item => item.proposalId === proposal.proposalId).status, 'discarded'); });",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    },
+    {
+      "sourceId": "SRC-SELF-AKP-SCHEMA",
+      "sourceType": "json-schema",
+      "path": "packages/schema/akp-v0.1.schema.json",
+      "uri": "workspace://packages/schema/akp-v0.1.schema.json",
+      "revision": "git-start:unknown;content-sha256:3bece4eed5ba11313043abda9a9c6f9e633d9c3955cae18726e988f3425964db",
+      "contentHash": "sha256:3bece4eed5ba11313043abda9a9c6f9e633d9c3955cae18726e988f3425964db",
+      "lineRange": {
+        "start": 3,
+        "end": 6
+      },
+      "anchor": "\"title\": \"Atlas Knowledge Package v0.1\"",
+      "excerpt": "  \"$id\": \"https://business-atlas.local/schemas/akp-v0.1.schema.json\",\n  \"title\": \"Atlas Knowledge Package v0.1\",\n  \"type\": \"object\",\n  \"additionalProperties\": false,",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    },
+    {
+      "sourceId": "SRC-SELF-STORAGE",
+      "sourceType": "source-file",
+      "path": "src/v9-access.js",
+      "uri": "workspace://src/v9-access.js",
+      "revision": "git-start:unknown;content-sha256:d9a7e0c3ff49b1f9f8cdc0e36890a8d4a639c520c264eed128d73a98478c37cf",
+      "contentHash": "sha256:d9a7e0c3ff49b1f9f8cdc0e36890a8d4a639c520c264eed128d73a98478c37cf",
+      "lineRange": {
+        "start": 231,
+        "end": 234
+      },
+      "anchor": "function safePersist",
+      "excerpt": "  }\n  function safePersist(key, store, storage) {\n    const target = storage || (typeof localStorage !== 'undefined' ? localStorage : null); if (!target) return { ok: false, code: 'STORAGE_UNAVAILABLE', error: '浏览器本地存储不可用，请导出备份。' };\n    try { const serialized = JSON.stringify(store); target.setItem(key, serialized); return { ok: true, bytes: serialized.length * 2 }; }",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    },
+    {
+      "sourceId": "SRC-SELF-DECISION-V93",
+      "sourceType": "source-file",
+      "path": "src/v9-3-decision.js",
+      "uri": "workspace://src/v9-3-decision.js",
+      "revision": "git-start:unknown;content-sha256:950fa5ea2baac230770ba8476ecaa0803fc0041b7b6f624e061e4fea75622fbd",
+      "contentHash": "sha256:950fa5ea2baac230770ba8476ecaa0803fc0041b7b6f624e061e4fea75622fbd",
+      "lineRange": {
+        "start": 93,
+        "end": 96
+      },
+      "anchor": "function evaluateRule",
+      "excerpt": "\n  function evaluateRule(project, ctx, ruleOrId, values = {}, options = {}) {\n    const id = typeof ruleOrId === 'string' ? ruleOrId : ruleOrId?.id;\n    const read = Access.readEntity(project, ctx, id);",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    },
+    {
+      "sourceId": "SRC-SELF-READING-V93",
+      "sourceType": "source-file",
+      "path": "src/v9-3-reading.js",
+      "uri": "workspace://src/v9-3-reading.js",
+      "revision": "git-start:unknown;content-sha256:8348b603120209692be459a2b4f22c86f4fe09ebb78d2655265fc01f57920e4a",
+      "contentHash": "sha256:8348b603120209692be459a2b4f22c86f4fe09ebb78d2655265fc01f57920e4a",
+      "lineRange": {
+        "start": 57,
+        "end": 60
+      },
+      "anchor": "function decisionProjection",
+      "excerpt": "\n  function decisionProjection(project, ctx, rootId) {\n    const rootRead = Access.readEntity(project, ctx, rootId);\n    if (!rootRead.ok) return { ok: false, code: rootRead.code, root: null, targetRules: [], observations: [], mechanisms: [], cases: [] };",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    },
+    {
+      "sourceId": "SRC-SELF-TASK-V93",
+      "sourceType": "source-file",
+      "path": "src/v9-3-task.js",
+      "uri": "workspace://src/v9-3-task.js",
+      "revision": "git-start:unknown;content-sha256:2acd8a5b10d35c951bf75f99640d452907998c161a047811d20a4667e6a38057",
+      "contentHash": "sha256:2acd8a5b10d35c951bf75f99640d452907998c161a047811d20a4667e6a38057",
+      "lineRange": {
+        "start": 173,
+        "end": 176
+      },
+      "anchor": "function evaluateDelivery",
+      "excerpt": "\n  function evaluateDelivery(project, ctx, taskId) {\n    const read = readTask(project, ctx, taskId); if (!read.ok) return { ok: false, state: 'forbidden', blockers: [{ code: read.code, reason: '任务在当前权限下不可读' }], warnings: [] };\n    const task = read.data, blockers = [], warnings = [], delivery = task.delivery || null, contract = task.semanticContract;",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    },
+    {
+      "sourceId": "SRC-SELF-MODEL-V93",
+      "sourceType": "source-file",
+      "path": "src/v9-3-model.js",
+      "uri": "workspace://src/v9-3-model.js",
+      "revision": "git-start:unknown;content-sha256:bbffc64196f46c5a91ed074d08231bb1803c7df2c2db362830b73029692c7d77",
+      "contentHash": "sha256:bbffc64196f46c5a91ed074d08231bb1803c7df2c2db362830b73029692c7d77",
+      "lineRange": {
+        "start": 18,
+        "end": 21
+      },
+      "anchor": "function initProject",
+      "excerpt": "\n  function initProject(project) {\n    const types = [\n      ['BusinessCase', '业务验证案例', '业务认知', 'CASE', [['caseKind', '案例类型', 'enum', ['positive', 'negative', 'boundary', 'unknown', 'regression']], ['decisionRef', '引用业务决策', 'json'], ['inputs', '业务输入', 'json'], ['expected', '预期业务结果', 'json'], ['confirmationStatus', '确认状态', 'text']]],",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    },
+    {
+      "sourceId": "SRC-SELF-UI-V93",
+      "sourceType": "source-file",
+      "path": "src/v9-3-ui.js",
+      "uri": "workspace://src/v9-3-ui.js",
+      "revision": "git-start:unknown;content-sha256:7c1da56db878d92c2d2901a579f114c337e44fcfd4461cb4ece4ce81d8104894",
+      "contentHash": "sha256:7c1da56db878d92c2d2901a579f114c337e44fcfd4461cb4ece4ce81d8104894",
+      "lineRange": {
+        "start": 81,
+        "end": 84
+      },
+      "anchor": "function readingWorkbench",
+      "excerpt": "\n  function readingWorkbench(api, projection, focusId) {\n    if (!['Feature', 'Scenario', 'Rule'].includes(projection.root?.typeId)) return V92.readingWorkbench(api, projection, focusId);\n    const view = Reading.decisionProjection(api.M(), api.readContext(), projection.root.id);",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    },
+    {
+      "sourceId": "SRC-SELF-TEST-V93",
+      "sourceType": "source-file",
+      "path": "tests/v9-3-acceptance.test.js",
+      "uri": "workspace://tests/v9-3-acceptance.test.js",
+      "revision": "git-start:unknown;content-sha256:05aec40fbed100472e3c8a0967ed9f88819fa4ecec058fd36f55e66b8071878f",
+      "contentHash": "sha256:05aec40fbed100472e3c8a0967ed9f88819fa4ecec058fd36f55e66b8071878f",
+      "lineRange": {
+        "start": 42,
+        "end": 45
+      },
+      "anchor": "test('V9.3-01",
+      "excerpt": "// 1–12 · Business decision evaluation.\ntest('V9.3-01 · 单条件精确判断', () => { const p = ruleProject(); assert.equal(D.evaluateRule(p, ctx(p), 'RULE-TEST', { x: 'A' }).outcome.id, 'YES'); assert.equal(D.evaluateRule(p, ctx(p), 'RULE-TEST', { x: 'B' }).code, 'NO_MATCH_NO_DEFAULT'); });\ntest('V9.3-02 · 多条件 AND 全部成立才命中', () => { const d = baseDefinition(); d.inputs.push({ id: 'y', label: '第二事实' }); d.rows[0].condition = { op: 'all', conditions: [{ op: 'equals', inputId: 'x', value: 'A' }, { op: 'equals', inputId: 'y', value: 'B' }] }; const p = ruleProject(d); assert.equal(D.evaluateRule(p, ctx(p), 'RULE-TEST', { x: 'A', y: 'B' }).status, 'decided'); assert.equal(D.evaluateRule(p, ctx(p), 'RULE-TEST', { x: 'A', y: 'C' }).code, 'NO_MATCH_NO_DEFAULT'); });\ntest('V9.3-03 · 多条件 OR 任一成立即可命中', () => { const d = baseDefinition(); d.inputs.push({ id: 'y', label: '第二事实' }); d.rows[0].condition = { op: 'any', conditions: [{ op: 'equals', inputId: 'x', value: 'A' }, { op: 'equals', inputId: 'y', value: 'B' }] }; const p = ruleProject(d); assert.equal(D.evaluateRule(p, ctx(p), 'RULE-TEST', { x: 'Z', y: 'B' }).outcome.id, 'YES'); });",
+      "captureMethod": "OpenCode read/grep; Node.js anchor and SHA-256 verification",
+      "sensitive": false
+    }
+  ],
+  "unknownsAndConflicts": [
+    {
+      "id": "UNK-SELF-BACKEND",
+      "kind": "unknown",
+      "title": "生产后台与生产数据库未实现",
+      "description": "当前只有浏览器 localStorage；正式存储、并发、事务和审计需要后续开发。",
+      "relatedExternalIds": [
+        "SELF-DATA-STORE"
+      ],
+      "status": "open",
+      "blocksFormal": false
+    },
+    {
+      "id": "UNK-SELF-AUTH",
+      "kind": "unknown",
+      "title": "企业身份认证与正式权限系统未实现",
+      "description": "当前权限是前端模拟访问规则，不是生产安全边界。",
+      "relatedExternalIds": [
+        "SELF-COMP-ACCESS"
+      ],
+      "status": "open",
+      "blocksFormal": false
+    },
+    {
+      "id": "UNK-SELF-MCP",
+      "kind": "unknown",
+      "title": "真实 MCP Server、MCP Client 和 LLM 推理未实现",
+      "description": "当前仅导入外部 Agent 记录并进行确定性问答。",
+      "relatedExternalIds": [
+        "SELF-COMP-AGENT",
+        "SELF-COMP-QA"
+      ],
+      "status": "open",
+      "blocksFormal": false
+    },
+    {
+      "id": "UNK-SELF-REPO",
+      "kind": "unknown",
+      "title": "任意老项目自动逆向和真实仓库同步未实现",
+      "description": "Self 包来自本次受控外部分析，不代表通用自动逆向引擎。",
+      "relatedExternalIds": [
+        "SELF-FEAT-AKP"
+      ],
+      "status": "open",
+      "blocksFormal": false
+    },
+    {
+      "id": "UNK-SELF-DEPLOY",
+      "kind": "unknown",
+      "title": "生产部署架构与运行监控未知",
+      "description": "源码只证明离线 HTML 运行，没有生产基础设施、部署版本或监控资料。",
+      "relatedExternalIds": [
+        "SELF-DEPLOY-FILE"
+      ],
+      "status": "open",
+      "blocksFormal": false
+    },
+    {
+      "id": "UNK-SELF-MULTIUSER",
+      "kind": "unknown",
+      "title": "多人实时协作与生产级审计未实现",
+      "description": "反馈和 Agent 记录为单浏览器原型，需正式系统验证并发与审计。",
+      "relatedExternalIds": [
+        "SELF-COMP-FEEDBACK"
+      ],
+      "status": "open",
+      "blocksFormal": false
+    }
+  ],
+  "importProvenance": {
+    "agentRunId": "RUN-SELF-ANALYSIS-001",
+    "toolExecutionRefs": [
+      "TC-SELF-READ",
+      "TC-SELF-GREP",
+      "TC-SELF-TEST",
+      "TC-SELF-HASH"
+    ],
+    "sourceFileRevisions": {
+      "README.md": "git-start:unknown;content-sha256:b0a3b0fd4ed3632d8dcce9d70c50c831835e25eb5cc26328e492215c47da19a8",
+      "docs/v8-design.md": "git-start:unknown;content-sha256:3cb94f06709389d529683703e56ab3413d92114146b6ac7ed5cddf518c5282b4",
+      "src/v7-framework.js": "git-start:unknown;content-sha256:fc25439b74516c51fd8f0aa4c0b89e3783a331956163253a63c92e91aac5daa1",
+      "v4-core.js": "git-start:unknown;content-sha256:378e14c1b577265f31acf1c49c7ea8646a78a53cc20136b26fa6f2e2785b1337",
+      "src/v6-core.js": "git-start:unknown;content-sha256:aa9bdfd7cc2805f6bdfcf976fad3b2582b3c5d4decb57e9eca87246ab6add07b",
+      "src/v8-read.js": "git-start:unknown;content-sha256:26072964005311d1b14ce62adaaa3917103549b96549dddd8f8ca78c31a4b52a",
+      "src/v6-projection.js": "git-start:unknown;content-sha256:55525df4b6bab96c81406f5860b1f58482b2f7675f842d6468a69c7be8d27730",
+      "src/v9-access.js": "git-start:unknown;content-sha256:d9a7e0c3ff49b1f9f8cdc0e36890a8d4a639c520c264eed128d73a98478c37cf",
+      "src/v9-applicability.js": "git-start:unknown;content-sha256:2877d17df5bdf7ca443245f63afda5a00e8b19249a93b8c15dbfbbc50821a81e",
+      "src/v9-akp.js": "git-start:unknown;content-sha256:a6889eac35925a8c6579c9d7b00c01aa7563040157717c618fff0aafa69d250d",
+      "src/v9-services.js": "git-start:unknown;content-sha256:3e5e89877c5a3b3e74e81bad23292ae48949bf8338d09e1133fc2608790300da",
+      "src/v6-app.js": "git-start:unknown;content-sha256:f06ed2a26a375550e2b824a266ae3afefaf394465c232366da6922ae2de52981",
+      "src/v9-ui.js": "git-start:unknown;content-sha256:1b766524e8ca9f0dedba6fab356f187607afefe31856ee347f5bf7dc331e1df1",
+      "src/v9-model.js": "git-start:unknown;content-sha256:9844050180ffb3d8c1cab06c27c8b04e88b06468a83e987b75fa56b07f918fb5",
+      "build.js": "git-start:unknown;content-sha256:6573d5665233c6d4234302e5bac3191f9e8c5962f83500c0b4d9b310b02bbc74",
+      "tests/v8-acceptance.test.js": "git-start:unknown;content-sha256:6ee748d44f0d8769871dcc0cbd26c09fa28f224d0c6b21ef836995254877333f",
+      "tests/v9-acceptance.test.js": "git-start:unknown;content-sha256:bd7c028770ac34990f7d4ccdbddaf73b3aebc0033c3a3fadf25aae0ebdfbc944",
+      "packages/schema/akp-v0.1.schema.json": "git-start:unknown;content-sha256:3bece4eed5ba11313043abda9a9c6f9e633d9c3955cae18726e988f3425964db",
+      "src/v9-3-decision.js": "git-start:unknown;content-sha256:950fa5ea2baac230770ba8476ecaa0803fc0041b7b6f624e061e4fea75622fbd",
+      "src/v9-3-reading.js": "git-start:unknown;content-sha256:8348b603120209692be459a2b4f22c86f4fe09ebb78d2655265fc01f57920e4a",
+      "src/v9-3-task.js": "git-start:unknown;content-sha256:2acd8a5b10d35c951bf75f99640d452907998c161a047811d20a4667e6a38057",
+      "src/v9-3-model.js": "git-start:unknown;content-sha256:bbffc64196f46c5a91ed074d08231bb1803c7df2c2db362830b73029692c7d77",
+      "src/v9-3-ui.js": "git-start:unknown;content-sha256:7c1da56db878d92c2d2901a579f114c337e44fcfd4461cb4ece4ce81d8104894",
+      "tests/v9-3-acceptance.test.js": "git-start:unknown;content-sha256:05aec40fbed100472e3c8a0967ed9f88819fa4ecec058fd36f55e66b8071878f"
+    },
+    "extractedAt": "2026-11-15T00:00:00.000Z",
+    "extractionStrategy": "外部分析 Agent 使用 read/grep/shell 定位真实源码，再以锚点、行范围、内容哈希和显式未知生成 AKP；不按名称猜测业务规范"
+  }
+}

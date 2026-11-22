@@ -1,0 +1,2236 @@
+{
+  "runId": "RUN-SELF-ANALYSIS-001",
+  "projectId": "PRJ-SELF",
+  "taskId": "TASK-SELF-KNOWLEDGE",
+  "agentIdentity": "OpenCode Kimi K3.1 Pro source analysis",
+  "model": "k3.1-pro",
+  "provider": "kimi-code-plan-cn",
+  "startTime": "2026-11-15T00:00:00.000Z",
+  "endTime": "2026-11-15T00:00:00.000Z",
+  "status": "completed",
+  "simulated": false,
+  "evidenceClassification": "reconstructed-analysis-record",
+  "rawCaptured": false,
+  "verification": {
+    "scriptExecution": true,
+    "sourceHashVerified": true,
+    "rawToolLogsAvailable": false,
+    "note": "真实源码、定位与哈希可验证；部分工具摘要由脚本事后组织，不冒充原始运行时工具日志。"
+  },
+  "userInstructions": "阅读当前 Business Atlas 工作区真实源码，形成可核验 AKP，明确观察、设计意图与未实现能力。",
+  "executionEvents": [
+    {
+      "eventId": "EV-SELF-PLAN",
+      "at": "2026-11-15T00:00:00.000Z",
+      "type": "plan",
+      "recordType": "reconstructed-analysis-record",
+      "content": "定位 V8 基线 → 阅读模型/Core/Read/Projection/UI/测试 → 运行基线 → 提取 V9 技术与协作知识 → 生成并验证 AKP。"
+    },
+    {
+      "eventId": "EV-SELF-OBSERVE",
+      "at": "2026-11-15T00:00:00.000Z",
+      "type": "observation",
+      "recordType": "verified-source-observation",
+      "content": "直接观察 31 份源码/文档/测试来源，67 个知识对象；所有来源锚点均由脚本定位。",
+      "sourceRefs": [
+        {
+          "resourceId": "SRC-SELF-ACCESS",
+          "locator": {
+            "start": 45,
+            "end": 48
+          }
+        }
+      ]
+    },
+    {
+      "eventId": "EV-SELF-INFER",
+      "at": "2026-11-15T00:00:00.000Z",
+      "type": "inference",
+      "recordType": "reconstructed-analysis-record",
+      "content": "架构职责映射是根据模块导出、调用与文档作出的受控分析；不将代码存在自动视为批准业务规范。"
+    },
+    {
+      "eventId": "EV-SELF-PROPOSAL",
+      "at": "2026-11-15T00:00:00.000Z",
+      "type": "proposal",
+      "recordType": "knowledge-proposal",
+      "content": "形成 62 条关系提案与 6 项明确未知，等待导入预览和人工审核。"
+    },
+    {
+      "eventId": "EV-SELF-OUTCOME",
+      "at": "2026-11-15T00:00:00.000Z",
+      "type": "outcome",
+      "recordType": "verified-script-execution",
+      "content": "AKP JSON 与执行记录已生成；后续由同一 AtlasV9AKP 导入器写入 Self Knowledge 草稿。"
+    }
+  ],
+  "toolCalls": [
+    {
+      "toolCallId": "TC-SELF-READ",
+      "recordType": "reconstructed-analysis-record",
+      "rawCaptured": false,
+      "provider": "opencode",
+      "server": "local-workspace",
+      "toolName": "functions.read",
+      "startedAt": "2026-11-15T00:00:00.000Z",
+      "completedAt": "2026-11-15T00:00:00.000Z",
+      "status": "completed",
+      "inputSummary": "README, model, core, read, projection, UI, tests",
+      "outputSummary": "读取并核对 31 个来源定位",
+      "referencedResources": [
+        {
+          "resourceId": "SRC-SELF-README",
+          "path": "README.md",
+          "lineRange": {
+            "start": 1,
+            "end": 3
+          }
+        },
+        {
+          "resourceId": "SRC-SELF-DESIGN",
+          "path": "docs/v8-design.md",
+          "lineRange": {
+            "start": 30,
+            "end": 33
+          }
+        },
+        {
+          "resourceId": "SRC-SELF-DIMENSIONS",
+          "path": "src/v7-framework.js",
+          "lineRange": {
+            "start": 12,
+            "end": 15
+          }
+        },
+        {
+          "resourceId": "SRC-SELF-SCHEMA",
+          "path": "v4-core.js",
+          "lineRange": {
+            "start": 138,
+            "end": 141
+          }
+        },
+        {
+          "resourceId": "SRC-SELF-COMMANDS",
+          "path": "src/v6-core.js",
+          "lineRange": {
+            "start": 14,
+            "end": 17
+          }
+        },
+        {
+          "resourceId": "SRC-SELF-TRANSACTION",
+          "path": "src/v6-core.js",
+          "lineRange": {
+            "start": 139,
+            "end": 142
+          }
+        },
+        {
+          "resourceId": "SRC-SELF-PUBLISH",
+          "path": "src/v6-core.js",
+          "lineRange": {
+            "start": 311,
+            "end": 314
+          }
+        },
+        {
+          "resourceId": "SRC-SELF-READ",
+          "path": "src/v8-read.js",
+          "lineRange": {
+            "start": 85,
+            "end": 88
+          }
+        },
+        {
+          "resourceId": "SRC-SELF-CATALOG",
+          "path": "src/v8-read.js",
+          "lineRange": {
+            "start": 199,
+            "end": 202
+          }
+        },
+        {
+          "resourceId": "SRC-SELF-PROJECTION",
+          "path": "src/v6-projection.js",
+          "lineRange": {
+            "start": 15,
+            "end": 18
+          }
+        },
+        {
+          "resourceId": "SRC-SELF-ACCESS",
+          "path": "src/v9-access.js",
+          "lineRange": {
+            "start": 45,
+            "end": 48
+          }
+        },
+        {
+          "resourceId": "SRC-SELF-APPLICABILITY",
+          "path": "src/v9-applicability.js",
+          "lineRange": {
+            "start": 36,
+            "end": 39
+          }
+        },
+        {
+          "resourceId": "SRC-SELF-AKP",
+          "path": "src/v9-akp.js",
+          "lineRange": {
+            "start": 140,
+            "end": 143
+          }
+        },
+        {
+          "resourceId": "SRC-SELF-SERVICES",
+          "path": "src/v9-services.js",
+          "lineRange": {
+            "start": 65,
+            "end": 68
+          }
+        },
+        {
+          "resourceId": "SRC-SELF-FEEDBACK",
+          "path": "src/v9-services.js",
+          "lineRange": {
+            "start": 127,
+            "end": 130
+          }
+        },
+        {
+          "resourceId": "SRC-SELF-AGENT",
+          "path": "src/v9-services.js",
+          "lineRange": {
+            "start": 167,
+            "end": 170
+          }
+        },
+        {
+          "resourceId": "SRC-SELF-VISUAL",
+          "path": "src/v9-services.js",
+          "lineRange": {
+            "start": 209,
+            "end": 212
+          }
+        },
+        {
+          "resourceId": "SRC-SELF-APP",
+          "path": "src/v6-app.js",
+          "lineRange": {
+            "start": 63,
+            "end": 66
+          }
+        },
+        {
+          "resourceId": "SRC-SELF-UI",
+          "path": "src/v9-ui.js",
+          "lineRange": {
+            "start": 28,
+            "end": 31
+          }
+        },
+        {
+          "resourceId": "SRC-SELF-MODEL",
+          "path": "src/v9-model.js",
+          "lineRange": {
+            "start": 12,
+            "end": 15
+          }
+        },
+        {
+          "resourceId": "SRC-SELF-BUILD",
+          "path": "build.js",
+          "lineRange": {
+            "start": 7,
+            "end": 10
+          }
+        },
+        {
+          "resourceId": "SRC-SELF-TEST-V8",
+          "path": "tests/v8-acceptance.test.js",
+          "lineRange": {
+            "start": 42,
+            "end": 45
+          }
+        },
+        {
+          "resourceId": "SRC-SELF-TEST-V9",
+          "path": "tests/v9-acceptance.test.js",
+          "lineRange": {
+            "start": 57,
+            "end": 60
+          }
+        },
+        {
+          "resourceId": "SRC-SELF-AKP-SCHEMA",
+          "path": "packages/schema/akp-v0.1.schema.json",
+          "lineRange": {
+            "start": 3,
+            "end": 6
+          }
+        },
+        {
+          "resourceId": "SRC-SELF-STORAGE",
+          "path": "src/v9-access.js",
+          "lineRange": {
+            "start": 231,
+            "end": 234
+          }
+        },
+        {
+          "resourceId": "SRC-SELF-DECISION-V93",
+          "path": "src/v9-3-decision.js",
+          "lineRange": {
+            "start": 93,
+            "end": 96
+          }
+        },
+        {
+          "resourceId": "SRC-SELF-READING-V93",
+          "path": "src/v9-3-reading.js",
+          "lineRange": {
+            "start": 57,
+            "end": 60
+          }
+        },
+        {
+          "resourceId": "SRC-SELF-TASK-V93",
+          "path": "src/v9-3-task.js",
+          "lineRange": {
+            "start": 173,
+            "end": 176
+          }
+        },
+        {
+          "resourceId": "SRC-SELF-MODEL-V93",
+          "path": "src/v9-3-model.js",
+          "lineRange": {
+            "start": 18,
+            "end": 21
+          }
+        },
+        {
+          "resourceId": "SRC-SELF-UI-V93",
+          "path": "src/v9-3-ui.js",
+          "lineRange": {
+            "start": 81,
+            "end": 84
+          }
+        },
+        {
+          "resourceId": "SRC-SELF-TEST-V93",
+          "path": "tests/v9-3-acceptance.test.js",
+          "lineRange": {
+            "start": 42,
+            "end": 45
+          }
+        }
+      ],
+      "sourceAnchors": [
+        {
+          "path": "README.md",
+          "lineRange": {
+            "start": 1,
+            "end": 3
+          }
+        },
+        {
+          "path": "docs/v8-design.md",
+          "lineRange": {
+            "start": 30,
+            "end": 33
+          }
+        },
+        {
+          "path": "src/v7-framework.js",
+          "lineRange": {
+            "start": 12,
+            "end": 15
+          }
+        },
+        {
+          "path": "v4-core.js",
+          "lineRange": {
+            "start": 138,
+            "end": 141
+          }
+        },
+        {
+          "path": "src/v6-core.js",
+          "lineRange": {
+            "start": 14,
+            "end": 17
+          }
+        },
+        {
+          "path": "src/v6-core.js",
+          "lineRange": {
+            "start": 139,
+            "end": 142
+          }
+        },
+        {
+          "path": "src/v6-core.js",
+          "lineRange": {
+            "start": 311,
+            "end": 314
+          }
+        },
+        {
+          "path": "src/v8-read.js",
+          "lineRange": {
+            "start": 85,
+            "end": 88
+          }
+        },
+        {
+          "path": "src/v8-read.js",
+          "lineRange": {
+            "start": 199,
+            "end": 202
+          }
+        },
+        {
+          "path": "src/v6-projection.js",
+          "lineRange": {
+            "start": 15,
+            "end": 18
+          }
+        },
+        {
+          "path": "src/v9-access.js",
+          "lineRange": {
+            "start": 45,
+            "end": 48
+          }
+        },
+        {
+          "path": "src/v9-applicability.js",
+          "lineRange": {
+            "start": 36,
+            "end": 39
+          }
+        },
+        {
+          "path": "src/v9-akp.js",
+          "lineRange": {
+            "start": 140,
+            "end": 143
+          }
+        },
+        {
+          "path": "src/v9-services.js",
+          "lineRange": {
+            "start": 65,
+            "end": 68
+          }
+        },
+        {
+          "path": "src/v9-services.js",
+          "lineRange": {
+            "start": 127,
+            "end": 130
+          }
+        },
+        {
+          "path": "src/v9-services.js",
+          "lineRange": {
+            "start": 167,
+            "end": 170
+          }
+        },
+        {
+          "path": "src/v9-services.js",
+          "lineRange": {
+            "start": 209,
+            "end": 212
+          }
+        },
+        {
+          "path": "src/v6-app.js",
+          "lineRange": {
+            "start": 63,
+            "end": 66
+          }
+        },
+        {
+          "path": "src/v9-ui.js",
+          "lineRange": {
+            "start": 28,
+            "end": 31
+          }
+        },
+        {
+          "path": "src/v9-model.js",
+          "lineRange": {
+            "start": 12,
+            "end": 15
+          }
+        },
+        {
+          "path": "build.js",
+          "lineRange": {
+            "start": 7,
+            "end": 10
+          }
+        },
+        {
+          "path": "tests/v8-acceptance.test.js",
+          "lineRange": {
+            "start": 42,
+            "end": 45
+          }
+        },
+        {
+          "path": "tests/v9-acceptance.test.js",
+          "lineRange": {
+            "start": 57,
+            "end": 60
+          }
+        },
+        {
+          "path": "packages/schema/akp-v0.1.schema.json",
+          "lineRange": {
+            "start": 3,
+            "end": 6
+          }
+        },
+        {
+          "path": "src/v9-access.js",
+          "lineRange": {
+            "start": 231,
+            "end": 234
+          }
+        },
+        {
+          "path": "src/v9-3-decision.js",
+          "lineRange": {
+            "start": 93,
+            "end": 96
+          }
+        },
+        {
+          "path": "src/v9-3-reading.js",
+          "lineRange": {
+            "start": 57,
+            "end": 60
+          }
+        },
+        {
+          "path": "src/v9-3-task.js",
+          "lineRange": {
+            "start": 173,
+            "end": 176
+          }
+        },
+        {
+          "path": "src/v9-3-model.js",
+          "lineRange": {
+            "start": 18,
+            "end": 21
+          }
+        },
+        {
+          "path": "src/v9-3-ui.js",
+          "lineRange": {
+            "start": 81,
+            "end": 84
+          }
+        },
+        {
+          "path": "tests/v9-3-acceptance.test.js",
+          "lineRange": {
+            "start": 42,
+            "end": 45
+          }
+        }
+      ]
+    },
+    {
+      "toolCallId": "TC-SELF-GREP",
+      "recordType": "reconstructed-analysis-record",
+      "rawCaptured": false,
+      "provider": "opencode",
+      "server": "local-workspace",
+      "toolName": "functions.grep",
+      "startedAt": "2026-11-15T00:00:00.000Z",
+      "completedAt": "2026-11-15T00:00:00.000Z",
+      "status": "completed",
+      "inputSummary": "定位 Schema、Command、Read Context、Baseline、测试和视觉对象锚点",
+      "outputSummary": "锚点存在性验证通过",
+      "sourceAnchors": [
+        {
+          "path": "README.md",
+          "anchor": "# Business Atlas V9"
+        },
+        {
+          "path": "docs/v8-design.md",
+          "anchor": "## 3. Baseline Invariant"
+        },
+        {
+          "path": "src/v7-framework.js",
+          "anchor": "const DIMENSIONS"
+        },
+        {
+          "path": "v4-core.js",
+          "anchor": "function registerType"
+        },
+        {
+          "path": "src/v6-core.js",
+          "anchor": "const COMMANDS"
+        },
+        {
+          "path": "src/v6-core.js",
+          "anchor": "function mutate"
+        },
+        {
+          "path": "src/v6-core.js",
+          "anchor": "function publishRevision"
+        },
+        {
+          "path": "src/v8-read.js",
+          "anchor": "function context"
+        },
+        {
+          "path": "src/v8-read.js",
+          "anchor": "function resolveCatalog"
+        },
+        {
+          "path": "src/v6-projection.js",
+          "anchor": "function projectKnowledge"
+        },
+        {
+          "path": "src/v9-access.js",
+          "anchor": "function readEntity"
+        },
+        {
+          "path": "src/v9-applicability.js",
+          "anchor": "function evaluate"
+        },
+        {
+          "path": "src/v9-akp.js",
+          "anchor": "function commitImport"
+        },
+        {
+          "path": "src/v9-services.js",
+          "anchor": "function ask"
+        },
+        {
+          "path": "src/v9-services.js",
+          "anchor": "function createFeedback"
+        },
+        {
+          "path": "src/v9-services.js",
+          "anchor": "function parseAgentRun"
+        },
+        {
+          "path": "src/v9-services.js",
+          "anchor": "function projectView"
+        },
+        {
+          "path": "src/v6-app.js",
+          "anchor": "function v9Api"
+        },
+        {
+          "path": "src/v9-ui.js",
+          "anchor": "function renderImports"
+        },
+        {
+          "path": "src/v9-model.js",
+          "anchor": "const TYPES"
+        },
+        {
+          "path": "build.js",
+          "anchor": "const files ="
+        },
+        {
+          "path": "tests/v8-acceptance.test.js",
+          "anchor": "test('V8-07"
+        },
+        {
+          "path": "tests/v9-acceptance.test.js",
+          "anchor": "test('V9-19"
+        },
+        {
+          "path": "packages/schema/akp-v0.1.schema.json",
+          "anchor": "\"title\": \"Atlas Knowledge Package v0.1\""
+        },
+        {
+          "path": "src/v9-access.js",
+          "anchor": "function safePersist"
+        },
+        {
+          "path": "src/v9-3-decision.js",
+          "anchor": "function evaluateRule"
+        },
+        {
+          "path": "src/v9-3-reading.js",
+          "anchor": "function decisionProjection"
+        },
+        {
+          "path": "src/v9-3-task.js",
+          "anchor": "function evaluateDelivery"
+        },
+        {
+          "path": "src/v9-3-model.js",
+          "anchor": "function initProject"
+        },
+        {
+          "path": "src/v9-3-ui.js",
+          "anchor": "function readingWorkbench"
+        },
+        {
+          "path": "tests/v9-3-acceptance.test.js",
+          "anchor": "test('V9.3-01"
+        }
+      ]
+    },
+    {
+      "toolCallId": "TC-SELF-TEST",
+      "recordType": "verified-script-execution",
+      "rawCaptured": false,
+      "provider": "opencode",
+      "server": "local-shell",
+      "toolName": "functions.shell",
+      "startedAt": "2026-11-15T00:00:00.000Z",
+      "completedAt": "2026-11-15T00:00:00.000Z",
+      "status": "completed",
+      "inputSummary": "node acceptance.test.js / V4–V9 tests",
+      "outputSummary": "V3–V8 基线 198/198；V9 结果以最终 artifacts/v9-test-results.json 为准",
+      "sourceAnchors": [
+        {
+          "path": "artifacts/v9-test-results.json"
+        }
+      ]
+    },
+    {
+      "toolCallId": "TC-SELF-HASH",
+      "recordType": "verified-script-execution",
+      "rawCaptured": false,
+      "provider": "opencode",
+      "server": "local-shell",
+      "toolName": "node:crypto",
+      "startedAt": "2026-11-15T00:00:00.000Z",
+      "completedAt": "2026-11-15T00:00:00.000Z",
+      "status": "completed",
+      "inputSummary": "SHA-256 source files and sorted source revision set",
+      "outputSummary": "7e2a94576035c7cfc70f613ff9271c3d8bfcf3b304d8b2f9f71b9e3fda54dc5d",
+      "sourceAnchors": [
+        {
+          "path": "README.md",
+          "contentHash": "sha256:b0a3b0fd4ed3632d8dcce9d70c50c831835e25eb5cc26328e492215c47da19a8"
+        },
+        {
+          "path": "docs/v8-design.md",
+          "contentHash": "sha256:3cb94f06709389d529683703e56ab3413d92114146b6ac7ed5cddf518c5282b4"
+        },
+        {
+          "path": "src/v7-framework.js",
+          "contentHash": "sha256:fc25439b74516c51fd8f0aa4c0b89e3783a331956163253a63c92e91aac5daa1"
+        },
+        {
+          "path": "v4-core.js",
+          "contentHash": "sha256:378e14c1b577265f31acf1c49c7ea8646a78a53cc20136b26fa6f2e2785b1337"
+        },
+        {
+          "path": "src/v6-core.js",
+          "contentHash": "sha256:aa9bdfd7cc2805f6bdfcf976fad3b2582b3c5d4decb57e9eca87246ab6add07b"
+        },
+        {
+          "path": "src/v6-core.js",
+          "contentHash": "sha256:aa9bdfd7cc2805f6bdfcf976fad3b2582b3c5d4decb57e9eca87246ab6add07b"
+        },
+        {
+          "path": "src/v6-core.js",
+          "contentHash": "sha256:aa9bdfd7cc2805f6bdfcf976fad3b2582b3c5d4decb57e9eca87246ab6add07b"
+        },
+        {
+          "path": "src/v8-read.js",
+          "contentHash": "sha256:26072964005311d1b14ce62adaaa3917103549b96549dddd8f8ca78c31a4b52a"
+        },
+        {
+          "path": "src/v8-read.js",
+          "contentHash": "sha256:26072964005311d1b14ce62adaaa3917103549b96549dddd8f8ca78c31a4b52a"
+        },
+        {
+          "path": "src/v6-projection.js",
+          "contentHash": "sha256:55525df4b6bab96c81406f5860b1f58482b2f7675f842d6468a69c7be8d27730"
+        },
+        {
+          "path": "src/v9-access.js",
+          "contentHash": "sha256:d9a7e0c3ff49b1f9f8cdc0e36890a8d4a639c520c264eed128d73a98478c37cf"
+        },
+        {
+          "path": "src/v9-applicability.js",
+          "contentHash": "sha256:2877d17df5bdf7ca443245f63afda5a00e8b19249a93b8c15dbfbbc50821a81e"
+        },
+        {
+          "path": "src/v9-akp.js",
+          "contentHash": "sha256:a6889eac35925a8c6579c9d7b00c01aa7563040157717c618fff0aafa69d250d"
+        },
+        {
+          "path": "src/v9-services.js",
+          "contentHash": "sha256:3e5e89877c5a3b3e74e81bad23292ae48949bf8338d09e1133fc2608790300da"
+        },
+        {
+          "path": "src/v9-services.js",
+          "contentHash": "sha256:3e5e89877c5a3b3e74e81bad23292ae48949bf8338d09e1133fc2608790300da"
+        },
+        {
+          "path": "src/v9-services.js",
+          "contentHash": "sha256:3e5e89877c5a3b3e74e81bad23292ae48949bf8338d09e1133fc2608790300da"
+        },
+        {
+          "path": "src/v9-services.js",
+          "contentHash": "sha256:3e5e89877c5a3b3e74e81bad23292ae48949bf8338d09e1133fc2608790300da"
+        },
+        {
+          "path": "src/v6-app.js",
+          "contentHash": "sha256:f06ed2a26a375550e2b824a266ae3afefaf394465c232366da6922ae2de52981"
+        },
+        {
+          "path": "src/v9-ui.js",
+          "contentHash": "sha256:1b766524e8ca9f0dedba6fab356f187607afefe31856ee347f5bf7dc331e1df1"
+        },
+        {
+          "path": "src/v9-model.js",
+          "contentHash": "sha256:9844050180ffb3d8c1cab06c27c8b04e88b06468a83e987b75fa56b07f918fb5"
+        },
+        {
+          "path": "build.js",
+          "contentHash": "sha256:6573d5665233c6d4234302e5bac3191f9e8c5962f83500c0b4d9b310b02bbc74"
+        },
+        {
+          "path": "tests/v8-acceptance.test.js",
+          "contentHash": "sha256:6ee748d44f0d8769871dcc0cbd26c09fa28f224d0c6b21ef836995254877333f"
+        },
+        {
+          "path": "tests/v9-acceptance.test.js",
+          "contentHash": "sha256:bd7c028770ac34990f7d4ccdbddaf73b3aebc0033c3a3fadf25aae0ebdfbc944"
+        },
+        {
+          "path": "packages/schema/akp-v0.1.schema.json",
+          "contentHash": "sha256:3bece4eed5ba11313043abda9a9c6f9e633d9c3955cae18726e988f3425964db"
+        },
+        {
+          "path": "src/v9-access.js",
+          "contentHash": "sha256:d9a7e0c3ff49b1f9f8cdc0e36890a8d4a639c520c264eed128d73a98478c37cf"
+        },
+        {
+          "path": "src/v9-3-decision.js",
+          "contentHash": "sha256:950fa5ea2baac230770ba8476ecaa0803fc0041b7b6f624e061e4fea75622fbd"
+        },
+        {
+          "path": "src/v9-3-reading.js",
+          "contentHash": "sha256:8348b603120209692be459a2b4f22c86f4fe09ebb78d2655265fc01f57920e4a"
+        },
+        {
+          "path": "src/v9-3-task.js",
+          "contentHash": "sha256:2acd8a5b10d35c951bf75f99640d452907998c161a047811d20a4667e6a38057"
+        },
+        {
+          "path": "src/v9-3-model.js",
+          "contentHash": "sha256:bbffc64196f46c5a91ed074d08231bb1803c7df2c2db362830b73029692c7d77"
+        },
+        {
+          "path": "src/v9-3-ui.js",
+          "contentHash": "sha256:7c1da56db878d92c2d2901a579f114c337e44fcfd4461cb4ece4ce81d8104894"
+        },
+        {
+          "path": "tests/v9-3-acceptance.test.js",
+          "contentHash": "sha256:05aec40fbed100472e3c8a0967ed9f88819fa4ecec058fd36f55e66b8071878f"
+        }
+      ]
+    }
+  ],
+  "sourceRefs": [
+    {
+      "resourceId": "SRC-SELF-README",
+      "locator": {
+        "path": "README.md",
+        "lineRange": {
+          "start": 1,
+          "end": 3
+        }
+      }
+    },
+    {
+      "resourceId": "SRC-SELF-DESIGN",
+      "locator": {
+        "path": "docs/v8-design.md",
+        "lineRange": {
+          "start": 30,
+          "end": 33
+        }
+      }
+    },
+    {
+      "resourceId": "SRC-SELF-DIMENSIONS",
+      "locator": {
+        "path": "src/v7-framework.js",
+        "lineRange": {
+          "start": 12,
+          "end": 15
+        }
+      }
+    },
+    {
+      "resourceId": "SRC-SELF-SCHEMA",
+      "locator": {
+        "path": "v4-core.js",
+        "lineRange": {
+          "start": 138,
+          "end": 141
+        }
+      }
+    },
+    {
+      "resourceId": "SRC-SELF-COMMANDS",
+      "locator": {
+        "path": "src/v6-core.js",
+        "lineRange": {
+          "start": 14,
+          "end": 17
+        }
+      }
+    },
+    {
+      "resourceId": "SRC-SELF-TRANSACTION",
+      "locator": {
+        "path": "src/v6-core.js",
+        "lineRange": {
+          "start": 139,
+          "end": 142
+        }
+      }
+    },
+    {
+      "resourceId": "SRC-SELF-PUBLISH",
+      "locator": {
+        "path": "src/v6-core.js",
+        "lineRange": {
+          "start": 311,
+          "end": 314
+        }
+      }
+    },
+    {
+      "resourceId": "SRC-SELF-READ",
+      "locator": {
+        "path": "src/v8-read.js",
+        "lineRange": {
+          "start": 85,
+          "end": 88
+        }
+      }
+    },
+    {
+      "resourceId": "SRC-SELF-CATALOG",
+      "locator": {
+        "path": "src/v8-read.js",
+        "lineRange": {
+          "start": 199,
+          "end": 202
+        }
+      }
+    },
+    {
+      "resourceId": "SRC-SELF-PROJECTION",
+      "locator": {
+        "path": "src/v6-projection.js",
+        "lineRange": {
+          "start": 15,
+          "end": 18
+        }
+      }
+    },
+    {
+      "resourceId": "SRC-SELF-ACCESS",
+      "locator": {
+        "path": "src/v9-access.js",
+        "lineRange": {
+          "start": 45,
+          "end": 48
+        }
+      }
+    },
+    {
+      "resourceId": "SRC-SELF-APPLICABILITY",
+      "locator": {
+        "path": "src/v9-applicability.js",
+        "lineRange": {
+          "start": 36,
+          "end": 39
+        }
+      }
+    },
+    {
+      "resourceId": "SRC-SELF-AKP",
+      "locator": {
+        "path": "src/v9-akp.js",
+        "lineRange": {
+          "start": 140,
+          "end": 143
+        }
+      }
+    },
+    {
+      "resourceId": "SRC-SELF-SERVICES",
+      "locator": {
+        "path": "src/v9-services.js",
+        "lineRange": {
+          "start": 65,
+          "end": 68
+        }
+      }
+    },
+    {
+      "resourceId": "SRC-SELF-FEEDBACK",
+      "locator": {
+        "path": "src/v9-services.js",
+        "lineRange": {
+          "start": 127,
+          "end": 130
+        }
+      }
+    },
+    {
+      "resourceId": "SRC-SELF-AGENT",
+      "locator": {
+        "path": "src/v9-services.js",
+        "lineRange": {
+          "start": 167,
+          "end": 170
+        }
+      }
+    },
+    {
+      "resourceId": "SRC-SELF-VISUAL",
+      "locator": {
+        "path": "src/v9-services.js",
+        "lineRange": {
+          "start": 209,
+          "end": 212
+        }
+      }
+    },
+    {
+      "resourceId": "SRC-SELF-APP",
+      "locator": {
+        "path": "src/v6-app.js",
+        "lineRange": {
+          "start": 63,
+          "end": 66
+        }
+      }
+    },
+    {
+      "resourceId": "SRC-SELF-UI",
+      "locator": {
+        "path": "src/v9-ui.js",
+        "lineRange": {
+          "start": 28,
+          "end": 31
+        }
+      }
+    },
+    {
+      "resourceId": "SRC-SELF-MODEL",
+      "locator": {
+        "path": "src/v9-model.js",
+        "lineRange": {
+          "start": 12,
+          "end": 15
+        }
+      }
+    },
+    {
+      "resourceId": "SRC-SELF-BUILD",
+      "locator": {
+        "path": "build.js",
+        "lineRange": {
+          "start": 7,
+          "end": 10
+        }
+      }
+    },
+    {
+      "resourceId": "SRC-SELF-TEST-V8",
+      "locator": {
+        "path": "tests/v8-acceptance.test.js",
+        "lineRange": {
+          "start": 42,
+          "end": 45
+        }
+      }
+    },
+    {
+      "resourceId": "SRC-SELF-TEST-V9",
+      "locator": {
+        "path": "tests/v9-acceptance.test.js",
+        "lineRange": {
+          "start": 57,
+          "end": 60
+        }
+      }
+    },
+    {
+      "resourceId": "SRC-SELF-AKP-SCHEMA",
+      "locator": {
+        "path": "packages/schema/akp-v0.1.schema.json",
+        "lineRange": {
+          "start": 3,
+          "end": 6
+        }
+      }
+    },
+    {
+      "resourceId": "SRC-SELF-STORAGE",
+      "locator": {
+        "path": "src/v9-access.js",
+        "lineRange": {
+          "start": 231,
+          "end": 234
+        }
+      }
+    },
+    {
+      "resourceId": "SRC-SELF-DECISION-V93",
+      "locator": {
+        "path": "src/v9-3-decision.js",
+        "lineRange": {
+          "start": 93,
+          "end": 96
+        }
+      }
+    },
+    {
+      "resourceId": "SRC-SELF-READING-V93",
+      "locator": {
+        "path": "src/v9-3-reading.js",
+        "lineRange": {
+          "start": 57,
+          "end": 60
+        }
+      }
+    },
+    {
+      "resourceId": "SRC-SELF-TASK-V93",
+      "locator": {
+        "path": "src/v9-3-task.js",
+        "lineRange": {
+          "start": 173,
+          "end": 176
+        }
+      }
+    },
+    {
+      "resourceId": "SRC-SELF-MODEL-V93",
+      "locator": {
+        "path": "src/v9-3-model.js",
+        "lineRange": {
+          "start": 18,
+          "end": 21
+        }
+      }
+    },
+    {
+      "resourceId": "SRC-SELF-UI-V93",
+      "locator": {
+        "path": "src/v9-3-ui.js",
+        "lineRange": {
+          "start": 81,
+          "end": 84
+        }
+      }
+    },
+    {
+      "resourceId": "SRC-SELF-TEST-V93",
+      "locator": {
+        "path": "tests/v9-3-acceptance.test.js",
+        "lineRange": {
+          "start": 42,
+          "end": 45
+        }
+      }
+    }
+  ],
+  "proposedKnowledge": [
+    {
+      "entityId": "SELF-PROJECT",
+      "name": "Business Atlas — Self Knowledge",
+      "verificationStatus": "documented_intent",
+      "recordType": "knowledge-proposal",
+      "explanation": "一个实际存在的离线前端原型代码库；以统一认知语法帮助人和 AI 建立、理解、维护和使用复杂软件项目知识，不是生产系统。"
+    },
+    {
+      "entityId": "SELF-FEAT-WORKSPACE",
+      "name": "统一项目认知工作空间",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "项目目录、认知工作台、投影、协作和阅读围绕同一知识身份。"
+    },
+    {
+      "entityId": "SELF-FEAT-CATALOG",
+      "name": "五维项目知识目录",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "项目、业务、系统、知识资产、协作治理五个维度及可配置分类解析。"
+    },
+    {
+      "entityId": "SELF-FEAT-SCHEMA",
+      "name": "Schema 驱动知识创建",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "稳定类型、字段校验、通用表单与自定义知识类型复用统一 Command。"
+    },
+    {
+      "entityId": "SELF-FEAT-COMMAND",
+      "name": "原子知识命令与草稿",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "Command 在暂存工作区校验并一次提交，失败回滚并支持 Undo。"
+    },
+    {
+      "entityId": "SELF-FEAT-READ",
+      "name": "统一知识访问边界",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "实体、关系、治理记录、问答、图形与契约按项目、版本、权限和适用性读取。"
+    },
+    {
+      "entityId": "SELF-FEAT-APPLICABILITY",
+      "name": "环境与组织适用性判断",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "适用、不适用、未知和冲突分离，支持项目自定义维度。"
+    },
+    {
+      "entityId": "SELF-FEAT-AKP",
+      "name": "老项目知识包接入",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "外部 Agent 整理老项目业务知识并生成 AKP；平台校验、预览、人工确认后进入草稿，不自动逆向仓库。"
+    },
+    {
+      "entityId": "SELF-FEAT-QA",
+      "name": "角色化可追溯问答",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "新人、BA、开发、测试、售前与 Agent 通过确定性查询获得带版本、适用条件和来源的解释。"
+    },
+    {
+      "entityId": "SELF-FEAT-FEEDBACK",
+      "name": "项目反馈处理闭环",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "反馈从实际上下文进入分流、Change Set 或任务、实施验收和关闭。"
+    },
+    {
+      "entityId": "SELF-FEAT-AGENT",
+      "name": "Agent 执行证据与知识提案",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "导入外部 JSON/JSONL 工具调用、观察、推断、来源和提案，人工复核前不成为批准事实。"
+    },
+    {
+      "entityId": "SELF-FEAT-VISUAL",
+      "name": "统一知识图文阅读",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "业务流程、状态、架构、数据、时序和界面热点从统一模型投影，Mermaid/ASCII 仅作表达。"
+    },
+    {
+      "entityId": "SELF-FEAT-BASELINE",
+      "name": "不可变知识基线",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "对象、断言和流程修订绑定批准快照；后续活动不回写旧基线。"
+    },
+    {
+      "entityId": "SELF-FEAT-BUILD",
+      "name": "离线单文件构建",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "全部运行脚本和样式内联，无外部网络资源，可通过 file:// 打开并校验重建一致性。"
+    },
+    {
+      "entityId": "SELF-FEAT-DECISION",
+      "name": "业务决策链与确定性案例评估",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "Context、Inputs、Preconditions、Evaluation、Priority、Branch、Outcome、Default、Exception、Evidence 共用同一规则语义；缺失和冲突不默认成功。"
+    },
+    {
+      "entityId": "SELF-FEAT-CONFORMANCE",
+      "name": "目标规范、当前观察与技术机制对照",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "三类事实独立关联，符合性绑定规则、观察、代码版本和证据；技术行为不自动成为批准目标。"
+    },
+    {
+      "entityId": "SELF-FEAT-TASK-SEMANTIC",
+      "name": "Task 业务语义合同与完整影响调查",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "新需求引用批准规则版本形成候选变化，逐项记录影响路径、证据、确认状态和处理决定。"
+    },
+    {
+      "entityId": "SELF-FEAT-DELIVERY-V12",
+      "name": "开发知识同步交付与版本对账",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "PR 候选知识、合并后 Delivery Manifest、测试、批准基线和部署版本分别关联，代码合并不等于知识批准。"
+    },
+    {
+      "entityId": "SELF-SYSTEM",
+      "name": "Business Atlas 离线前端原型",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "浏览器内运行的模块化 JavaScript 原型，构建为单文件 HTML；没有生产后台。"
+    },
+    {
+      "entityId": "SELF-COMP-FRAMEWORK",
+      "name": "目录框架模块",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "src/v7-framework.js：五维目录、分类、覆盖与可信状态。"
+    },
+    {
+      "entityId": "SELF-COMP-SCHEMA",
+      "name": "Schema Registry 模块",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "v4-core.js：核心类型、注册、字段校验与通用知识身份。"
+    },
+    {
+      "entityId": "SELF-COMP-COMMAND",
+      "name": "Knowledge Command 模块",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "src/v6-core.js：命令、暂存事务、Change Set、发布与协作。"
+    },
+    {
+      "entityId": "SELF-COMP-DRAFT",
+      "name": "Draft Workspace 与版本模块",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "src/v6-core.js：实体/断言/流程草稿、Undo、不可变修订和基线。"
+    },
+    {
+      "entityId": "SELF-COMP-READ",
+      "name": "Read Context 与 Catalog Resolver",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "src/v8-read.js：统一上下文、目录解析、覆盖和上下文缓存。"
+    },
+    {
+      "entityId": "SELF-COMP-ACCESS",
+      "name": "Knowledge Access Boundary",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "src/v9-access.js：结果协议、授权记录、契约视图、修订事件与安全持久化。"
+    },
+    {
+      "entityId": "SELF-COMP-APPLICABILITY",
+      "name": "Applicability Evaluator",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "src/v9-applicability.js：维度组合、缺失上下文、冲突和两种使用模式。"
+    },
+    {
+      "entityId": "SELF-COMP-PROJECTION",
+      "name": "Projection Engine",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "src/v6-projection.js：必要依赖闭包、焦点事实和正式任务契约。"
+    },
+    {
+      "entityId": "SELF-COMP-AKP",
+      "name": "AKP 导入模块",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "src/v9-akp.js：真实解析、校验、稳定映射、预览、原子草稿提交和撤销。"
+    },
+    {
+      "entityId": "SELF-COMP-QA",
+      "name": "确定性知识问答模块",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "src/v9-services.js：五类意图、角色化解释、引用、限制与追问。"
+    },
+    {
+      "entityId": "SELF-COMP-FEEDBACK",
+      "name": "反馈闭环模块",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "src/v9-services.js：反馈、分流、转变更/任务与结果关闭。"
+    },
+    {
+      "entityId": "SELF-COMP-AGENT",
+      "name": "Agent Run 记录模块",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "src/v9-services.js：JSON/JSONL、工具摘要、来源、脱敏与待确认问题。"
+    },
+    {
+      "entityId": "SELF-COMP-VISUAL",
+      "name": "语义图形投影模块",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "src/v9-services.js 与 src/v9-ui.js：模型驱动 SVG、同步焦点、热点与文本导出。"
+    },
+    {
+      "entityId": "SELF-COMP-APP",
+      "name": "单页工作空间模块",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "src/v6-app.js 与 src/v9-ui.js：项目、目录、导入、问答、反馈、Agent 与图形交互。"
+    },
+    {
+      "entityId": "SELF-COMP-BUILD",
+      "name": "单文件构建模块",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "build.js：按固定模块顺序内联源码与样式并拒绝外部资源。"
+    },
+    {
+      "entityId": "SELF-COMP-TESTS",
+      "name": "自动化验收模块",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "tests：V3–V9 规则、权限、版本、导入、反馈、图形和破坏性回归。"
+    },
+    {
+      "entityId": "SELF-COMP-DECISION-V93",
+      "name": "业务决策评估器",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "src/v9-3-decision.js：授权、批准状态、适用性、类型化条件、三值逻辑、冲突和来源轨迹。"
+    },
+    {
+      "entityId": "SELF-COMP-READING-V93",
+      "name": "业务认知投影模块",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "src/v9-3-reading.js：决策、符合性、Flow 语义守恒和三视角受控投影。"
+    },
+    {
+      "entityId": "SELF-COMP-TASK-V93",
+      "name": "Task 语义与交付闭环模块",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "src/v9-3-task.js：Task Semantic Contract、Impact Investigation 和 V1.2 交付核对。"
+    },
+    {
+      "entityId": "SELF-COMP-UI-V93",
+      "name": "决策优先阅读与任务交互",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "src/v9-3-ui.js：条件—判断—结果、案例模拟、三视角、影响调查和版本对账。"
+    },
+    {
+      "entityId": "SELF-TECH-JS",
+      "name": "JavaScript（无前端框架）",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "UMD 风格内部模块、DOM 和 SVG；未使用 React/Vue 等前端框架。"
+    },
+    {
+      "entityId": "SELF-TECH-HTML-CSS",
+      "name": "HTML / CSS / 内置 SVG",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "单文件页面、样式和图形，无外部字体、CDN 或图形运行库。"
+    },
+    {
+      "entityId": "SELF-RUNTIME-BROWSER",
+      "name": "Chromium 浏览器运行时",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "实际浏览器验收目标；file:// 离线打开，localStorage 持久化。"
+    },
+    {
+      "entityId": "SELF-RUNTIME-NODE",
+      "name": "Node.js 构建与测试运行时",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "仅使用 Node 内置 fs/path/assert/crypto 等模块；当前实测 v24.21.0。"
+    },
+    {
+      "entityId": "SELF-FRAMEWORK-NONE",
+      "name": "无应用前端框架",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "项目刻意保持无 npm 运行依赖的原生 JavaScript 原型。"
+    },
+    {
+      "entityId": "SELF-DEP-NODE-BUILTIN",
+      "name": "Node.js 内置模块",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "构建与测试使用 node:fs、node:path、node:crypto、node:assert；无第三方包。"
+    },
+    {
+      "entityId": "SELF-BUILD-PIPELINE",
+      "name": "Node 单文件重建流水线",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "源码提取 → Self AKP → 实际导入器生成 Self 项目 → 模块内联 → SHA-256 重建比对。"
+    },
+    {
+      "entityId": "SELF-DEPLOY-FILE",
+      "name": "离线 HTML 浏览器运行单元",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "dist/business-atlas-v9.3.html 的本地 file:// 运行；不是生产部署拓扑。"
+    },
+    {
+      "entityId": "SELF-DATA-STORE",
+      "name": "浏览器本地项目快照",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "store.projects、contexts 和 storageVersion 保存在 business-atlas-v9 localStorage；容量失败显式提示并允许导出备份。"
+    },
+    {
+      "entityId": "SELF-DATA-AKP",
+      "name": "AKP JSON 知识包文件",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "外部交换数据，经非可信输入检查、Schema/引用校验和人工预览后才进入草稿。"
+    },
+    {
+      "entityId": "SELF-API-ACCESS",
+      "name": "Knowledge Access JavaScript API",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "内部 readEntity/listEntities/readRelations/readRecord/readContract 接口；不是 HTTP 或 MCP Server。"
+    },
+    {
+      "entityId": "SELF-API-AKP",
+      "name": "AKP Import JavaScript API",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "stagePackage → previewImport → commitImport → 既有 ProposeChange/PublishRevision；不是 HTTP 服务。"
+    },
+    {
+      "entityId": "SELF-ADR-UNIFIED",
+      "name": "统一知识而非多套事实库",
+      "verificationStatus": "documented_intent",
+      "recordType": "knowledge-proposal",
+      "explanation": "目录、问答、反馈、Agent 提案、图形和导入共享实体、断言、来源与版本。"
+    },
+    {
+      "entityId": "SELF-ADR-COMMAND",
+      "name": "所有知识写入遵守 Command Transaction",
+      "verificationStatus": "documented_intent",
+      "recordType": "knowledge-proposal",
+      "explanation": "导入和反馈转变更复用暂存工作区与 Change Set，失败原子回滚。"
+    },
+    {
+      "entityId": "SELF-ADR-BASELINE",
+      "name": "批准基线不可变且协作历史分离",
+      "verificationStatus": "documented_intent",
+      "recordType": "knowledge-proposal",
+      "explanation": "旧基线保存当时知识快照，后续反馈、导入和 Agent 活动不能回写。"
+    },
+    {
+      "entityId": "SELF-ADR-FACT-LEVEL",
+      "name": "源码观察不自动升级为批准业务规范",
+      "verificationStatus": "documented_intent",
+      "recordType": "knowledge-proposal",
+      "explanation": "Observed、Documented Intent、Inferred、Unknown、Conflicting 分别保存。"
+    },
+    {
+      "entityId": "SELF-ADR-OFFLINE",
+      "name": "离线单文件与零运行依赖",
+      "verificationStatus": "documented_intent",
+      "recordType": "knowledge-proposal",
+      "explanation": "原型验证交互与工程约束，不在本轮引入后台、前端框架或外部图形引擎。"
+    },
+    {
+      "entityId": "SELF-ADR-MODULES",
+      "name": "模块化原型边界为未来模块化单体保留",
+      "verificationStatus": "documented_intent",
+      "recordType": "knowledge-proposal",
+      "explanation": "访问、适用性、导入、协作、投影和 UI 分文件；本轮不开发微服务或生产后台。"
+    },
+    {
+      "entityId": "SELF-ADR-THREE-FACTS",
+      "name": "目标规范、当前行为与技术机制不可混同",
+      "verificationStatus": "documented_intent",
+      "recordType": "knowledge-proposal",
+      "explanation": "技术观察和源码机制只能支持实现符合性判断，未经业务 Owner 批准不得成为目标规范。"
+    },
+    {
+      "entityId": "SELF-ADR-TASK-REFS",
+      "name": "Task 引用规则版本而不复制规范",
+      "verificationStatus": "documented_intent",
+      "recordType": "knowledge-proposal",
+      "explanation": "Task Semantic Contract 保存基线引用与候选差异，历史基线保持不可变，候选决策必须独立批准。"
+    },
+    {
+      "entityId": "SELF-CONV-OFFLINE",
+      "name": "无外部运行资源与可重复构建",
+      "verificationStatus": "documented_intent",
+      "recordType": "knowledge-proposal",
+      "explanation": "核心脚本和样式内联；构建产物 SHA-256 必须与干净重建一致。"
+    },
+    {
+      "entityId": "SELF-CONV-TESTS",
+      "name": "既有测试继续执行且不得删除失败检查",
+      "verificationStatus": "documented_intent",
+      "recordType": "knowledge-proposal",
+      "explanation": "V3–V8 回归与 V9 权限、破坏性导入和浏览器旅程共同验收。"
+    },
+    {
+      "entityId": "SELF-TEST-BASELINE",
+      "name": "历史基线不可变回归",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "V8 SHA-256 基线测试与 V9 后续活动测试验证旧批准快照不被修改。"
+    },
+    {
+      "entityId": "SELF-TEST-AKP",
+      "name": "AKP 重复导入与原子失败回归",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "验证稳定外部 ID、无效引用、危险输入、无部分草稿和人工发布。"
+    },
+    {
+      "entityId": "SELF-TEST-ACCESS",
+      "name": "跨入口权限与适用性回归",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "验证直接 ID、关系、契约、问答和图形的授权，以及生产/测试/未知条件。"
+    },
+    {
+      "entityId": "SELF-TEST-V93",
+      "name": "V9.3 业务认知与交付闭环回归",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "覆盖条件求值、符合性、Task 语义、影响闭合、Flow 图形、权限、版本与导出。"
+    },
+    {
+      "entityId": "SELF-CONFIG-STORAGE",
+      "name": "浏览器本地存储配置",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "business-atlas-v9；仅存少量项目数据，图片和大型日志受容量限制。"
+    },
+    {
+      "entityId": "SELF-ENV-BROWSER",
+      "name": "本地浏览器原型环境",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "唯一明确实现的运行环境；生产部署环境未知。"
+    },
+    {
+      "assertionId": "SELF-REL-SYSTEM-PROJECT",
+      "subject": "SELF-SYSTEM",
+      "predicate": "references",
+      "object": "SELF-PROJECT",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "离线前端原型承载 Self Knowledge 项目认知"
+    },
+    {
+      "assertionId": "SELF-REL-SYSTEM-CATALOG",
+      "subject": "SELF-SYSTEM",
+      "predicate": "contains",
+      "object": "SELF-COMP-FRAMEWORK",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "五维目录属于同一系统"
+    },
+    {
+      "assertionId": "SELF-REL-SYSTEM-COMMAND",
+      "subject": "SELF-SYSTEM",
+      "predicate": "contains",
+      "object": "SELF-COMP-COMMAND",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "Command 属于同一系统"
+    },
+    {
+      "assertionId": "SELF-REL-SYSTEM-READ",
+      "subject": "SELF-SYSTEM",
+      "predicate": "contains",
+      "object": "SELF-COMP-READ",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "Read Context 与目录读取"
+    },
+    {
+      "assertionId": "SELF-REL-SYSTEM-ACCESS",
+      "subject": "SELF-SYSTEM",
+      "predicate": "contains",
+      "object": "SELF-COMP-ACCESS",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "统一访问边界"
+    },
+    {
+      "assertionId": "SELF-REL-SYSTEM-AKP",
+      "subject": "SELF-SYSTEM",
+      "predicate": "contains",
+      "object": "SELF-COMP-AKP",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "AKP 导入组件"
+    },
+    {
+      "assertionId": "SELF-REL-SYSTEM-APP",
+      "subject": "SELF-SYSTEM",
+      "predicate": "contains",
+      "object": "SELF-COMP-APP",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "工作空间 UI"
+    },
+    {
+      "assertionId": "SELF-REL-SYSTEM-BUILD",
+      "subject": "SELF-SYSTEM",
+      "predicate": "contains",
+      "object": "SELF-COMP-BUILD",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "构建组件"
+    },
+    {
+      "assertionId": "SELF-REL-IMPLEMENT-0",
+      "subject": "SELF-COMP-FRAMEWORK",
+      "predicate": "implements",
+      "object": "SELF-FEAT-CATALOG",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "assertionId": "SELF-REL-IMPLEMENT-1",
+      "subject": "SELF-COMP-SCHEMA",
+      "predicate": "implements",
+      "object": "SELF-FEAT-SCHEMA",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "assertionId": "SELF-REL-IMPLEMENT-2",
+      "subject": "SELF-COMP-COMMAND",
+      "predicate": "implements",
+      "object": "SELF-FEAT-COMMAND",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "assertionId": "SELF-REL-IMPLEMENT-3",
+      "subject": "SELF-COMP-DRAFT",
+      "predicate": "implements",
+      "object": "SELF-FEAT-COMMAND",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "assertionId": "SELF-REL-IMPLEMENT-4",
+      "subject": "SELF-COMP-READ",
+      "predicate": "implements",
+      "object": "SELF-FEAT-READ",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "assertionId": "SELF-REL-IMPLEMENT-5",
+      "subject": "SELF-COMP-ACCESS",
+      "predicate": "implements",
+      "object": "SELF-FEAT-READ",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "assertionId": "SELF-REL-IMPLEMENT-6",
+      "subject": "SELF-COMP-APPLICABILITY",
+      "predicate": "implements",
+      "object": "SELF-FEAT-APPLICABILITY",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "assertionId": "SELF-REL-IMPLEMENT-7",
+      "subject": "SELF-COMP-PROJECTION",
+      "predicate": "implements",
+      "object": "SELF-FEAT-WORKSPACE",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "assertionId": "SELF-REL-IMPLEMENT-8",
+      "subject": "SELF-COMP-AKP",
+      "predicate": "implements",
+      "object": "SELF-FEAT-AKP",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "assertionId": "SELF-REL-IMPLEMENT-9",
+      "subject": "SELF-COMP-QA",
+      "predicate": "implements",
+      "object": "SELF-FEAT-QA",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "assertionId": "SELF-REL-IMPLEMENT-10",
+      "subject": "SELF-COMP-FEEDBACK",
+      "predicate": "implements",
+      "object": "SELF-FEAT-FEEDBACK",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "assertionId": "SELF-REL-IMPLEMENT-11",
+      "subject": "SELF-COMP-AGENT",
+      "predicate": "implements",
+      "object": "SELF-FEAT-AGENT",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "assertionId": "SELF-REL-IMPLEMENT-12",
+      "subject": "SELF-COMP-VISUAL",
+      "predicate": "implements",
+      "object": "SELF-FEAT-VISUAL",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "assertionId": "SELF-REL-IMPLEMENT-13",
+      "subject": "SELF-COMP-APP",
+      "predicate": "implements",
+      "object": "SELF-FEAT-WORKSPACE",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "assertionId": "SELF-REL-IMPLEMENT-14",
+      "subject": "SELF-COMP-BUILD",
+      "predicate": "implements",
+      "object": "SELF-FEAT-BUILD",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "assertionId": "SELF-REL-IMPLEMENT-15",
+      "subject": "SELF-COMP-TESTS",
+      "predicate": "implements",
+      "object": "SELF-FEAT-BASELINE",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "assertionId": "SELF-REL-IMPLEMENT-16",
+      "subject": "SELF-COMP-DECISION-V93",
+      "predicate": "implements",
+      "object": "SELF-FEAT-DECISION",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "assertionId": "SELF-REL-IMPLEMENT-17",
+      "subject": "SELF-COMP-READING-V93",
+      "predicate": "implements",
+      "object": "SELF-FEAT-CONFORMANCE",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "assertionId": "SELF-REL-IMPLEMENT-18",
+      "subject": "SELF-COMP-TASK-V93",
+      "predicate": "implements",
+      "object": "SELF-FEAT-TASK-SEMANTIC",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "assertionId": "SELF-REL-IMPLEMENT-19",
+      "subject": "SELF-COMP-UI-V93",
+      "predicate": "implements",
+      "object": "SELF-FEAT-DECISION",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "组件职责支撑对应原型功能"
+    },
+    {
+      "assertionId": "SELF-REL-USES-JS-0",
+      "subject": "SELF-COMP-ACCESS",
+      "predicate": "uses",
+      "object": "SELF-TECH-JS",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "直接由 JavaScript 模块实现"
+    },
+    {
+      "assertionId": "SELF-REL-USES-JS-1",
+      "subject": "SELF-COMP-AKP",
+      "predicate": "uses",
+      "object": "SELF-TECH-JS",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "直接由 JavaScript 模块实现"
+    },
+    {
+      "assertionId": "SELF-REL-USES-JS-2",
+      "subject": "SELF-COMP-QA",
+      "predicate": "uses",
+      "object": "SELF-TECH-JS",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "直接由 JavaScript 模块实现"
+    },
+    {
+      "assertionId": "SELF-REL-USES-JS-3",
+      "subject": "SELF-COMP-FEEDBACK",
+      "predicate": "uses",
+      "object": "SELF-TECH-JS",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "直接由 JavaScript 模块实现"
+    },
+    {
+      "assertionId": "SELF-REL-USES-JS-4",
+      "subject": "SELF-COMP-AGENT",
+      "predicate": "uses",
+      "object": "SELF-TECH-JS",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "直接由 JavaScript 模块实现"
+    },
+    {
+      "assertionId": "SELF-REL-USES-JS-5",
+      "subject": "SELF-COMP-VISUAL",
+      "predicate": "uses",
+      "object": "SELF-TECH-JS",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "直接由 JavaScript 模块实现"
+    },
+    {
+      "assertionId": "SELF-REL-USES-JS-6",
+      "subject": "SELF-COMP-APP",
+      "predicate": "uses",
+      "object": "SELF-TECH-JS",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "直接由 JavaScript 模块实现"
+    },
+    {
+      "assertionId": "SELF-REL-USES-JS-7",
+      "subject": "SELF-COMP-DECISION-V93",
+      "predicate": "uses",
+      "object": "SELF-TECH-JS",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "直接由 JavaScript 模块实现"
+    },
+    {
+      "assertionId": "SELF-REL-USES-JS-8",
+      "subject": "SELF-COMP-READING-V93",
+      "predicate": "uses",
+      "object": "SELF-TECH-JS",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "直接由 JavaScript 模块实现"
+    },
+    {
+      "assertionId": "SELF-REL-USES-JS-9",
+      "subject": "SELF-COMP-TASK-V93",
+      "predicate": "uses",
+      "object": "SELF-TECH-JS",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "直接由 JavaScript 模块实现"
+    },
+    {
+      "assertionId": "SELF-REL-USES-JS-10",
+      "subject": "SELF-COMP-UI-V93",
+      "predicate": "uses",
+      "object": "SELF-TECH-JS",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "直接由 JavaScript 模块实现"
+    },
+    {
+      "assertionId": "SELF-REL-FRAMEWORK-DEP",
+      "subject": "SELF-FRAMEWORK-NONE",
+      "predicate": "dependsOn",
+      "object": "SELF-DEP-NODE-BUILTIN",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "仅构建和测试依赖 Node 内置模块；浏览器无第三方运行依赖"
+    },
+    {
+      "assertionId": "SELF-REL-DEPLOY-HOSTS",
+      "subject": "SELF-DEPLOY-FILE",
+      "predicate": "hosts",
+      "object": "SELF-COMP-APP",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "离线 HTML 承载工作空间，不代表生产部署"
+    },
+    {
+      "assertionId": "SELF-REL-ACCESS-EXPOSES",
+      "subject": "SELF-COMP-ACCESS",
+      "predicate": "exposes",
+      "object": "SELF-API-ACCESS",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "内部 JavaScript 读取接口"
+    },
+    {
+      "assertionId": "SELF-REL-AKP-EXPOSES",
+      "subject": "SELF-COMP-AKP",
+      "predicate": "exposes",
+      "object": "SELF-API-AKP",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "内部 JavaScript 导入接口"
+    },
+    {
+      "assertionId": "SELF-REL-APP-WRITES",
+      "subject": "SELF-COMP-APP",
+      "predicate": "writes",
+      "object": "SELF-DATA-STORE",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "浏览器本地快照写入"
+    },
+    {
+      "assertionId": "SELF-REL-APP-READS",
+      "subject": "SELF-COMP-APP",
+      "predicate": "reads",
+      "object": "SELF-DATA-STORE",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "刷新后恢复项目快照"
+    },
+    {
+      "assertionId": "SELF-REL-AKP-READS",
+      "subject": "SELF-COMP-AKP",
+      "predicate": "reads",
+      "object": "SELF-DATA-AKP",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "读取非可信 AKP JSON 文件"
+    },
+    {
+      "assertionId": "SELF-REL-BUILD-OUTPUT",
+      "subject": "SELF-BUILD-PIPELINE",
+      "predicate": "contains",
+      "object": "SELF-DEPLOY-FILE",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "构建产物为离线 HTML 运行单元"
+    },
+    {
+      "assertionId": "SELF-REL-ADR-0",
+      "subject": "SELF-ADR-UNIFIED",
+      "predicate": "constrains",
+      "object": "SELF-COMP-APP",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "已记录设计决策约束对应实现"
+    },
+    {
+      "assertionId": "SELF-REL-ADR-1",
+      "subject": "SELF-ADR-COMMAND",
+      "predicate": "constrains",
+      "object": "SELF-COMP-APP",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "已记录设计决策约束对应实现"
+    },
+    {
+      "assertionId": "SELF-REL-ADR-2",
+      "subject": "SELF-ADR-BASELINE",
+      "predicate": "constrains",
+      "object": "SELF-COMP-DRAFT",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "已记录设计决策约束对应实现"
+    },
+    {
+      "assertionId": "SELF-REL-ADR-3",
+      "subject": "SELF-ADR-FACT-LEVEL",
+      "predicate": "constrains",
+      "object": "SELF-COMP-AKP",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "已记录设计决策约束对应实现"
+    },
+    {
+      "assertionId": "SELF-REL-ADR-4",
+      "subject": "SELF-ADR-OFFLINE",
+      "predicate": "constrains",
+      "object": "SELF-COMP-BUILD",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "已记录设计决策约束对应实现"
+    },
+    {
+      "assertionId": "SELF-REL-ADR-5",
+      "subject": "SELF-ADR-MODULES",
+      "predicate": "constrains",
+      "object": "SELF-COMP-APP",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "已记录设计决策约束对应实现"
+    },
+    {
+      "assertionId": "SELF-REL-ADR-6",
+      "subject": "SELF-ADR-THREE-FACTS",
+      "predicate": "constrains",
+      "object": "SELF-COMP-APP",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "已记录设计决策约束对应实现"
+    },
+    {
+      "assertionId": "SELF-REL-ADR-7",
+      "subject": "SELF-ADR-TASK-REFS",
+      "predicate": "constrains",
+      "object": "SELF-COMP-APP",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "已记录设计决策约束对应实现"
+    },
+    {
+      "assertionId": "SELF-REL-TEST-BASELINE",
+      "subject": "SELF-TEST-BASELINE",
+      "predicate": "verifies",
+      "object": "SELF-FEAT-BASELINE",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "测试验证基线不可变"
+    },
+    {
+      "assertionId": "SELF-REL-TEST-AKP",
+      "subject": "SELF-TEST-AKP",
+      "predicate": "verifies",
+      "object": "SELF-FEAT-AKP",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "测试验证知识导入"
+    },
+    {
+      "assertionId": "SELF-REL-TEST-ACCESS",
+      "subject": "SELF-TEST-ACCESS",
+      "predicate": "verifies",
+      "object": "SELF-FEAT-READ",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "测试验证统一访问与适用性"
+    },
+    {
+      "assertionId": "SELF-REL-TEST-V93-DECISION",
+      "subject": "SELF-TEST-V93",
+      "predicate": "verifies",
+      "object": "SELF-FEAT-DECISION",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "V9.3 测试验证业务决策与案例"
+    },
+    {
+      "assertionId": "SELF-REL-TEST-V93-TASK",
+      "subject": "SELF-TEST-V93",
+      "predicate": "verifies",
+      "object": "SELF-FEAT-TASK-SEMANTIC",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "V9.3 测试验证任务语义与完整影响"
+    },
+    {
+      "assertionId": "SELF-REL-TEST-V93-DELIVERY",
+      "subject": "SELF-TEST-V93",
+      "predicate": "verifies",
+      "object": "SELF-FEAT-DELIVERY-V12",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "V9.3 测试验证知识交付与版本对账"
+    },
+    {
+      "assertionId": "SELF-REL-CONFIG-APP",
+      "subject": "SELF-CONFIG-STORAGE",
+      "predicate": "affects",
+      "object": "SELF-COMP-APP",
+      "verificationStatus": "observed",
+      "recordType": "knowledge-proposal",
+      "explanation": "浏览器存储键与容量策略影响应用持久化"
+    }
+  ],
+  "unresolvedQuestions": [
+    {
+      "title": "生产后台与生产数据库未实现",
+      "impact": "当前只有浏览器 localStorage；正式存储、并发、事务和审计需要后续开发。",
+      "relatedIds": [
+        "SELF-DATA-STORE"
+      ]
+    },
+    {
+      "title": "企业身份认证与正式权限系统未实现",
+      "impact": "当前权限是前端模拟访问规则，不是生产安全边界。",
+      "relatedIds": [
+        "SELF-COMP-ACCESS"
+      ]
+    },
+    {
+      "title": "真实 MCP Server、MCP Client 和 LLM 推理未实现",
+      "impact": "当前仅导入外部 Agent 记录并进行确定性问答。",
+      "relatedIds": [
+        "SELF-COMP-AGENT",
+        "SELF-COMP-QA"
+      ]
+    },
+    {
+      "title": "任意老项目自动逆向和真实仓库同步未实现",
+      "impact": "Self 包来自本次受控外部分析，不代表通用自动逆向引擎。",
+      "relatedIds": [
+        "SELF-FEAT-AKP"
+      ]
+    },
+    {
+      "title": "生产部署架构与运行监控未知",
+      "impact": "源码只证明离线 HTML 运行，没有生产基础设施、部署版本或监控资料。",
+      "relatedIds": [
+        "SELF-DEPLOY-FILE"
+      ]
+    },
+    {
+      "title": "多人实时协作与生产级审计未实现",
+      "impact": "反馈和 Agent 记录为单浏览器原型，需正式系统验证并发与审计。",
+      "relatedIds": [
+        "SELF-COMP-FEEDBACK"
+      ]
+    }
+  ],
+  "outcome": "真实源码 AKP 已生成，尚未由工具记录本身批准任何事实。",
+  "reviewStatus": "pending",
+  "importProposalId": null
+}
