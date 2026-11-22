@@ -92,37 +92,69 @@ public sealed class PostgresContractDeliveryStore(string connectionString, Postg
         if (string.IsNullOrWhiteSpace(request.BuildDigest) || string.IsNullOrWhiteSpace(request.Environment)) throw ProjectIdentityException.Invalid("Build digest and environment are required.");
         var read = await access.CreateReadContextAsync(principal, project, request.ReadContext, ct);
         var action = read.Mode == ReadMode.Historical ? "read_history" : "read";
-        await access.AuthorizeReadAsync(read, request.NormativeRevision.UnitId, action, request.NormativeRevision.RevisionId, ct);
-        await access.AuthorizeReadAsync(read, request.ObservedRevision.UnitId, action, request.ObservedRevision.RevisionId, ct);
+        // Authorize the containing units through the read context, then bind the exact
+        // revisions below. Normative and observed revisions may legitimately belong to
+        // different baselines, which is precisely what conformance comparison must support.
+        await access.AuthorizeReadAsync(read, request.NormativeRevision.UnitId, action, null, ct);
+        await access.AuthorizeReadAsync(read, request.ObservedRevision.UnitId, action, null, ct);
         await using var connection = await OpenAsync(ct); await using var tx = await connection.BeginTransactionAsync(ct); await SetContext(tx, project, principal, ct);
+        await AuthorizeExact(tx, principal, project, null, request.NormativeRevision, ct); await AuthorizeExact(tx, principal, project, null, request.ObservedRevision, ct);
         var expected = await RevisionPayload(tx, project, request.NormativeRevision, ct); var actual = await RevisionPayload(tx, project, request.ObservedRevision, ct);
         var equal = CanonicalJson.Sha256(expected) == CanonicalJson.Sha256(actual);
         var evidence = await ExistingEvidence(tx, project, request.NormativeRevision, request.ObservedRevision, request.BuildDigest, request.Environment, ct);
-        return new(null, request.NormativeRevision, request.ObservedRevision, request.BuildDigest, request.Environment, read.ContextHash, Hash(expected, actual),
+        // A check always compares the requested revisions again. Prior evidence may support the
+        // observation, but a previously recorded verdict is never reused as the new verdict.
+        return new(null, request.NormativeRevision, request.ObservedRevision, request.BuildDigest, request.Environment, read.ContextHash, EvidenceHash(evidence),
             evidence, expected, actual, "canonical revision comparison", equal ? "conformant" : "divergent");
     }
 
     public async Task<ConformanceView> RecordConformanceAsync(AtlasPrincipal actor, Guid project, ConformanceView request, string key, string requestId, string? trace, CancellationToken ct)
     {
         ValidateKey(key); var digest = Digest(request);
-        if (request.Verdict is not ("conformant" or "divergent" or "insufficient" or "unverified" or "stale" or "conflict") || string.IsNullOrWhiteSpace(request.Method)) throw ProjectIdentityException.Invalid("Conformance verdict and method are invalid.");
+        if (request.Verdict is not ("conformant" or "divergent" or "insufficient" or "unverified" or "stale" or "conflict") || string.IsNullOrWhiteSpace(request.Method) ||
+            string.IsNullOrWhiteSpace(request.BuildDigest) || string.IsNullOrWhiteSpace(request.Environment)) throw ProjectIdentityException.Invalid("Conformance verdict, method, build and environment are required.");
+        if (!IsSha256(request.ContextHash) || request.EvidenceHash != EvidenceHash(request.Evidence)) throw ProjectIdentityException.Invalid("Conformance context and evidence hashes must bind the exact supplied observation.");
+        if ((request.Verdict is "conformant" or "divergent") && (request.Evidence.Count == 0 || request.Evidence.Any(item => item.CaptureKind is "proposed" or "reconstructed")))
+            throw ProjectIdentityException.Invalid("A conformance decision requires actual captured or human-attested evidence.");
+        var read = await access.CreateReadContextAsync(actor.PrincipalId, project, new(ReadMode.Published, ReadPurpose.Implement, null, null, null), ct);
+        foreach (var unit in new[] { request.NormativeRevision, request.ObservedRevision }.Concat(request.Evidence.Select(item => item.Source)).Select(item => item.UnitId).Distinct())
+            await access.AuthorizeReadAsync(read, unit, "read", null, ct);
         await using var connection = await OpenAsync(ct); await using var tx = await connection.BeginTransactionAsync(ct); await SetContext(tx, project, actor.PrincipalId, ct); var verifier = await RequireMember(tx, project, actor.PrincipalId, true, ct);
         if (actor.Kind != PrincipalKind.Human || !verifier.Roles.Contains("Verifier")) throw ProjectIdentityException.Forbidden();
         if (await Replay<ConformanceView>(tx, project, actor.PrincipalId, "recordConformance", key, digest, ct) is { } replay) { await tx.CommitAsync(ct); return replay; }
         await AuthorizeExact(tx, actor.PrincipalId, project, null, request.NormativeRevision, ct); await AuthorizeExact(tx, actor.PrincipalId, project, null, request.ObservedRevision, ct);
         foreach (var item in request.Evidence) await AuthorizeExact(tx, actor.PrincipalId, project, null, item.Source, ct);
+        var expected = await RevisionPayload(tx, project, request.NormativeRevision, ct); var actual = await RevisionPayload(tx, project, request.ObservedRevision, ct);
+        if (CanonicalJson.Sha256(expected) != CanonicalJson.Sha256(request.Expected) || CanonicalJson.Sha256(actual) != CanonicalJson.Sha256(request.Actual))
+            throw ProjectIdentityException.Invalid("Expected and actual payloads must be freshly read from the identified revisions.");
+        var equal = CanonicalJson.Sha256(expected) == CanonicalJson.Sha256(actual);
+        if (request.Verdict == "conformant" && !equal || request.Verdict == "divergent" && equal)
+            throw ProjectIdentityException.Invalid("The conformance verdict must follow the current revision comparison.");
         var id = Guid.NewGuid(); var result = request with { CheckId = id };
         await Execute(tx, "INSERT INTO delivery.conformance(project_id,check_id,normative_revision_id,observed_revision_id,build_digest,environment,context_sha256,evidence_sha256,evidence_refs,expected,actual,verdict,method,created_by) VALUES(@project,@id,@normative,@observed,@build,@environment,@context,@evidenceHash,@evidence::jsonb,@expected::jsonb,@actual::jsonb,@verdict,@method,@actor)", ct,
             ("project", project), ("id", id), ("normative", request.NormativeRevision.RevisionId), ("observed", request.ObservedRevision.RevisionId), ("build", request.BuildDigest), ("environment", request.Environment),
             ("context", request.ContextHash), ("evidenceHash", request.EvidenceHash), ("evidence", JsonSerializer.Serialize(request.Evidence, Json)), ("expected", request.Expected.GetRawText()), ("actual", request.Actual.GetRawText()),
             ("verdict", request.Verdict), ("method", request.Method), ("actor", actor.PrincipalId));
+        if (request.Verdict is "divergent" or "stale" or "conflict")
+            await Execute(tx, """
+                INSERT INTO delivery.context_invalidation(project_id,invalidation_id,context_id,cause)
+                SELECT @project,gen_random_uuid(),cd.context_id,@cause
+                FROM delivery.context_dependency cd
+                WHERE cd.project_id=@project AND cd.required AND cd.revision_id IN (@normative,@observed)
+                  AND NOT EXISTS(SELECT 1 FROM delivery.context_invalidation i WHERE i.project_id=cd.project_id AND i.context_id=cd.context_id AND i.cause=@cause)
+                """, ct, ("project", project), ("normative", request.NormativeRevision.RevisionId), ("observed", request.ObservedRevision.RevisionId),
+                ("cause", $"conformance_{request.Verdict}_{id}"));
         await Save(tx, project, actor.PrincipalId, "recordConformance", key, digest, result, requestId, trace, ct); await tx.CommitAsync(ct); return result;
     }
 
     public async Task<IdView> RecordAcceptanceAsync(AtlasPrincipal actor, Guid project, Guid task, AcceptanceInput request, long expected, string key, string requestId, string? trace, CancellationToken ct)
     {
         ValidateKey(key); if (request.Result is not ("pass" or "fail" or "not_run" or "unknown") || string.IsNullOrWhiteSpace(request.TestId)) throw ProjectIdentityException.Invalid("Acceptance testId or result is invalid.");
-        if (request.Result == "pass" && (!request.Observed.HasValue || string.IsNullOrWhiteSpace(request.BuildDigest) || request.Evidence.Count == 0 || request.Evidence.Any(item => item.CaptureKind is "proposed" or "reconstructed"))) throw ProjectIdentityException.Invalid("A passing acceptance result requires observed output, build digest and actual captured evidence.");
+        if (request.Result == "pass" && (!request.Observed.HasValue || string.IsNullOrWhiteSpace(request.BuildDigest) || string.IsNullOrWhiteSpace(request.Environment) ||
+            request.Evidence.Count == 0 || request.Evidence.Any(item => item.CaptureKind is "proposed" or "reconstructed")))
+            throw ProjectIdentityException.Invalid("A passing acceptance result requires observed output, build, target environment and actual captured evidence.");
+        if (request.Result == "pass" && CanonicalJson.Sha256(request.Expected) != CanonicalJson.Sha256(request.Observed!.Value))
+            throw ProjectIdentityException.Invalid("A passing acceptance result cannot contradict its observed output.");
         var digest = Digest(new { task, request, expected }); await using var connection = await OpenAsync(ct); await using var tx = await connection.BeginTransactionAsync(ct);
         await SetContext(tx, project, actor.PrincipalId, ct); var member = await RequireMember(tx, project, actor.PrincipalId, true, ct);
         if (!member.Roles.Any(role => role is "Verifier" or "CIService")) throw ProjectIdentityException.Forbidden();
@@ -131,6 +163,8 @@ public sealed class PostgresContractDeliveryStore(string connectionString, Postg
         var context = await ReadContext(tx, actor.PrincipalId, project, request.ContextId, ct);
         if (context.TaskId != task || context.Phase != "executable" || context.Status != "valid") throw ProjectIdentityException.Conflict("Acceptance requires the current valid executable task context.");
         foreach (var item in request.Evidence) await AuthorizeExact(tx, actor.PrincipalId, project, context.BaselineId, item.Source, ct);
+        if (request.Result == "pass" && !request.Evidence.Any(item => context.RequiredRefs.Contains(item.Source)))
+            throw ProjectIdentityException.Invalid("A passing case must cite a requirement, rule or knowledge revision frozen in the task context.");
         var id = Guid.NewGuid(); var result = new IdView(id);
         await Execute(tx, "INSERT INTO delivery.acceptance(project_id,acceptance_id,task_id,context_id,test_id,expected,observed,result,build_digest,environment,evidence_refs,created_by) VALUES(@project,@id,@task,@context,@test,@expected::jsonb,@observed::jsonb,@result,@build,@environment,@evidence::jsonb,@actor)", ct,
             ("project", project), ("id", id), ("task", task), ("context", request.ContextId), ("test", request.TestId), ("expected", request.Expected.GetRawText()), ("observed", Db(request.Observed?.GetRawText())),
@@ -144,18 +178,24 @@ public sealed class PostgresContractDeliveryStore(string connectionString, Postg
         return await Closure(tx, principal, project, task, context, ct);
     }
 
-    public async Task<TaskView> RequestClosureAsync(AtlasPrincipal actor, Guid project, Guid task, CloseTaskRequest request, long expected, string key, string requestId, string? trace, CancellationToken ct)
+    public async Task<ClosureView> RequestClosureAsync(AtlasPrincipal actor, Guid project, Guid task, CloseTaskRequest request, long expected, string key, string requestId, string? trace, CancellationToken ct)
     {
         ValidateKey(key); if (actor.Kind != PrincipalKind.Human || string.IsNullOrWhiteSpace(request.Reason)) throw ProjectIdentityException.Invalid("An independent human acceptance reason is required.");
         var digest = Digest(new { task, request, expected }); await using var connection = await OpenAsync(ct); await using var tx = await connection.BeginTransactionAsync(ct);
         await SetContext(tx, project, actor.PrincipalId, ct); var member = await RequireMember(tx, project, actor.PrincipalId, false, ct);
-        if (!member.Roles.Any(role => role is "Verifier" or "Reviewer" or "ProjectAdmin")) throw ProjectIdentityException.Forbidden();
-        if (await Replay<TaskView>(tx, project, actor.PrincipalId, "requestTaskClosure", key, digest, ct) is { } replay) { await tx.CommitAsync(ct); return replay; }
+        if (!member.Roles.Any(role => role is "BusinessOwner" or "Verifier")) throw ProjectIdentityException.Forbidden();
+        if (await Replay<ClosureView>(tx, project, actor.PrincipalId, "requestTaskClosure", key, digest, ct) is { } replay) { await tx.CommitAsync(ct); return replay; }
         var row = await TaskRow(tx, project, task, true, ct); if (row.Version != expected) throw ProjectIdentityException.CasMismatch(); if (row.CreatedBy == actor.PrincipalId) throw ProjectIdentityException.Forbidden();
+        if (row.State == "completed") throw ProjectIdentityException.Conflict("The task is already closed.");
         var closure = await Closure(tx, actor.PrincipalId, project, task, request.ContextId, ct);
         if (closure.State != "ready_for_acceptance") throw ProjectIdentityException.Conflict("All critical closure checks must pass before independent human acceptance.");
         await Execute(tx, "UPDATE collab.task SET state='completed',version=version+1 WHERE project_id=@project AND task_id=@task", ct, ("project", project), ("task", task));
-        var result = await ReadTask(tx, project, task, ct); await Save(tx, project, actor.PrincipalId, "requestTaskClosure", key, digest, result, requestId, trace, ct); await tx.CommitAsync(ct); return result;
+        var result = closure with { State = "complete" };
+        await Save(tx, project, actor.PrincipalId, "requestTaskClosure", key, digest, result, requestId, trace, ct);
+        await Execute(tx, "INSERT INTO ops.audit_event(project_id,audit_id,actor_id,action,resource_ref,result_code,request_id,trace_id) VALUES(@project,@audit,@actor,'humanTaskAcceptance',@resource::jsonb,'OK',@request,@trace)", ct,
+            ("project", project), ("audit", Guid.NewGuid()), ("actor", actor.PrincipalId), ("resource", JsonSerializer.Serialize(new { task, request.ContextId, request.Reason, closureDigest = Digest(closure) }, Json)),
+            ("request", requestId), ("trace", trace));
+        await tx.CommitAsync(ct); return result;
     }
 
     public async Task<IdView> IngestProposalAsync(AtlasPrincipal actor, Guid project, JsonElement proposal, string key, string requestId, string? trace, CancellationToken ct)
@@ -231,26 +271,85 @@ public sealed class PostgresContractDeliveryStore(string connectionString, Postg
         if (context.TaskId != task) throw ProjectIdentityException.NotFound(); var checks = new List<ClosureCheck>();
         var valid = context.Phase == "executable" && context.Status == "valid";
         checks.Add(new("authorization", valid ? "pass" : "fail", true, valid ? "Executable context is current and authorized." : "Context is stale, insufficient or not executable.", [], "Build a reauthorized current context."));
-        checks.Add(new("targetCheck", valid && context.Target.Count > 0 ? "pass" : "fail", true, "Target changes must be explicitly frozen.", []));
+        var approvalRequired = row.Classification != "implementation_only";
+        checks.Add(new("approvalCheck", !approvalRequired ? "not_applicable" : context.ApprovalIds.Count > 0 ? "pass" : "fail", true,
+            approvalRequired ? "The approved business target and its preserving constraints must remain bound to this context." : "Implementation-only compatibility work does not create a business approval.", []));
+        checks.Add(new("targetCheck", valid && context.Target.Count > 0 ? "pass" : "fail", true, "Target changes must be explicitly frozen.", context.Evidence));
         var impacts = await Impacts(tx, project, task, ct);
-        var unresolved = impacts.Where(item => context.ImpactIds.Contains(item.ImpactId) && (item.CloseState != "resolved" || item.InspectionState is not ("inspected" or "verified"))).ToArray();
-        checks.Add(new("impactCheck", unresolved.Length == 0 ? "pass" : "fail", true, unresolved.Length == 0 ? "All frozen impacts are resolved and inspected." : $"{unresolved.Length} impacts remain unresolved.", []));
-        var passing = await Scalar<long>(tx, "SELECT count(*) FROM delivery.acceptance WHERE project_id=@project AND task_id=@task AND context_id=@context AND result='pass'", ct, ("project", project), ("task", task), ("context", contextId));
-        var failing = await Scalar<long>(tx, "SELECT count(*) FROM delivery.acceptance WHERE project_id=@project AND task_id=@task AND context_id=@context AND result IN ('fail','not_run','unknown')", ct, ("project", project), ("task", task), ("context", contextId));
-        checks.Add(new("testCheck", passing > 0 && failing == 0 ? "pass" : failing > 0 ? "fail" : "unknown", true, "Passing evidence is required and no result may remain failed or unknown.", []));
-        checks.Add(new("preserveCheck", passing > 0 && context.Preserve.Count >= 0 ? "pass" : "unknown", true, "Preserved constraints are covered only by actual passing acceptance evidence.", []));
+        var unresolved = impacts.Where(item => context.ImpactIds.Contains(item.ImpactId) && (item.CloseState != "resolved" || item.InspectionState is not ("inspected" or "verified") ||
+            item.Disposition == "no_change" && item.Evidence.Count == 0)).ToArray();
+        checks.Add(new("impactCheck", unresolved.Length == 0 ? "pass" : "fail", true,
+            unresolved.Length == 0 ? "All frozen impacts are resolved, inspected and evidenced." : $"{unresolved.Length} impacts remain unresolved or lack no-change evidence.",
+            [], "Resolve and verify every frozen impact."));
+
         var delivery = await Scalar<Guid?>(tx, "SELECT delivery_id FROM delivery.delivery_record WHERE project_id=@project AND task_id=@task ORDER BY created_at DESC LIMIT 1", ct, ("project", project), ("task", task));
         DeliveryStatus? status = delivery.HasValue ? await ReconcileOne(tx, project, delivery.Value, ct) : null;
         checks.Add(new("codeEvidenceCheck", status?.Status is "aligned" or "pending_review" ? "pass" : "fail", true, status is null ? "No verified CI delivery manifest exists." : $"Delivery reconciliation is {status.Status}.", []));
         checks.Add(new("knowledgeCheck", status?.ChangeSetId.HasValue == true && status.PublishedBaselineId.HasValue ? "pass" : "unknown", true, "Knowledge must be approved and published, or explicitly handled as authorized noncritical debt.", []));
-        checks.Add(new("deploymentCheck", status?.Status == "aligned" ? "pass" : "fail", true, "The target environment must match the delivered commit and build.", []));
-        var conformance = await Scalar<long>(tx, "SELECT count(*) FROM delivery.conformance c JOIN delivery.delivery_record d ON d.project_id=c.project_id AND d.build_digest=c.build_digest WHERE c.project_id=@project AND d.task_id=@task AND c.verdict IN ('divergent','stale','conflict')", ct, ("project", project), ("task", task));
-        checks.Add(new("conformanceCheck", conformance == 0 ? "pass" : "fail", true, conformance == 0 ? "No recorded divergence for this build." : "Divergent or stale conformance evidence blocks closure.", []));
+        var openCriticalDebt = await Scalar<long>(tx, "SELECT count(*) FROM delivery.knowledge_debt WHERE project_id=@project AND task_id=@task AND state NOT IN ('closed','cancelled') AND risk IN ('high','critical')", ct, ("project", project), ("task", task));
+        if (openCriticalDebt > 0) checks.Add(new("knowledgeDebt", "fail", true, $"{openCriticalDebt} critical knowledge debts remain open.", [], "Close required knowledge debt before completion."));
+
+        var acceptance = await LatestAcceptance(tx, project, task, contextId, ct);
+        var passing = acceptance.Where(item => item.Result == "pass").ToArray(); var failing = acceptance.Where(item => item.Result != "pass").ToArray();
+        var uncoveredCases = context.AcceptanceCases.Where(reference => !passing.Any(item => Covers(item, reference))).ToArray();
+        var testPass = passing.Length > 0 && failing.Length == 0 && uncoveredCases.Length == 0;
+        checks.Add(new("testCheck", testPass ? "pass" : failing.Length > 0 ? "fail" : "unknown", true,
+            testPass ? "Every current acceptance case has passing actual evidence." : failing.Length > 0 ? "A current acceptance result is failed, not run or unknown." : uncoveredCases.Length > 0 ? $"{uncoveredCases.Length} frozen acceptance cases lack passing evidence." : "At least one passing actual acceptance result is required.",
+            passing.SelectMany(item => item.Evidence).ToArray(), "Run and record every positive, boundary, regression and permission case."));
+        var uncoveredPreserve = context.Preserve.Where(reference => !passing.Any(item => Covers(item, reference))).ToArray();
+        var preserveStatus = context.Preserve.Count == 0 ? "not_applicable" : uncoveredPreserve.Length == 0 && failing.Length == 0 ? "pass" : "unknown";
+        checks.Add(new("preserveCheck", preserveStatus, true, context.Preserve.Count == 0 ? "No separate preserve revision was frozen." : uncoveredPreserve.Length == 0 ? "Every preserved constraint is covered by passing evidence." : $"{uncoveredPreserve.Length} preserved constraints lack explicit passing evidence.",
+            passing.SelectMany(item => item.Evidence).ToArray(), "Add acceptance evidence citing each preserved revision."));
+
+        var deployedAcceptance = passing.FirstOrDefault(item => status is not null && item.BuildDigest == status.BuildDigest && !string.IsNullOrWhiteSpace(item.Environment));
+        var targetEnvironment = deployedAcceptance?.Environment;
+        var deployed = targetEnvironment is not null && status is not null && await Scalar<long>(tx, """
+            SELECT count(*) FROM delivery.deployment_record WHERE project_id=@project AND environment=@environment AND repo_key=(SELECT repo_key FROM delivery.delivery_record WHERE project_id=@project AND delivery_id=@delivery)
+              AND final_commit_sha=@commit AND build_digest=@build
+            """, ct, ("project", project), ("delivery", delivery), ("environment", targetEnvironment), ("commit", status.CommitSha), ("build", status.BuildDigest)) > 0;
+        checks.Add(new("deploymentCheck", deployed && status?.Status == "aligned" ? "pass" : "fail", true,
+            deployed ? "The acceptance target environment matches the delivered commit and build." : "The passing acceptance build has no matching target-environment deployment reconciliation.", []));
+
+        var conformance = 0L; var conformant = 0L;
+        if (status is not null && targetEnvironment is not null && context.RequiredRefs.Count > 0)
+        {
+            var revisions = context.RequiredRefs.Select(item => item.RevisionId).ToArray();
+            conformance = await Scalar<long>(tx, """
+                WITH latest AS (SELECT c.*,row_number() OVER(PARTITION BY normative_revision_id,observed_revision_id,build_digest,environment ORDER BY created_at DESC,check_id DESC) rn
+                  FROM delivery.conformance c WHERE c.project_id=@project AND c.build_digest=@build AND c.environment=@environment AND c.normative_revision_id=ANY(@revisions))
+                SELECT count(*) FROM latest WHERE rn=1 AND verdict IN ('divergent','stale','conflict')
+                """, ct, ("project", project), ("build", status.BuildDigest), ("environment", targetEnvironment), ("revisions", revisions));
+            conformant = await Scalar<long>(tx, """
+                WITH latest AS (SELECT c.*,row_number() OVER(PARTITION BY normative_revision_id,observed_revision_id,build_digest,environment ORDER BY created_at DESC,check_id DESC) rn
+                  FROM delivery.conformance c WHERE c.project_id=@project AND c.build_digest=@build AND c.environment=@environment AND c.normative_revision_id=ANY(@revisions))
+                SELECT count(*) FROM latest WHERE rn=1 AND verdict='conformant'
+                """, ct, ("project", project), ("build", status.BuildDigest), ("environment", targetEnvironment), ("revisions", revisions));
+        }
+        checks.Add(new("conformanceCheck", conformance == 0 && conformant > 0 ? "pass" : conformance > 0 ? "fail" : "unknown", true,
+            conformance > 0 ? "The latest reverse observation is divergent, stale or conflicting." : conformant > 0 ? "Fresh conformance evidence supports this build and environment." : "No fresh conformant observation binds the delivered build and target environment.", [],
+            "Recheck the exact normative and observed revisions and record actual evidence."));
         var openIssues = await Scalar<long>(tx, "SELECT count(*) FROM collab.issue WHERE project_id=@project AND task_id=@task AND state IN ('open','addressed')", ct, ("project", project), ("task", task));
         checks.Add(new("unresolvedIssues", openIssues == 0 ? "pass" : "fail", true, openIssues == 0 ? "No unresolved task issues." : $"{openIssues} task issues remain open.", []));
-        var blocked = checks.Any(item => item.Critical && item.Status != "pass"); var state = row.State == "completed" && !blocked ? "complete" : blocked ? "blocked" : "ready_for_acceptance";
+        var blocked = checks.Any(item => item.Critical && item.Status is not ("pass" or "not_applicable")); var state = row.State == "completed" && !blocked ? "complete" : blocked ? "blocked" : "ready_for_acceptance";
         var unknowns = checks.Where(item => item.Status == "unknown").Select(item => new ContextUnknown(item.Key, item.Reason, item.Critical ? "blocking" : "warning", "unverified", item.NextAction)).ToArray();
         return new(task, contextId, state, checks, unknowns);
+    }
+
+    private static bool Covers(AcceptanceRecord acceptance, RevisionRef reference) =>
+        acceptance.TestId == reference.RevisionId.ToString() || acceptance.TestId == reference.UnitId.ToString() || acceptance.Evidence.Any(item => item.Source == reference);
+
+    private static async Task<List<AcceptanceRecord>> LatestAcceptance(NpgsqlTransaction tx, Guid project, Guid task, Guid context, CancellationToken ct)
+    {
+        var result = new List<AcceptanceRecord>();
+        await using var command = Command(tx, """
+            WITH latest AS (SELECT a.*,row_number() OVER(PARTITION BY test_id ORDER BY created_at DESC,acceptance_id DESC) rn
+              FROM delivery.acceptance a WHERE project_id=@project AND task_id=@task AND context_id=@context)
+            SELECT test_id,result,build_digest,environment,evidence_refs::text FROM latest WHERE rn=1 ORDER BY created_at DESC,acceptance_id DESC
+            """, ("project", project), ("task", task), ("context", context));
+        await using var reader = await command.ExecuteReaderAsync(ct);
+        while (await reader.ReadAsync(ct)) result.Add(new(reader.GetString(0), reader.GetString(1), reader.IsDBNull(2) ? null : reader.GetString(2), reader.IsDBNull(3) ? null : reader.GetString(3),
+            Deserialize<List<ContextEvidence>>(JsonDocument.Parse(reader.GetString(4)).RootElement)));
+        return result;
     }
 
     private async Task<DeliveryStatus> ReconcileOne(NpgsqlTransaction tx, Guid project, Guid delivery, CancellationToken ct)
@@ -392,7 +491,8 @@ public sealed class PostgresContractDeliveryStore(string connectionString, Postg
     private static Guid RequiredGuid(JsonElement element, string property) => Guid.TryParse(RequiredString(element, property), out var result) ? result : throw ProjectIdentityException.Invalid($"{property} must be a UUID.");
     private static void ValidateKey(string key) { if (key.Length is < 8 or > 128) throw ProjectIdentityException.Invalid("Idempotency-Key must contain 8-128 characters."); }
     private static string Digest<T>(T value) => Sha256(JsonSerializer.Serialize(value, Json));
-    private static string Hash(params JsonElement[] values) => Sha256(string.Join('|', values.Select(CanonicalJson.Sha256)));
+    private static string EvidenceHash(IEnumerable<ContextEvidence> evidence) => CanonicalJson.Sha256(JsonSerializer.SerializeToElement(evidence, Json));
+    private static bool IsSha256(string value) => value.Length == 64 && value.All(character => character is >= '0' and <= '9' or >= 'a' and <= 'f');
     private static string Sha256(string value) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(value))).ToLowerInvariant();
     private static Guid? Cursor(string? value) { if (string.IsNullOrEmpty(value)) return null; try { return new Guid(Convert.FromBase64String(value)); } catch { throw ProjectIdentityException.Invalid("Invalid cursor."); } }
     private static async Task<T?> Replay<T>(NpgsqlTransaction tx, Guid project, Guid principal, string operation, string key, string digest, CancellationToken ct)
@@ -401,6 +501,7 @@ public sealed class PostgresContractDeliveryStore(string connectionString, Postg
         await Execute(tx, "INSERT INTO ops.idempotency(project_id,record_id,principal_id,operation_id,idempotency_key,request_sha256,result_ref) VALUES(@project,@record,@principal,@operation,@key,@digest,@result::jsonb); INSERT INTO ops.audit_event(project_id,audit_id,actor_id,action,resource_ref,result_code,request_id,trace_id) VALUES(@project,@audit,@principal,@operation,@resource::jsonb,'OK',@request,@trace)", ct,
             ("project", project), ("record", Guid.NewGuid()), ("principal", principal), ("operation", operation), ("key", key), ("digest", digest), ("result", JsonSerializer.Serialize(new { requestSha256 = digest, result }, Json)),
             ("audit", Guid.NewGuid()), ("resource", JsonSerializer.Serialize(result, Json)), ("request", requestId), ("trace", trace));
+    private sealed record AcceptanceRecord(string TestId, string Result, string? BuildDigest, string? Environment, IReadOnlyList<ContextEvidence> Evidence);
     private sealed record TaskRowData(Guid BaseBaseline, string Summary, string State, long Version, Guid CreatedBy, string Classification);
     private sealed record MemberData(long Version, long Epoch, string[] Roles);
 }

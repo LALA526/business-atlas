@@ -4,6 +4,7 @@ using AccessApplicability.Infrastructure;
 using ContractDelivery.Contracts;
 using ContractDelivery.Infrastructure;
 using ImportEvidence.Blob;
+using KnowledgeCore.Application;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using ProjectIdentity.Application;
@@ -93,6 +94,129 @@ public sealed class ContractDeliveryTests
             await using var command = connection.CreateCommand(); command.CommandText = $"DROP DATABASE IF EXISTS {database} WITH (FORCE)"; await command.ExecuteNonQueryAsync();
             if (Directory.Exists(blobRoot)) Directory.Delete(blobRoot, true);
         }
+    }
+
+    [PostgreSqlFact]
+    public async Task AT_T25_Reverse_observation_invalidates_and_real_evidence_gates_human_closure()
+    {
+        var administrator = new NpgsqlConnectionStringBuilder(Environment.GetEnvironmentVariable("ATLAS_TEST_CONNECTIONSTRING"));
+        var database = $"atlas_t25_{Guid.NewGuid():N}"; var blobRoot = Path.Combine(Path.GetTempPath(), $"atlas-t25-{Guid.NewGuid():N}");
+        await using (var connection = new NpgsqlConnection(administrator.ConnectionString))
+        { await connection.OpenAsync(); await using var command = connection.CreateCommand(); command.CommandText = $"CREATE DATABASE {database}"; await command.ExecuteNonQueryAsync(); }
+        administrator.Database = database;
+        try
+        {
+            var options = new DbContextOptionsBuilder<BuildingBlocks.Persistence.AtlasDbContext>().UseNpgsql(administrator.ConnectionString).Options;
+            await using (var context = new BuildingBlocks.Persistence.AtlasDbContext(options)) await context.Database.MigrateAsync();
+            var runtime = new NpgsqlConnectionStringBuilder(administrator.ConnectionString) { Options = "-c role=atlas_app" }.ConnectionString;
+            var projects = new PostgresProjectIdentityStore(runtime); var access = new PostgresAccessApplicabilityStore(runtime);
+            var collab = new PostgresTaskCollabStore(runtime, access); var delivery = new PostgresContractDeliveryStore(runtime, access, new PrivateBlobStorage(blobRoot));
+            var author = await projects.ResolvePrincipalAsync($"https://identity.test/{Guid.NewGuid():N}", "t25-automated-author", PrincipalKind.Human, CancellationToken.None);
+            var verifier = await projects.ResolvePrincipalAsync($"https://identity.test/{Guid.NewGuid():N}", "t25-automated-verifier", PrincipalKind.Human, CancellationToken.None);
+            var acceptor = await projects.ResolvePrincipalAsync($"https://identity.test/{Guid.NewGuid():N}", "t25-automated-independent-acceptor", PrincipalKind.Human, CancellationToken.None);
+            var ci = await projects.ResolvePrincipalAsync($"https://identity.test/{Guid.NewGuid():N}", "t25-ci-service", PrincipalKind.Service, CancellationToken.None);
+            var project = await projects.CreateProjectAsync(author, new("Conformance closure", $"closure-{Guid.NewGuid():N}", "t25-project-0001"), "t25-r1", null, CancellationToken.None);
+            await AddMembership(administrator.ConnectionString, project.ProjectId, verifier.PrincipalId, "Verifier");
+            await AddMembership(administrator.ConnectionString, project.ProjectId, acceptor.PrincipalId, "Verifier");
+            await AddMembership(administrator.ConnectionString, project.ProjectId, ci.PrincipalId, "CIService");
+            var unit = Guid.NewGuid(); var revision = Guid.NewGuid();
+            await AddUnit(administrator.ConnectionString, project.ProjectId, author.PrincipalId, project.CurrentBaselineId, unit, revision);
+            var task = await collab.CreateTaskAsync(author, project.ProjectId, new("Preserve the documented outcome during implementation", null, unit, null, null), "t25-task-0001", "t25-r2", null, CancellationToken.None);
+            var amended = await collab.AmendTaskAsync(author, project.ProjectId, task.TaskId,
+                new(null, [new("revalidate", "Recheck the exact implementation observation", "Implementation-only compatibility check", new(unit, revision))], [new(unit, revision)], null),
+                task.Version, "t25-amend-001", "t25-r3", null, CancellationToken.None);
+            await SetImplementationOnly(administrator.ConnectionString, project.ProjectId, task.TaskId);
+            var readRequest = new ReadContextRequest(ReadMode.Published, ReadPurpose.Implement, project.CurrentBaselineId, null, null);
+            var built = await delivery.BuildContextAsync(author, project.ProjectId, task.TaskId, new(readRequest, "executable"), amended.Version, "t25-context-01", "t25-r4", null, CancellationToken.None);
+            var blocked = await delivery.CheckClosureAsync(verifier.PrincipalId, project.ProjectId, task.TaskId, built.ContextId, CancellationToken.None);
+            Assert.Equal("blocked", blocked.State);
+            Assert.Contains(blocked.Checks, item => item.Key == "testCheck" && item.Status != "pass");
+            Assert.Contains(blocked.Checks, item => item.Key == "conformanceCheck" && item.Status != "pass");
+
+            var evidence = new[] { new ContextEvidence(new(unit, revision), JsonSerializer.SerializeToElement(new { kind = "test", uri = "private://ci/25/conformance" }), "supports", "rawCaptured") };
+            var checkRequest = new ConformanceCheckRequest(new(unit, revision), new(unit, revision), readRequest, new string('d', 64), "production");
+            var checkedConformance = await delivery.CheckConformanceAsync(verifier.PrincipalId, project.ProjectId, checkRequest, CancellationToken.None);
+            var conformanceInput = checkedConformance with { Evidence = evidence, EvidenceHash = TestEvidenceHash(evidence) };
+            await delivery.RecordConformanceAsync(verifier, project.ProjectId, conformanceInput, "t25-conformance-pass", "t25-r5", null, CancellationToken.None);
+            var expected = JsonSerializer.SerializeToElement(new { outcome = "preserved", permission = "unchanged" });
+            var contradictory = await Assert.ThrowsAsync<ProjectIdentityException>(() => delivery.RecordAcceptanceAsync(verifier, project.ProjectId, task.TaskId,
+                new(built.ContextId, revision.ToString(), expected, JsonSerializer.SerializeToElement(new { outcome = "changed" }), "pass", checkRequest.BuildDigest, "production", evidence),
+                amended.Version + 1, "t25-acceptance-bad", "t25-r6", null, CancellationToken.None));
+            Assert.Equal(422, contradictory.StatusCode);
+            await delivery.RecordAcceptanceAsync(verifier, project.ProjectId, task.TaskId,
+                new(built.ContextId, revision.ToString(), expected, expected, "pass", checkRequest.BuildDigest, "production", evidence),
+                amended.Version + 1, "t25-acceptance-pass", "t25-r7", null, CancellationToken.None);
+
+            var proposal = JsonSerializer.SerializeToElement(new { schemaVersion = "1.3.0", proposalId = "T25-PROPOSAL", projectId = project.ProjectId, taskId = task.TaskId,
+                repo = new { url = "https://example.invalid/business-atlas.git", branch = "task/T25", pullRequestId = "25" } });
+            await delivery.IngestProposalAsync(author, project.ProjectId, proposal, "t25-proposal-01", "t25-r8", null, CancellationToken.None);
+            var proposalSha = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(proposal.GetRawText()))).ToLowerInvariant();
+            var commit = new string('c', 40);
+            var manifest = JsonSerializer.SerializeToElement(new { schemaVersion = "1.3.0", deliveryId = "T25-DELIVERY", proposalId = "T25-PROPOSAL", proposalSha256 = proposalSha,
+                projectId = project.ProjectId, taskId = task.TaskId, repo = new { url = "https://example.invalid/business-atlas.git", pullRequestId = "25" }, finalCommitSha = commit,
+                mergeStrategy = "squash", buildId = "CI-25", buildDigest = checkRequest.BuildDigest, verifiedAt = DateTimeOffset.UtcNow,
+                testEvidence = new[] { new { testId = "AT-T25", result = "passed", artifactUri = "private://ci/25/tests" } },
+                anchorResolutions = new[] { new { path = "src/Modules/ContractDelivery", locator = "contract", resolvedBlobSha = new string('e', 40), verification = "matched" } }, status = "verified" });
+            var delivered = await delivery.IngestManifestAsync(ci, project.ProjectId, manifest, "t25-manifest-01", "t25-r9", null, CancellationToken.None);
+            await PublishKnowledge(administrator.ConnectionString, project.ProjectId, project.CurrentBaselineId, delivered.DeliveryId, author.PrincipalId);
+            await delivery.RecordDeploymentAsync(ci, project.ProjectId, new(null, "production", "https://example.invalid/business-atlas.git", commit, checkRequest.BuildDigest,
+                "20261122000000", new string('f', 64), DateTimeOffset.UtcNow, null, evidence), "t25-deploy-0001", "t25-r10", null, CancellationToken.None);
+            var ready = await delivery.CheckClosureAsync(verifier.PrincipalId, project.ProjectId, task.TaskId, built.ContextId, CancellationToken.None);
+            Assert.Equal("ready_for_acceptance", ready.State);
+            Assert.All(ready.Checks, item => Assert.True(item.Status is "pass" or "not_applicable", $"{item.Key}: {item.Reason}"));
+            var current = await collab.GetTaskAsync(author.PrincipalId, project.ProjectId, task.TaskId, CancellationToken.None);
+            var closed = await delivery.RequestClosureAsync(acceptor, project.ProjectId, task.TaskId, new(built.ContextId, "Automated test actor verified the complete synthetic evidence chain."),
+                current.Version, "t25-close-0001", "t25-r11", null, CancellationToken.None);
+            Assert.Equal("complete", closed.State);
+
+            var observed = Guid.NewGuid(); await AddObservedRevision(administrator.ConnectionString, project.ProjectId, unit, revision, observed, verifier.PrincipalId);
+            var historicalRead = new ReadContextRequest(ReadMode.Historical, ReadPurpose.Implement, project.CurrentBaselineId, null, null);
+            var reverse = await delivery.CheckConformanceAsync(verifier.PrincipalId, project.ProjectId, checkRequest with { ObservedRevision = new(unit, observed), ReadContext = historicalRead }, CancellationToken.None);
+            Assert.Equal("divergent", reverse.Verdict);
+            await delivery.RecordConformanceAsync(verifier, project.ProjectId, reverse with { Evidence = evidence, EvidenceHash = TestEvidenceHash(evidence) }, "t25-conformance-reverse", "t25-r12", null, CancellationToken.None);
+            Assert.Equal("stale", (await delivery.GetContextAsync(author.PrincipalId, project.ProjectId, built.ContextId, CancellationToken.None)).Status);
+            var invalidated = await delivery.CheckClosureAsync(verifier.PrincipalId, project.ProjectId, task.TaskId, built.ContextId, CancellationToken.None);
+            Assert.Equal("blocked", invalidated.State);
+            Assert.Contains(invalidated.Checks, item => item.Key == "authorization" && item.Status == "fail");
+        }
+        finally
+        {
+            NpgsqlConnection.ClearAllPools(); administrator.Database = "postgres";
+            await using var connection = new NpgsqlConnection(administrator.ConnectionString); await connection.OpenAsync();
+            await using var command = connection.CreateCommand(); command.CommandText = $"DROP DATABASE IF EXISTS {database} WITH (FORCE)"; await command.ExecuteNonQueryAsync();
+            if (Directory.Exists(blobRoot)) Directory.Delete(blobRoot, true);
+        }
+    }
+
+    private static string TestEvidenceHash(IEnumerable<ContextEvidence> evidence) =>
+        CanonicalJson.Sha256(JsonSerializer.SerializeToElement(evidence, new JsonSerializerOptions(JsonSerializerDefaults.Web)));
+
+    private static async Task PublishKnowledge(string connection, Guid project, Guid baseBaseline, Guid delivery, Guid actor)
+    {
+        await using var db = new NpgsqlConnection(connection); await db.OpenAsync(); await using var command = db.CreateCommand(); command.CommandText = """
+            SET session_replication_role=replica;
+            INSERT INTO gov.change_set(project_id,change_set_id,base_baseline_id,title,state,review_requirements,summary,created_by,version)
+              VALUES(@project,@change,@base,'T25 knowledge','published','{}','{}',@actor,1);
+            INSERT INTO gov.baseline(project_id,baseline_id,baseline_no,parent_baseline_id,change_set_id,registry_version,digest,sealed,created_by)
+              SELECT @project,@published,baseline_no+1,@base,@change,registry_version,@digest,true,@actor FROM gov.baseline WHERE project_id=@project AND baseline_id=@base;
+            UPDATE delivery.delivery_record SET change_set_id=@change WHERE project_id=@project AND delivery_id=@delivery;
+            """;
+        command.Parameters.AddWithValue("project", project); command.Parameters.AddWithValue("change", Guid.NewGuid()); command.Parameters.AddWithValue("published", Guid.NewGuid());
+        command.Parameters.AddWithValue("base", baseBaseline); command.Parameters.AddWithValue("delivery", delivery); command.Parameters.AddWithValue("actor", actor); command.Parameters.AddWithValue("digest", new string('b', 64));
+        await command.ExecuteNonQueryAsync();
+    }
+
+    private static async Task AddObservedRevision(string connection, Guid project, Guid unit, Guid parent, Guid revision, Guid actor)
+    {
+        await using var db = new NpgsqlConnection(connection); await db.OpenAsync(); await using var command = db.CreateCommand(); command.CommandText = """
+            SET session_replication_role=replica;
+            INSERT INTO core.revision(project_id,revision_id,unit_id,rev_no,parent_revision_id,schema_type,schema_version,fact_kind,verification,payload,applicability,content_sha256,sealed,created_by)
+              VALUES(@project,@revision,@unit,2,@parent,'Source','1.0','observed','verified','{"title":"Reverse observation invalidates the old conclusion"}','{}',@hash,true,@actor);
+            INSERT INTO access.grant(project_id,grant_id,unit_id,principal_id,action,field_paths,effect,created_by)
+              VALUES(@project,gen_random_uuid(),@unit,@actor,'read_history',ARRAY['*'],'allow',@actor);
+            """;
+        command.Parameters.AddWithValue("project", project); command.Parameters.AddWithValue("unit", unit); command.Parameters.AddWithValue("parent", parent);
+        command.Parameters.AddWithValue("revision", revision); command.Parameters.AddWithValue("actor", actor); command.Parameters.AddWithValue("hash", new string('c', 64)); await command.ExecuteNonQueryAsync();
     }
 
     private static async Task AddUnit(string connection, Guid project, Guid actor, Guid baseline, Guid unit, Guid revision)
