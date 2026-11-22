@@ -47,16 +47,28 @@ export default function ProjectShell() {
   };
 
   return <div className="app-shell">
+    <header className="workspace-header">
+      <button className="menu-button" aria-label="打开导航" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)}>☰</button>
+      <Link className="brand" to={`/p/${projectId}/overview`}><span className="brand-mark">A</span><span>Business Atlas</span><small>业务认知工作空间</small></Link>
+      <label className="project-switcher"><span>当前项目</span><select aria-label="切换项目" value={projectId} onChange={event => chooseProject(event.target.value)}>{projects.data?.items.map(item => <option key={item.projectId} value={item.projectId}>{item.displayName}</option>)}</select></label>
+      <button ref={searchButton} className="search-trigger" onClick={() => setSearchOpen(true)}><span aria-hidden="true">⌕</span><span>搜索当前项目知识</span><kbd>/</kbd></button>
+      <Link className="workspace-projects" to="/projects">全部项目</Link>
+      <span className="user"><i />{session.displayName}</span>
+    </header>
     <aside className={menuOpen ? 'sidebar open' : 'sidebar'}>
-      <Link className="brand" to={`/p/${projectId}/overview`}><span className="brand-mark">BA</span><span>Business Atlas<small>业务认知工作空间</small></span></Link>
-      <div className="workspace-label">当前工作空间</div>
-      <select className="shell-project-select" aria-label="切换项目" value={projectId} onChange={event => chooseProject(event.target.value)}>{projects.data?.items.map(item => <option key={item.projectId} value={item.projectId}>{item.displayName}</option>)}</select>
-      <nav className="primary-nav" aria-label="项目主导航">{entries.map(([path, label, description]) => <NavLink key={path} to={`/p/${projectId}/${path}`} onClick={() => setMenuOpen(false)}><span>{label}</span><small>{description}</small></NavLink>)}</nav>
-      <div className="sidebar-foot"><Link to={`/p/${projectId}/imports`}>资料接入与导入历史 <span>↗</span></Link><Link to="/projects">全部项目</Link></div>
+      <nav className="primary-nav" aria-label="项目主导航">
+        <span className="nav-group-label">理解项目</span>
+        {entries.slice(0, 3).map(([path, label]) => <NavLink key={path} to={`/p/${projectId}/${path}`} onClick={() => setMenuOpen(false)}><span>{label}</span></NavLink>)}
+        <span className="nav-group-label">维护知识</span>
+        <NavLink to={`/p/${projectId}/review`} onClick={() => setMenuOpen(false)}><span>变更与审核</span></NavLink>
+        <span className="nav-group-label">项目协作</span>
+        {entries.slice(4).map(([path, label]) => <NavLink key={path} to={`/p/${projectId}/${path}`} onClick={() => setMenuOpen(false)}><span>{label}</span></NavLink>)}
+      </nav>
+      {project && <section className="sidebar-context" aria-label="当前知识版本"><span>当前知识版本</span><strong>{overview.data?.context.baselineId ? '已发布' : '正在读取'}</strong><small>{overview.data?.completeness === 'complete' ? '授权范围完整' : '按当前权限读取'}</small></section>}
+      <div className="sidebar-foot"><Link to={`/p/${projectId}/imports`}>资料接入与导入历史 <span>↗</span></Link></div>
     </aside>
     {menuOpen && <button className="nav-scrim" aria-label="关闭导航" onClick={() => setMenuOpen(false)} />}
     <div className="shell-content">
-      <header className="shell-header"><button className="menu-button" aria-label="打开导航" onClick={() => setMenuOpen(true)}>☰</button><div><strong>{project?.displayName ?? '项目工作空间'}</strong><small>{project?.slug}</small></div><button ref={searchButton} className="search-trigger" onClick={() => setSearchOpen(true)}><span>⌕</span>搜索业务知识<kbd>/</kbd></button><span className="context-chip">正式发布</span><span className="user"><i />{session.displayName}<small>已认证会话</small></span></header>
       <main className="route-main">
         {projects.isPending ? <LoadingState label="正在确认项目访问权限" /> : projects.isError ? <ErrorState error={projects.error} onRetry={() => projects.refetch()} /> : !project ? <ErrorState error={new Error('项目不存在，或当前账号无权访问。')} /> : overview.isError ? <ErrorState error={overview.error} onRetry={() => overview.refetch()} /> : <Outlet context={{ project, overview: overview.data } satisfies ProjectOutletContext} />}
       </main>

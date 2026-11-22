@@ -11,6 +11,7 @@ import KnowledgeEditor from '../knowledge/KnowledgeEditor';
 import { ReaderSection, UnknownList } from '../knowledge/ReaderContent';
 import SourceDrawer from '../knowledge/SourceDrawer';
 import type { ProjectOutletContext } from './ProjectShell';
+import { factKindLabel, knowledgeKindLabel } from './knowledgeLabels';
 
 const purposes: { key: ReadingPurpose; label: string; description: string }[] = [
   { key: 'understand', label: '理解业务', description: '先读目的、行为与判断' },
@@ -18,8 +19,6 @@ const purposes: { key: ReadingPurpose; label: string; description: string }[] = 
   { key: 'change', label: '准备变更', description: '优先读规则与约束' },
   { key: 'verify', label: '核验结果', description: '优先读案例、测试与观察' },
 ];
-const kindLabels: Record<string, string> = { Feature: '业务功能', BusinessRule: '业务规则', Rule: '业务规则', Flow: '业务流程', DomainTerm: '领域术语', DomainConcept: '业务概念', BusinessAttribute: '业务属性', Component: '系统组件', Api: '接口契约', Observation: '实际观察', Design: '业务设计' };
-const factLabels: Record<string, string> = { normative: '目标规范', observed: '实际观察', documented_intent: '记录意图', design_decision: '设计决定', inferred: '推断候选', assumption: '待确认假设' };
 
 export default function KnowledgePage() {
   const { project } = useOutletContext<ProjectOutletContext>();
@@ -69,13 +68,13 @@ export default function KnowledgePage() {
     <Link className="back-link" to={back}>← 返回原阅读位置</Link>
     {reading.isPending || unit.isPending ? <LoadingState label="正在组合局部知识、规则与来源" /> : reading.isError ? <ErrorState error={reading.error} onRetry={() => reading.refetch()} /> : unit.isError ? <ErrorState error={unit.error} onRetry={() => unit.refetch()} /> : <>
       <header className="knowledge-heading">
-        <div className="knowledge-title"><p className="eyebrow">{kindLabels[unit.data.kind] ?? unit.data.kind}</p><h1>{reading.data.heading}</h1><p>围绕当前主题组合必要内容；规则、目标设计与实际观察分开阅读。</p></div>
-        <dl className="knowledge-meta"><div><dt>内容性质</dt><dd>{factLabels[unit.data.factKind]}</dd></div><div><dt>阅读版本</dt><dd>{baseline ? '历史基线' : '当前已发布'}</dd></div><div><dt>授权完整性</dt><dd>{reading.data.completeness === 'complete' ? '当前范围完整' : '部分内容'}</dd></div></dl>
+        <div className="knowledge-title"><p className="eyebrow">{knowledgeKindLabel(unit.data.kind)}</p><h1>{reading.data.heading}</h1><p>围绕当前主题组合必要内容；规则、目标设计与实际观察分开阅读。</p></div>
+        <dl className="knowledge-meta"><div><dt>内容性质</dt><dd>{factKindLabel(unit.data.factKind)}</dd></div><div><dt>阅读版本</dt><dd>{baseline ? '历史基线' : '当前已发布'}</dd></div><div><dt>授权完整性</dt><dd>{reading.data.completeness === 'complete' ? '当前范围完整' : '部分内容'}</dd></div></dl>
         <div className="reader-actions"><button className="secondary" onClick={() => update({ sources: sourcesOpen ? undefined : '1' })}>来源与适用范围</button><button className="primary" onClick={() => update({ edit: '1' })}>编辑候选</button></div>
       </header>
       <section className="reader-controls" aria-label="阅读上下文">
         <label>阅读目的<select value={purpose} onChange={event => update({ purpose: event.target.value, focus: undefined })}>{purposes.map(item => <option key={item.key} value={item.key}>{item.label} · {item.description}</option>)}</select></label>
-        <label>知识版本<select value={baseline ?? ''} onChange={event => update({ baseline: event.target.value || undefined, focus: undefined })}><option value="">当前已发布 · {project.currentBaselineId.slice(0, 8)}</option>{baselines.data?.items.filter(item => item.baselineId !== project.currentBaselineId).map(item => <option key={item.baselineId} value={item.baselineId}>历史基线 #{item.number} · {new Date(item.createdAt).toLocaleDateString('zh-CN')}</option>)}</select></label>
+        <label>知识版本<select value={baseline ?? ''} onChange={event => update({ baseline: event.target.value || undefined, focus: undefined })}><option value="">当前已发布</option>{baselines.data?.items.filter(item => item.baselineId !== project.currentBaselineId).map(item => <option key={item.baselineId} value={item.baselineId}>历史基线 #{item.number} · {new Date(item.createdAt).toLocaleDateString('zh-CN')}</option>)}</select></label>
         <span>切换阅读方式或版本只改变投影，不修改知识事实。</span>
       </section>
       {baselines.isError && <p className="inline-warning">历史版本列表暂时不可用；当前阅读不受影响。<button onClick={() => baselines.refetch()}>重试历史列表</button></p>}
@@ -89,7 +88,7 @@ export default function KnowledgePage() {
         </div>
         {(unit.data.kind === 'BusinessRule' || unit.data.kind === 'Rule') && <CaseEvaluator projectId={projectId} revision={unit.data} baselineId={baseline ?? project.currentBaselineId} />}
       </>}
-      {sourcesOpen && <SourceDrawer revision={unit.data} baselineId={baseline ?? project.currentBaselineId} onClose={closeSources} />}
+      {sourcesOpen && <SourceDrawer revision={unit.data} onClose={closeSources} />}
     </>}
   </div>;
 }

@@ -160,7 +160,7 @@ export default function AssistantPanel({ project, open, onClose }: Props) {
   if (!open) return null;
   const returnTo = `${location.pathname}${location.search}`;
   return <section ref={panelRef} tabIndex={-1} id="project-assistant" className="assistant-panel" role="dialog" aria-modal="false" aria-labelledby="assistant-title">
-    <header className="assistant-head"><div><p className="eyebrow">AUTHORIZED PROJECT ASSISTANT</p><h2 id="assistant-title">项目助手</h2><p>{selected?.rootUnitId ? '绑定当前知识上下文' : '当前项目上下文'} · 固定基线 {selected?.baselineId.slice(0, 8) ?? routeBaseline.slice(0, 8)}</p></div><button className="icon-button" aria-label="关闭项目助手" onClick={onClose}>×</button></header>
+    <header className="assistant-head"><div><p className="eyebrow">项目知识助手</p><h2 id="assistant-title">项目助手</h2><p>{selected?.rootUnitId ? '绑定当前知识上下文' : '当前项目上下文'} · 使用已发布知识版本</p></div><button className="icon-button" aria-label="关闭项目助手" onClick={onClose}>×</button></header>
     <div className="assistant-toolbar">
       <label>历史会话<select aria-label="选择历史会话" value={selected?.conversationId ?? ''} onChange={event => selectConversation(event.target.value)}><option value="">选择会话</option>{items.map((item, index) => <option key={item.conversationId} value={item.conversationId}>对话 {items.length - index}{item.rootUnitId === routeUnitId ? ' · 当前知识' : ''}</option>)}</select></label>
       <button className="secondary" disabled={saving} onClick={createConversation}>基于当前位置新建</button>

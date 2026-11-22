@@ -1,5 +1,9 @@
 # Business Atlas V9.4
 
+> Archived working copy only. Do not use V9.4 as the current product design
+> reference. Follow `../docs/ui-reference/README.md` and the V9.2/V9.3 design
+> direction in the T1.0 baseline.
+
 一个轻量、离线、文字优先的软件项目认知与知识交付原型。
 
 ## 运行与开发

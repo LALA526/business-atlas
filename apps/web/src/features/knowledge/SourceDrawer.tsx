@@ -4,7 +4,7 @@ import type { Revision } from '../../shared/api';
 const supportLabels = { supports: '支持此结论', refutes: '反驳此结论', contextual: '提供上下文' } as const;
 const captureLabels = { rawCaptured: '原始捕获', verifiedScript: '脚本核验', reconstructed: '重建记录', proposed: '候选材料', humanAttestation: '人工确认' } as const;
 
-export default function SourceDrawer({ revision, baselineId, onClose }: { revision: Revision; baselineId: string; onClose: () => void }) {
+export default function SourceDrawer({ revision, onClose }: { revision: Revision; onClose: () => void }) {
   const closeButton = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
@@ -17,7 +17,7 @@ export default function SourceDrawer({ revision, baselineId, onClose }: { revisi
   return <div className="drawer-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) onClose(); }}>
     <aside className="source-drawer" role="dialog" aria-modal="true" aria-labelledby="source-drawer-title">
       <div className="dialog-head"><div><p className="eyebrow">按需查看证据</p><h2 id="source-drawer-title">结论来源与适用范围</h2></div><button ref={closeButton} className="icon-button" aria-label="关闭来源" onClick={onClose}>×</button></div>
-      <p className="source-subject">{revision.title}<span>修订 {revision.revisionId.slice(0, 8)} · 基线 {baselineId.slice(0, 8)}</span></p>
+      <p className="source-subject">{revision.title}<span>{revision.revNo ? `修订 ${revision.revNo}` : '知识修订'} · 已绑定当前阅读版本</span></p>
       {evidence.length === 0 ? <div className="source-empty"><strong>未提供可查看的来源证据</strong><p>这不等于结论已经被证实。可在候选编辑中补充依据，再交由审核人确认。</p></div> : <div className="evidence-list">{evidence.map((item, index) => <article key={`${item.source.revisionId}-${index}`}>
         <div><strong>{supportLabels[item.support]}</strong><span>{captureLabels[item.captureKind]}</span></div>
         <dl>

@@ -14,6 +14,7 @@ import ReviewWorkspace from './features/review/ReviewWorkspace';
 import TaskWorkspace from './features/task/TaskWorkspace';
 import DeliveryWorkspace from './features/delivery/DeliveryWorkspace';
 import './styles.css';
+import './styles-workspace.css';
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: 30_000, refetchOnWindowFocus: false }, mutations: { retry: false } } });
 

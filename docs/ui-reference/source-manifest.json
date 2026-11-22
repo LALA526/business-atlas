@@ -1,7 +1,10 @@
 {
-  "selection": "V9.4 working copy for text-first UI reference, not a product implementation",
+  "selection": "V9.2/V9.3 information architecture and interaction direction; V9.4 is explicitly excluded as a product design target",
+  "primary": "V9.2 Self Knowledge project workspace and six-entry navigation",
+  "secondary": "V9.3 business decision reading, unknown handling, task semantics, and delivery closure",
+  "excluded": "V9.4 working copy; retained only for provenance, not implementation guidance",
   "checkpoint": "1207759 V9.3",
-  "source": "E:/Business Atlas/prototype",
+  "source": "docs/baselines/T1.0/05_原始基线/V9.3原评审报告.md and docs/baselines/T1.0/05_原始基线",
   "files": {
     "working-v9.4.tar.gz": "04f4797f138f7669276283fffdb72ea702e939439272d8f781026943e3760180",
     "checkpoint-v9.3-1207759.tar.gz": "13457f9bec1e1971a6046919cfe4ac808c106db3ea78ec98d21fc02daa358d10"
