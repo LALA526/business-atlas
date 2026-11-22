@@ -288,14 +288,16 @@ END $$;""", database="keycloak")
         compose("up", "-d", "api", "worker", "web")
         for attempt in range(90):
             try:
+                # Keycloak does not re-import a realm into an existing database.
+                # Reconcile its callback URLs before exercising the BFF login;
+                # otherwise a healthy API is failed by stale identity settings.
+                subprocess.run([sys.executable, str(release / "configure-identity.py"), str(release)], check=True)
                 check_health(ca_cert, public_url, local_url)
                 break
             except Exception:
                 if attempt == 89:
                     raise
                 time.sleep(2)
-        subprocess.run([sys.executable, str(release / "configure-identity.py"), str(release)], check=True)
-        check_health(ca_cert, public_url, local_url)
         resource_report = verify_architecture_and_resources()
         atomic_json(login_file, login)
         atomic_json(marker, {

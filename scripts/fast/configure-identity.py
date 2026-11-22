@@ -8,7 +8,10 @@ import urllib.request
 release = Path(sys.argv[1])
 product = release.parent.parent
 secrets = json.loads((product / "secrets.json").read_text())
-realm = json.loads((release / "keycloak-realm.json").read_text())
+# Realm import only applies to a new Keycloak database. Synchronize existing
+# installations from the rendered realm so public and loopback callbacks match
+# the URLs the BFF actually uses; the source template contains placeholders.
+realm = json.loads((release / "keycloak/atlas-realm.json").read_text())
 # Use loopback while retaining the certificate trust and public issuer.
 base = "https://127.0.0.1:15809/auth"
 context = ssl.create_default_context(cafile=str(product / "tls/atlas-local-ca.crt"))
