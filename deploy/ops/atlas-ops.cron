@@ -1,0 +1,6 @@
+# Install with paths/secrets supplied by the host environment; do not embed them here.
+*/15 * * * * atlas /opt/atlas/deploy/backup/backup.py wal-sync --backup-root "$ATLAS_BACKUP_ROOT" --key-file "$ATLAS_BACKUP_KEY_FILE" --wal-root "$ATLAS_WAL_ROOT" >> /var/lib/atlas/ops/wal-sync.log 2>&1
+17 2 * * * atlas /opt/atlas/deploy/backup/backup.py create --release-dir /opt/atlas/current --backup-root "$ATLAS_BACKUP_ROOT" --key-file "$ATLAS_BACKUP_KEY_FILE" --kind logical >> /var/lib/atlas/ops/backup.log 2>&1
+43 2 * * 0 atlas /opt/atlas/deploy/backup/backup.py create --release-dir /opt/atlas/current --backup-root "$ATLAS_BACKUP_ROOT" --key-file "$ATLAS_BACKUP_KEY_FILE" --kind base >> /var/lib/atlas/ops/base-backup.log 2>&1
+53 3 * * * atlas /opt/atlas/deploy/backup/backup.py retain --backup-root "$ATLAS_BACKUP_ROOT" --key-file "$ATLAS_BACKUP_KEY_FILE" >> /var/lib/atlas/ops/retention.log 2>&1
+*/5 * * * * atlas /opt/atlas/deploy/ops/monitor.py --release-dir /opt/atlas/current --backup-root "$ATLAS_BACKUP_ROOT" --state-dir /var/lib/atlas/ops --health-url "$ATLAS_BASE_URL/health/ready" --ca-file /opt/atlas/tls/atlas-local-ca.crt >> /var/lib/atlas/ops/monitor.log 2>&1

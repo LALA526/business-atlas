@@ -9,6 +9,7 @@ using BuildingBlocks;
 using BuildingBlocks.Persistence;
 using Microsoft.EntityFrameworkCore;
 using PlatformOps;
+using PlatformOps.Observability;
 using ProjectIdentity.Infrastructure;
 using Atlas.Api.Auth;
 using Atlas.Api.Platform;
@@ -38,6 +39,7 @@ using Atlas.Api.Assistant;
 using Atlas.Api.Mcp;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Logging.AddJsonConsole(options => { options.IncludeScopes = true; options.TimestampFormat = "yyyy-MM-ddTHH:mm:ss.fffZ"; });
 builder.Services.AddSingleton<HealthState>();
 builder.Services.AddPlatformOps(builder.Configuration.GetConnectionString("Atlas"));
 builder.Services.AddSingleton(new PostgresProjectIdentityStore(builder.Configuration.GetConnectionString("Atlas") ?? string.Empty));
@@ -74,6 +76,7 @@ if (args.Contains("--migrate-only", StringComparer.Ordinal))
 }
 
 app.Lifetime.ApplicationStopping.Register(app.Services.GetRequiredService<HealthState>().BeginShutdown);
+app.Use(AtlasObservability.MeasureHttpRequests);
 app.UseAuthentication();
 app.UseAtlasCsrfProtection();
 app.UseAuthorization();
@@ -92,6 +95,8 @@ app.MapAssistantEndpoints();
 app.MapAtlasMcp();
 app.MapHub<ProjectHub>("/hubs/project");
 
+// Internal-only operational scrape endpoint; Caddy intentionally has no /metrics route.
+app.MapGet("/metrics", (AtlasDbContext database, CancellationToken cancellationToken) => AtlasObservability.Metrics(database, cancellationToken));
 app.MapGet("/health/live", (HttpContext context) => HealthResponse(context, "ok"));
 app.MapGet("/health/ready", async (HttpContext context, HealthState state, AtlasDbContext database, CancellationToken ct) =>
 {

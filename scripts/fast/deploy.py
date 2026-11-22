@@ -26,6 +26,7 @@ SECRET_NAMES = (
     "ATLAS_OIDC_CLIENT_SECRET",
     "ATLAS_USER_PASSWORD",
     "ATLAS_CURSOR_KEY",
+    "ATLAS_BACKUP_KEY",
 )
 SERVICES = ("postgres", "identity", "api", "worker", "web")
 
@@ -166,6 +167,12 @@ def main():
         if not local_secrets.get(name):
             local_secrets[name] = secrets.token_urlsafe(36)
     atomic_json(secret_file, local_secrets)
+    backup_root = Path(os.environ.get("ATLAS_BACKUP_ROOT", str(product / "backups"))).resolve()
+    (backup_root / "wal").mkdir(parents=True, exist_ok=True)
+    backup_root.chmod(0o700)
+    backup_key = product / "backup-encryption.key"
+    backup_key.write_text(local_secrets["ATLAS_BACKUP_KEY"] + "\n")
+    backup_key.chmod(0o600)
 
     public_url = base_url()
     host = urlsplit(public_url).hostname
@@ -180,7 +187,7 @@ def main():
         realm = realm.replace("__" + name + "__", value)
     (release / "keycloak/atlas-realm.json").write_text(realm)
     # Caddy listens on container port 8443; clients use the mapped public origin.
-    env_values = {**local_secrets, "ATLAS_AUTHORITY": public_url + "/auth"}
+    env_values = {**local_secrets, "ATLAS_AUTHORITY": public_url + "/auth", "ATLAS_BACKUP_ROOT": str(backup_root)}
     (release / ".env").write_text("".join(f"{name}={value}\n" for name, value in env_values.items()))
     (release / ".env").chmod(0o600)
 
@@ -265,6 +272,7 @@ def main():
             docker("load", "-i", str(release / "runtime-images.tar"))
         else:
             compose("pull", "postgres", "identity", "api", "worker", "web")
+        docker("run", "--rm", "-v", f"{backup_root / 'wal'}:/wal", "postgres:17", "chown", "-R", "999:999", "/wal")
         compose("up", "-d", "postgres")
         for attempt in range(60):
             ready = subprocess.run([docker_path, "compose", "-p", "atlas-product", "exec", "-T", "postgres", "pg_isready", "-U", "atlas", "-d", "atlas"], cwd=release, env=env, capture_output=True)
@@ -304,6 +312,13 @@ BEGIN
   EXECUTE format('ALTER TABLE %I.%I OWNER TO keycloak', relation.nspname, relation.relname);
  END LOOP;
 END $$;""", database="keycloak")
+        pre_deploy_backup = None
+        if previous:
+            backup_command = [sys.executable, str(release / "deploy/backup/backup.py"), "create", "--release-dir", str(release),
+                "--backup-root", str(backup_root), "--key-file", str(backup_key), "--kind", "logical", "--build-id", previous["buildId"]]
+            subprocess.run(backup_command, cwd=release, env=env, check=True)
+            metadata_files = sorted(backup_root.glob("*.json"), key=lambda path: path.stat().st_mtime, reverse=True)
+            pre_deploy_backup = str(metadata_files[0]) if metadata_files else None
         compose("up", "-d", "identity")
         compose("run", "--rm", "--no-deps", "migrate")
         sql("GRANT atlas_app TO atlas_runtime; GRANT atlas_worker TO atlas_background;")
@@ -321,6 +336,8 @@ END $$;""", database="keycloak")
                     raise
                 time.sleep(2)
         resource_report = verify_architecture_and_resources()
+        subprocess.run([sys.executable, str(release / "deploy/backup/backup.py"), "wal-sync", "--backup-root", str(backup_root),
+            "--key-file", str(backup_key), "--wal-root", str(backup_root / "wal")], cwd=release, env=env, check=True)
         atomic_json(login_file, login)
         atomic_json(marker, {
             "buildId": build_id,
@@ -330,6 +347,8 @@ END $$;""", database="keycloak")
             "loginFile": str(login_file),
             "caCertificate": str(ca_cert),
             "resourceReport": str(resource_report),
+            "backupRoot": str(backup_root),
+            "preDeployBackup": pre_deploy_backup,
             "previousRelease": ({key: previous[key] for key in ("buildId", "directory", "applicationUrl", "deployedAt", "resourceReport") if key in previous} if previous else None),
         })
         append_event(history, {"at": utc_now(), "event": "deployment_succeeded", "buildId": build_id, "resourceReport": str(resource_report)})

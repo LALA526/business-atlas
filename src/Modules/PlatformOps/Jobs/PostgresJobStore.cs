@@ -4,6 +4,7 @@ using BuildingBlocks.Commands;
 using BuildingBlocks.Persistence;
 using Microsoft.EntityFrameworkCore;
 using NpgsqlTypes;
+using PlatformOps.Observability;
 
 namespace PlatformOps.Jobs;
 
@@ -135,7 +136,7 @@ public sealed class PostgresJobStore(AtlasDbContext database) : IJobQueue
         await using var transaction = await Begin(projectId, workerPrincipalId, "job.claim", $"claim-{Guid.NewGuid():N}", cancellationToken);
         await using var command = transaction.CreateCommand("""
             WITH candidate AS (
-              SELECT project_id,job_id FROM ops.job
+              SELECT project_id,job_id,(state='running' AND lease_until<now()) AS recovered_lease FROM ops.job
               WHERE project_id=@project AND available_at<=now()
                 AND (state='queued' OR (state='running' AND lease_until<now()))
               ORDER BY available_at,job_id FOR UPDATE SKIP LOCKED LIMIT 1
@@ -144,13 +145,17 @@ public sealed class PostgresJobStore(AtlasDbContext database) : IJobQueue
                 fence=target.fence+1,attempt=target.attempt+1,version=target.version+1,error_code=NULL
               FROM candidate WHERE target.project_id=candidate.project_id AND target.job_id=candidate.job_id
               RETURNING target.*
-            ) SELECT * FROM updated
+            ) SELECT updated.*,candidate.recovered_lease FROM updated JOIN candidate USING(project_id,job_id)
             """);
         Add(command, "project", projectId); Add(command, "holder", holder); Add(command, "lease", lease);
         ClaimedJob? claimed = null;
         await using (var reader = await command.ExecuteReaderAsync(cancellationToken))
         {
-            if (await reader.ReadAsync(cancellationToken)) claimed = new ClaimedJob(ReadJob(reader), holder, reader.GetInt64(reader.GetOrdinal("fence")), reader.GetInt32(reader.GetOrdinal("attempt")));
+            if (await reader.ReadAsync(cancellationToken))
+            {
+                claimed = new ClaimedJob(ReadJob(reader), holder, reader.GetInt64(reader.GetOrdinal("fence")), reader.GetInt32(reader.GetOrdinal("attempt")));
+                AtlasObservability.JobClaimed(reader.GetBoolean(reader.GetOrdinal("recovered_lease")));
+            }
         }
         if (claimed is not null)
         {
@@ -216,7 +221,11 @@ public sealed class PostgresJobStore(AtlasDbContext database) : IJobQueue
             await AppendLifecycle(transaction, job!, "job.succeeded", null, cancellationToken);
             await transaction.CommitAsync(cancellationToken);
         }
-        else await transaction.RollbackAsync(cancellationToken);
+        else
+        {
+            AtlasObservability.StaleCommit();
+            await transaction.RollbackAsync(cancellationToken);
+        }
         return updated;
     }
 

@@ -27,6 +27,9 @@ stages:
         cp -R dist "$OUT/web"
         cd ../..
         cp scripts/fast/* "$OUT/"
+        cp -R deploy "$OUT/deploy"
+        mkdir -p "$OUT/scripts"
+        cp -R scripts/restore "$OUT/scripts/restore"
       displayName: Build API, worker and web
     - publish: $(Build.ArtifactStagingDirectory)/atlas-release
       artifact: atlas-release

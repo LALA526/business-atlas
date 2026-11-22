@@ -11,6 +11,7 @@ using Assistant.Infrastructure;
 using Assistant.Reasoning;
 
 var builder = Host.CreateApplicationBuilder(args);
+builder.Logging.AddJsonConsole(options => { options.IncludeScopes = true; options.TimestampFormat = "yyyy-MM-ddTHH:mm:ss.fffZ"; });
 builder.Services.AddPlatformOps(builder.Configuration.GetConnectionString("Atlas"));
 builder.Services.AddSingleton(new PostgresAccessApplicabilityStore(builder.Configuration.GetConnectionString("Atlas") ?? string.Empty));
 builder.Services.AddSingleton(services => new PostgresKnowledgeStore(builder.Configuration.GetConnectionString("Atlas") ?? string.Empty, services.GetRequiredService<PostgresAccessApplicabilityStore>()));

@@ -1,0 +1,16 @@
+{
+  "webhookUrl": "https://ops.example.invalid/business-atlas-alerts",
+  "webhookSecretFile": "/run/secrets/atlas-alert-webhook-secret",
+  "runbookBase": "https://ops.example.invalid/business-atlas-runbook",
+  "thresholds": {
+    "backupAgeHours": 25,
+    "walArchiveLagMinutes": 20,
+    "minimumDiskFreePercent": 15,
+    "oldestQueuedSeconds": 300,
+    "expiredLeases": 0,
+    "failedJobs": 0,
+    "outboxRetries": 0,
+    "databaseConnections": 35,
+    "databaseQueryMilliseconds": 2000
+  }
+}
