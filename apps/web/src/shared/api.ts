@@ -17,8 +17,8 @@ export type ReviewRequest = Schema<'ReviewRequest'>;
 export type Baseline = Schema<'Baseline'>;
 export type BaselinePage = Schema<'BaselinePage'>;
 export type DiffItem = Schema<'DiffItem'>;
-export type Activity = Schema<'Activity'>;
-export type ActivityPage = Schema<'ActivityPage'>;
+export type Activity = Omit<Schema<'Activity'>, 'target'> & { target: { unitId?: string; revisionId?: string; taskId?: string; changeSetId?: string; body: string } };
+export type ActivityPage = { items: Activity[]; nextCursor?: string };
 export type SearchPage = Schema<'SearchHitPage'>;
 export type ImportBatch = Schema<'ImportBatch'>;
 export type Conversation = Schema<'Conversation'>;
@@ -26,6 +26,23 @@ export type ConversationPage = Schema<'ConversationPage'>;
 export type AssistantMessage = Schema<'Message'>;
 export type MessagePage = Schema<'MessagePage'>;
 export type ConversationJob = Schema<'Job'>;
+export type Task = Schema<'Task'>;
+export type TaskPage = Schema<'TaskPage'>;
+export type Impact = {
+  impactId?: string; taskId: string; target?: Schema<'UnitRef'>; locator?: Schema<'SourceLocator'>;
+  path: { edge: Schema<'RevisionRef'>; predicate: string; direction: 'forward' | 'reverse' }[];
+  disposition: 'required' | 'potential' | 'no_change' | 'deferred' | 'unknown';
+  inspectionState: 'candidate' | 'inspected' | 'verified' | 'stale'; investigationId?: string;
+  reason: string; risk: 'low' | 'medium' | 'high' | 'critical'; assignedTaskId?: string;
+  evidence: Schema<'EvidenceRef'>[]; closeState: 'open' | 'resolved' | 'deferred'; version?: number;
+};
+export type ImpactPage = { items: Impact[]; nextCursor?: string };
+export type TaskContext = Schema<'TaskContext'>;
+export type Closure = Schema<'Closure'>;
+export type AcceptanceInput = Schema<'AcceptanceInput'>;
+export type DeliveryStatus = Schema<'DeliveryStatus'>;
+export type DeliveryStatusPage = Schema<'DeliveryStatusPage'>;
+export type AgentRunPage = Schema<'AgentRunPage'>;
 export type Session = { principalId: string; displayName: string; expiresAt: string; csrfToken: string };
 
 let csrfToken = '';
@@ -96,6 +113,24 @@ export const atlasApi = {
   sendMessage: (projectId: string, conversation: Conversation, currentBaselineId: string, text: string, key: string) => unwrap<ConversationJob>(client.POST('/api/v1/projects/{projectId}/conversations/{conversationId}/messages', { params: { path: { projectId, conversationId: conversation.conversationId }, header: { 'Idempotency-Key': key, 'If-Match': `"${conversation.version}"` } }, body: { text, readContext: { mode: conversation.baselineId === currentBaselineId ? 'published' : 'historical', baselineId: conversation.baselineId, purpose: 'understand' } } })),
   cancelConversation: (projectId: string, conversationId: string, jobId: string, version: number, key: string) => unwrap<ConversationJob>(client.POST('/api/v1/projects/{projectId}/conversations/{conversationId}/cancel', { params: { path: { projectId, conversationId }, header: { 'Idempotency-Key': key, 'If-Match': `"${version}"` } }, body: { jobId } })),
   createFeedback: (projectId: string, input: Schema<'ActivityInput'>, key: string) => unwrap<Activity>(client.POST('/api/v1/projects/{projectId}/feedback', { params: { path: { projectId }, header: { 'Idempotency-Key': key } }, body: input })),
+  tasks: (projectId: string, cursor?: string) => unwrap<TaskPage>(client.GET('/api/v1/projects/{projectId}/tasks', { params: { path: { projectId }, query: { limit: 100, cursor } } })),
+  createTask: (projectId: string, intent: string, baseBaselineId: string, key: string) => unwrap<Task>(client.POST('/api/v1/projects/{projectId}/tasks', { params: { path: { projectId }, header: { 'Idempotency-Key': key } }, body: { intent, baseBaselineId } })),
+  task: (projectId: string, taskId: string) => unwrap<Task>(client.GET('/api/v1/projects/{projectId}/tasks/{taskId}', { params: { path: { projectId, taskId } } })),
+  impacts: (projectId: string, taskId: string) => unwrap<ImpactPage>(client.GET('/api/v1/projects/{projectId}/tasks/{taskId}/impacts', { params: { path: { projectId, taskId }, query: { limit: 100 } } })),
+  taskContext: (projectId: string, contextId: string) => unwrap<TaskContext>(client.GET('/api/v1/projects/{projectId}/contexts/{contextId}', { params: { path: { projectId, contextId } } })),
+  agentRuns: (projectId: string, taskId: string) => unwrap<AgentRunPage>(client.GET('/api/v1/projects/{projectId}/agent-runs', { params: { path: { projectId }, query: { taskId, limit: 100 } } })),
+  taskComments: (projectId: string, taskId: string) => unwrap<ActivityPage>(client.GET('/api/v1/projects/{projectId}/comments', { params: { path: { projectId }, query: { taskId, limit: 100 } } })),
+  issues: (projectId: string) => unwrap<ActivityPage>(client.GET('/api/v1/projects/{projectId}/issues', { params: { path: { projectId }, query: { limit: 100 } } })),
+  feedback: (projectId: string) => unwrap<ActivityPage>(client.GET('/api/v1/projects/{projectId}/feedback', { params: { path: { projectId }, query: { limit: 100 } } })),
+  createIssue: (projectId: string, input: Schema<'ActivityInput'>, key: string) => unwrap<Activity>(client.POST('/api/v1/projects/{projectId}/issues', { params: { path: { projectId }, header: { 'Idempotency-Key': key } }, body: input })),
+  resolveIssue: (projectId: string, activityId: string, version: number, reason: string, taskId: string | undefined, key: string) => unwrap<Activity>(client.POST('/api/v1/projects/{projectId}/issues/{activityId}/resolve', { params: { path: { projectId, activityId }, header: { 'Idempotency-Key': key, 'If-Match': `"${version}"` } }, body: { reason, taskId } })),
+  resolveFeedback: (projectId: string, activityId: string, version: number, reason: string, taskId: string | undefined, changeSetId: string | undefined, key: string) => unwrap<Activity>(client.POST('/api/v1/projects/{projectId}/feedback/{activityId}/resolve', { params: { path: { projectId, activityId }, header: { 'Idempotency-Key': key, 'If-Match': `"${version}"` } }, body: { reason, taskId, changeSetId } })),
+  transitionTask: (projectId: string, taskId: string, version: number, event: 'begin_investigation' | 'request_decision' | 'begin_implementation' | 'submit_verification' | 'request_cancel' | 'resume', reason: string, contextId: string | undefined, key: string) => unwrap<Task>(client.POST('/api/v1/projects/{projectId}/tasks/{taskId}/transition', { params: { path: { projectId, taskId }, header: { 'Idempotency-Key': key, 'If-Match': `"${version}"` } }, body: { event, reason, contextId } })),
+  decideImpact: (projectId: string, taskId: string, impactId: string, version: number, impact: Impact, key: string) => unwrap<Impact>(client.PUT('/api/v1/projects/{projectId}/tasks/{taskId}/impacts/{impactId}', { params: { path: { projectId, taskId, impactId }, header: { 'Idempotency-Key': key, 'If-Match': `"${version}"` } }, body: impact })),
+  closure: (projectId: string, taskId: string, contextId: string) => unwrap<Closure>(client.GET('/api/v1/projects/{projectId}/tasks/{taskId}/closure', { params: { path: { projectId, taskId }, query: { contextId } } })),
+  deliveries: (projectId: string, cursor?: string) => unwrap<DeliveryStatusPage>(client.GET('/api/v1/projects/{projectId}/knowledge-delivery', { params: { path: { projectId }, query: { limit: 100, cursor } } })),
+  recordAcceptance: (projectId: string, taskId: string, version: number, input: AcceptanceInput, key: string) => unwrap<Schema<'IdView'>>(client.POST('/api/v1/projects/{projectId}/tasks/{taskId}/acceptance', { params: { path: { projectId, taskId }, header: { 'Idempotency-Key': key, 'If-Match': `"${version}"` } }, body: input })),
+  closeTask: (projectId: string, taskId: string, version: number, contextId: string, reason: string, key: string) => unwrap<Closure>(client.POST('/api/v1/projects/{projectId}/tasks/{taskId}/close', { params: { path: { projectId, taskId }, header: { 'Idempotency-Key': key, 'If-Match': `"${version}"` } }, body: { contextId, reason } })),
 };
 
 export async function apiRequest<T>(url: string, init: RequestInit = {}): Promise<T> {
