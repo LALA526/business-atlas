@@ -3,6 +3,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
+    <PackageReference Include="ModelContextProtocol.AspNetCore" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,6 +20,11 @@
     <ProjectReference Include="../../src/Modules/ReadSearchExplain/ReadSearchExplain.csproj" />
     <ProjectReference Include="../../src/Modules/SchemaCatalog/SchemaCatalog.csproj" />
     <ProjectReference Include="../../src/Modules/TaskCollab/TaskCollab.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="../../contracts/mcp-tools.json" Link="contracts/mcp-tools.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../../skills/business-atlas-project/SKILL.md" Link="skills/business-atlas-project/SKILL.md" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <PropertyGroup>

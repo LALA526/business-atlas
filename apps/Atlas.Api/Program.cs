@@ -35,23 +35,24 @@ using SchemaCatalog.Infrastructure;
 using Assistant;
 using Assistant.Infrastructure;
 using Atlas.Api.Assistant;
+using Atlas.Api.Mcp;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<HealthState>();
 builder.Services.AddPlatformOps(builder.Configuration.GetConnectionString("Atlas"));
 builder.Services.AddSingleton(new PostgresProjectIdentityStore(builder.Configuration.GetConnectionString("Atlas") ?? string.Empty));
 builder.Services.AddSingleton(new PostgresAccessApplicabilityStore(builder.Configuration.GetConnectionString("Atlas") ?? string.Empty));
-builder.Services.AddSingleton<PostgresSchemaCatalogStore>();
+builder.Services.AddSingleton(services => new PostgresSchemaCatalogStore(builder.Configuration.GetConnectionString("Atlas") ?? string.Empty, services.GetRequiredService<PostgresAccessApplicabilityStore>()));
 builder.Services.AddSingleton(services => new PostgresKnowledgeStore(builder.Configuration.GetConnectionString("Atlas") ?? string.Empty, services.GetRequiredService<PostgresAccessApplicabilityStore>()));
 builder.Services.AddSingleton(services => new PostgresGovernanceStore(builder.Configuration.GetConnectionString("Atlas") ?? string.Empty, services.GetRequiredService<PostgresKnowledgeStore>(), services.GetRequiredService<PostgresAccessApplicabilityStore>()));
 builder.Services.AddSingleton<PolicyService>();
 builder.Services.AddAssistant(builder.Configuration);
 builder.Services.AddSingleton<IPrivateBlobStorage>(new PrivateBlobStorage(builder.Configuration["ImportEvidence:PrivateBlobRoot"] ?? throw new InvalidOperationException("ImportEvidence:PrivateBlobRoot is required.")));
 builder.Services.AddSingleton<IContentScanner, BuiltInContentScanner>();
-builder.Services.AddSingleton<PostgresImportEvidenceStore>();
+builder.Services.AddSingleton(services => new PostgresImportEvidenceStore(builder.Configuration.GetConnectionString("Atlas") ?? string.Empty, services.GetRequiredService<IPrivateBlobStorage>(), services.GetRequiredService<IContentScanner>(), services.GetRequiredService<PostgresAccessApplicabilityStore>(), services.GetRequiredService<PostgresKnowledgeStore>()));
 builder.Services.AddSingleton(services => new PostgresReadSearchService(builder.Configuration.GetConnectionString("Atlas") ?? string.Empty, services.GetRequiredService<PostgresKnowledgeStore>(), services.GetRequiredService<PostgresAccessApplicabilityStore>(), builder.Configuration["ReadSearchExplain:CursorKey"] ?? throw new InvalidOperationException("ReadSearchExplain:CursorKey is required.")));
 builder.Services.AddSingleton<ReadingProjectionService>();
-builder.Services.AddScoped<PostgresExportService>();
+builder.Services.AddScoped(services => new PostgresExportService(builder.Configuration.GetConnectionString("Atlas") ?? string.Empty, services.GetRequiredService<PostgresKnowledgeStore>(), services.GetRequiredService<PostgresAccessApplicabilityStore>(), services.GetRequiredService<PostgresReadSearchService>(), services.GetRequiredService<PlatformOps.Jobs.IJobQueue>()));
 builder.Services.AddSingleton(services => new PostgresTaskCollabStore(builder.Configuration.GetConnectionString("Atlas") ?? string.Empty, services.GetRequiredService<PostgresAccessApplicabilityStore>()));
 builder.Services.AddSingleton(services => new PostgresContractDeliveryStore(builder.Configuration.GetConnectionString("Atlas") ?? string.Empty, services.GetRequiredService<PostgresAccessApplicabilityStore>(), services.GetRequiredService<IPrivateBlobStorage>()));
 builder.Services.AddSingleton(services => new PostgresAgentMcpStore(builder.Configuration.GetConnectionString("Atlas") ?? string.Empty, services.GetRequiredService<PostgresAccessApplicabilityStore>()));
@@ -62,6 +63,7 @@ builder.Services.AddSingleton<IPolicyService>(services => services.GetRequiredSe
 builder.Services.AddSingleton<IReadContextFactory>(services => services.GetRequiredService<PolicyService>());
 builder.Services.ConfigureHttpJsonOptions(options => options.SerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower)));
 builder.Services.AddAtlasAuthentication(builder.Configuration, builder.Environment);
+builder.Services.AddAtlasMcp(builder.Configuration, builder.Environment);
 
 var app = builder.Build();
 if (args.Contains("--migrate-only", StringComparer.Ordinal))
@@ -87,6 +89,7 @@ app.MapTaskCollabEndpoints();
 app.MapContractDeliveryEndpoints();
 app.MapAgentMcpEndpoints();
 app.MapAssistantEndpoints();
+app.MapAtlasMcp();
 app.MapHub<ProjectHub>("/hubs/project");
 
 app.MapGet("/health/live", (HttpContext context) => HealthResponse(context, "ok"));

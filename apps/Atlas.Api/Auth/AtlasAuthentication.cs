@@ -127,7 +127,8 @@ public static class AtlasAuthentication
             .AddPolicy("AtlasEvidence", policy => policy.RequireAuthenticatedUser().RequireAssertion(context => HasScope(context.User, "atlas.evidence", CookieScheme)))
             .AddPolicy("AtlasReview", policy => policy.RequireAuthenticatedUser().RequireAssertion(context => HasScope(context.User, "atlas.review", CookieScheme)))
             .AddPolicy("AtlasCi", policy => policy.RequireAuthenticatedUser().RequireAssertion(context => HasScope(context.User, "atlas.ci", CookieScheme)))
-            .AddPolicy("AtlasAgent", policy => policy.RequireAuthenticatedUser().RequireAssertion(context => HasScope(context.User, "atlas.agent", CookieScheme)));
+            .AddPolicy("AtlasAgent", policy => policy.RequireAuthenticatedUser().RequireAssertion(context => HasScope(context.User, "atlas.agent", CookieScheme)))
+            .AddPolicy("McpBearer", policy => policy.RequireAuthenticatedUser().RequireAssertion(context => context.User.Identity?.AuthenticationType == BearerScheme && HasScope(context.User, "atlas.read", BearerScheme)));
         return services;
     }
 
