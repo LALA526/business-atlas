@@ -260,9 +260,28 @@ def main():
             "ALTER ROLE atlas_background PASSWORD '" + local_secrets["ATLAS_WORKER_PASSWORD"] + "';" +
             "ALTER ROLE keycloak PASSWORD '" + local_secrets["KEYCLOAK_DB_PASSWORD"] + "';" +
             "ALTER DATABASE keycloak OWNER TO keycloak;")
-        # Existing installations created Keycloak tables as atlas; transfer those
-        # objects before switching the identity service to its dedicated role.
-        sql("REASSIGN OWNED BY atlas TO keycloak;", database="keycloak")
+        # Existing installations created Keycloak relations as atlas. REASSIGN
+        # OWNED is deliberately not used here: it also targets shared objects
+        # such as extensions, whose ownership PostgreSQL cannot transfer.
+        sql("""DO $$
+DECLARE relation RECORD;
+BEGIN
+ FOR relation IN
+  SELECT c.oid, n.nspname, c.relname
+  FROM pg_class c
+  JOIN pg_namespace n ON n.oid = c.relnamespace
+  WHERE pg_get_userbyid(c.relowner) = 'atlas'
+    AND c.relkind IN ('r', 'p', 'S', 'v', 'm', 'f')
+    AND n.nspname NOT LIKE 'pg_%'
+    AND n.nspname <> 'information_schema'
+    AND NOT EXISTS (
+      SELECT 1 FROM pg_depend d
+      WHERE d.classid = 'pg_class'::regclass AND d.objid = c.oid AND d.deptype = 'e'
+    )
+ LOOP
+  EXECUTE format('ALTER TABLE %I.%I OWNER TO keycloak', relation.nspname, relation.relname);
+ END LOOP;
+END $$;""", database="keycloak")
         compose("up", "-d", "identity")
         compose("run", "--rm", "--no-deps", "migrate")
         sql("GRANT atlas_app TO atlas_runtime; GRANT atlas_worker TO atlas_background;")
