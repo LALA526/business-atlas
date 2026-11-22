@@ -219,6 +219,16 @@
           "ProjectIdentity": "[1.0.0, )"
         }
       },
+      "assistant": {
+        "type": "Project",
+        "dependencies": {
+          "AccessApplicability": "[1.0.0, )",
+          "KnowledgeCore": "[1.0.0, )",
+          "PlatformOps": "[1.0.0, )",
+          "ProjectIdentity": "[1.0.0, )",
+          "ReadSearchExplain": "[1.0.0, )"
+        }
+      },
       "buildingblocks": {
         "type": "Project",
         "dependencies": {

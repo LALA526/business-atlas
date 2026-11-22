@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="../AccessApplicability/AccessApplicability.csproj" />
+    <ProjectReference Include="../KnowledgeCore/KnowledgeCore.csproj" />
+    <ProjectReference Include="../PlatformOps/PlatformOps.csproj" />
+    <ProjectReference Include="../ProjectIdentity/ProjectIdentity.csproj" />
+    <ProjectReference Include="../ReadSearchExplain/ReadSearchExplain.csproj" />
+  </ItemGroup>
+</Project>

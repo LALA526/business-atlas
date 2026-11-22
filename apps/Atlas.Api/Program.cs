@@ -30,6 +30,9 @@ using ImportEvidence.Blob;
 using ImportEvidence.Infrastructure;
 using KnowledgeCore.Infrastructure;
 using SchemaCatalog.Infrastructure;
+using Assistant;
+using Assistant.Infrastructure;
+using Atlas.Api.Assistant;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<HealthState>();
@@ -40,6 +43,7 @@ builder.Services.AddSingleton<PostgresSchemaCatalogStore>();
 builder.Services.AddSingleton(services => new PostgresKnowledgeStore(builder.Configuration.GetConnectionString("Atlas") ?? string.Empty, services.GetRequiredService<PostgresAccessApplicabilityStore>()));
 builder.Services.AddSingleton(services => new PostgresGovernanceStore(builder.Configuration.GetConnectionString("Atlas") ?? string.Empty, services.GetRequiredService<PostgresKnowledgeStore>(), services.GetRequiredService<PostgresAccessApplicabilityStore>()));
 builder.Services.AddSingleton<PolicyService>();
+builder.Services.AddAssistant(builder.Configuration);
 builder.Services.AddSingleton<IPrivateBlobStorage>(new PrivateBlobStorage(builder.Configuration["ImportEvidence:PrivateBlobRoot"] ?? throw new InvalidOperationException("ImportEvidence:PrivateBlobRoot is required.")));
 builder.Services.AddSingleton<IContentScanner, BuiltInContentScanner>();
 builder.Services.AddSingleton<PostgresImportEvidenceStore>();
@@ -78,6 +82,7 @@ app.MapGovernanceEndpoints();
 app.MapReadSearchExplainEndpoints();
 app.MapTaskCollabEndpoints();
 app.MapContractDeliveryEndpoints();
+app.MapAssistantEndpoints();
 app.MapHub<ProjectHub>("/hubs/project");
 
 app.MapGet("/health/live", (HttpContext context) => HealthResponse(context, "ok"));
