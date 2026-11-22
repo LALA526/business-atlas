@@ -13,6 +13,7 @@ import subprocess
 import sys
 import time
 import urllib.request
+import urllib.error
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -120,7 +121,23 @@ def check_health(ca_cert, authority, local_url):
     https_get(opener, local_url + "/")
     https_get(opener, local_url + "/auth/realms/atlas/.well-known/openid-configuration")
     # Exercise the real BFF authorization-code + PKCE challenge through discovery.
-    https_get(opener, authority + "/auth/login?returnUrl=/")
+    # Verify the BFF creates the expected public login redirect locally. Following
+    # that redirect from a server-side probe can hit external bot protection;
+    # browser interaction is not a prerequisite for publishing the application.
+    class KeepLoginRedirect(urllib.request.HTTPRedirectHandler):
+        def redirect_request(self, request, fp, code, message, headers, newurl):
+            return None
+    login = urllib.request.build_opener(
+        urllib.request.ProxyHandler({}), urllib.request.HTTPSHandler(context=context), KeepLoginRedirect()
+    )
+    try:
+        login.open(local_url + "/auth/login?returnUrl=/", timeout=8)
+    except urllib.error.HTTPError as response:
+        destination = urlsplit(response.headers.get("Location", ""))
+        if response.code not in (302, 303) or destination.scheme != "https" or destination.hostname != urlsplit(authority).hostname:
+            raise
+    else:
+        raise RuntimeError("The BFF did not return its configured HTTPS login redirect")
 
 
 def main():
