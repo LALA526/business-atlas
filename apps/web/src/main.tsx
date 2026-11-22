@@ -1,4 +1,4 @@
-import { StrictMode } from 'react';
+import { StrictMode, Suspense, lazy } from 'react';
 import { createRoot } from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
@@ -13,15 +13,15 @@ import ImportWorkspace from './features/project/ImportWorkspace';
 import ReviewWorkspace from './features/review/ReviewWorkspace';
 import TaskWorkspace from './features/task/TaskWorkspace';
 import DeliveryWorkspace from './features/delivery/DeliveryWorkspace';
-import SelfProjectPage from './features/public/SelfProjectPage';
 import './styles.css';
 import './styles-workspace.css';
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: 30_000, refetchOnWindowFocus: false }, mutations: { retry: false } } });
+const SelfProjectPage = lazy(() => import('./features/public/SelfProjectPage'));
 
 createRoot(document.getElementById('root')!).render(<StrictMode><QueryClientProvider client={queryClient}><BrowserRouter><SessionProvider><Routes>
   <Route path="/" element={<Navigate to="/public/self" replace />} />
-  <Route path="/public/self" element={<SelfProjectPage />} />
+  <Route path="/public/self" element={<Suspense fallback={<main className="page-state">正在读取公开项目资料</main>}><SelfProjectPage /></Suspense>} />
   <Route path="/projects" element={<ProjectsPage />} />
   <Route path="/p/:projectId" element={<ProjectShell />}>
     <Route index element={<Navigate to="overview" replace />} />

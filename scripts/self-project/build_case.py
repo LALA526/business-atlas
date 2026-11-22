@@ -68,9 +68,10 @@ def read_rows(revision: str) -> tuple[list[dict], list[dict]]:
     return requirements, tasks
 
 
-def build(revision: str) -> tuple[dict, dict]:
+def build(revision: str, generated_at: str | None = None) -> tuple[dict, dict]:
     revision = git("rev-parse", f"{revision}^{{commit}}")
     requirements, tasks = read_rows(revision)
+    generated_at = generated_at or datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     sources = [file_info(path, revision)[1] for path in ALL_SOURCES]
     by_path = {item["path"]: item for item in sources}
     requirement_items = [{
@@ -139,7 +140,7 @@ def build(revision: str) -> tuple[dict, dict]:
             "contentHash": by_path[path]["contentHash"],
         } for path in PUBLIC_DOCUMENTS],
         "sources": [{"path": item["path"], "revision": revision, "contentHash": item["contentHash"], "uri": item["uri"]} for item in sources],
-        "provenance": {"sourceRevision": revision, "generatedAt": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"), "sourceScope": "Repository docs/code and actual Azure DevOps records; no prototype simulation data."},
+        "provenance": {"sourceRevision": revision, "generatedAt": generated_at, "sourceScope": "Repository docs/code and actual Azure DevOps records; no prototype simulation data."},
     }
 
     entities = [
@@ -190,7 +191,7 @@ def build(revision: str) -> tuple[dict, dict]:
         "manifest": {
             "formatVersion": "AKP/0.1", "packageId": "AKP-BUSINESS-ATLAS-SELF-2026-11",
             "sourceProjectId": "BusinessAtlas-Self", "projectName": profile["name"],
-            "generatedAt": public_view["provenance"]["generatedAt"],
+            "generatedAt": generated_at,
             "producer": {"kind": "tool", "identity": "scripts/self-project/build_case.py"},
             "sourceRevision": revision,
             "importPurpose": "Owner-requested Self Project case built from exact product design, source, PR and deployment evidence; documented intent remains distinct from observation and approval.",
@@ -207,7 +208,7 @@ def build(revision: str) -> tuple[dict, dict]:
         "importProvenance": {
             "agentRunId": "self-project-source-build", "toolExecutionRefs": [f"git rev-parse {revision}", f"git ls-tree {revision}"],
             "sourceFileRevisions": {path: revision for path in ALL_SOURCES},
-            "extractedAt": public_view["provenance"]["generatedAt"],
+            "extractedAt": generated_at,
             "extractionStrategy": "Exact Git object content, SHA-256 source hashes, structured CSV/JSON parsing, and captured Azure DevOps PR/build records.",
         },
     }
@@ -222,10 +223,11 @@ def write(path: Path, document: dict) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--revision", default="HEAD")
+    parser.add_argument("--generated-at")
     parser.add_argument("--public-output", type=Path, default=ROOT / "apps/web/src/features/public/self-project.json")
     parser.add_argument("--candidate-output", type=Path, default=ROOT / "knowledge/candidates/AKP-BUSINESS-ATLAS-SELF-2026-11.json")
     args = parser.parse_args()
-    public_view, package = build(args.revision)
+    public_view, package = build(args.revision, args.generated_at)
     write(args.public_output, public_view)
     write(args.candidate_output, package)
     print(f"Built Self Project case: {len(public_view['requirements'])} requirements, {len(public_view['tasks'])} tasks, {len(package['entities'])} candidate entities")

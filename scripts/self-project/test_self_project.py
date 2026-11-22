@@ -68,7 +68,8 @@ class SelfProjectTests(unittest.TestCase):
 
     def test_public_case_and_import_candidate_trace_all_requirements_and_tasks(self) -> None:
         revision = self_project.revision(self_project.ROOT, "HEAD")
-        public_view, package = build_case.build(revision)
+        public_view, package = build_case.build(revision, generated_at="2026-11-22T00:00:00Z")
+        repeated_view, repeated_package = build_case.build(revision, generated_at="2026-11-22T00:00:00Z")
         self.assertEqual(154, public_view["counts"]["requirements"])
         self.assertEqual(44, public_view["counts"]["tasks"])
         self.assertEqual(154, len([item for item in package["entities"] if item["typeId"] == "Requirement"]))
@@ -76,6 +77,8 @@ class SelfProjectTests(unittest.TestCase):
         self.assertTrue(all(source["contentHash"] for source in package["sources"]))
         self.assertTrue(all(document["contentHash"] for document in public_view["documents"]))
         self.assertEqual("not_ready", public_view["design"]["currentAcceptance"]["decision"])
+        self.assertEqual(public_view, repeated_view)
+        self.assertEqual(package, repeated_package)
 
 
 if __name__ == "__main__":
