@@ -8,6 +8,7 @@ using Atlas.Api.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -94,6 +95,7 @@ public sealed class BearerAuthenticationTests : IClassFixture<WebApplicationFact
             .UseSetting("Authentication:Oidc:Authority", "https://identity.test/auth")
             .UseSetting("Authentication:Oidc:MetadataAddress", $"http://127.0.0.1:{port}/realms/atlas/.well-known/openid-configuration")
             .UseSetting("Authentication:Oidc:ClientId", "atlas-test")
+            .UseSetting("Authentication:Oidc:CallbackOrigin", "https://public.atlas.test")
             .UseSetting("Authentication:Oidc:UseUserInfo", "false")
             .UseSetting("Authentication:Bearer:Authority", "https://identity.test/auth")
             .UseSetting("Authentication:Bearer:MetadataAddress", $"http://127.0.0.1:{port}/realms/atlas/.well-known/openid-configuration")
@@ -104,6 +106,8 @@ public sealed class BearerAuthenticationTests : IClassFixture<WebApplicationFact
 
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
         Assert.StartsWith(issuer + "/protocol/openid-connect/auth", response.Headers.Location?.ToString(), StringComparison.Ordinal);
+        var parameters = QueryHelpers.ParseQuery(response.Headers.Location!.Query);
+        Assert.Equal("https://public.atlas.test/signin-oidc", parameters["redirect_uri"]);
         Assert.Contains("/realms/atlas/protocol/openid-connect/certs", requests);
         listener.Stop();
         try { await serving; } catch (Exception) when (!listener.IsListening) { }

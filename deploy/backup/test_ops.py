@@ -113,7 +113,7 @@ class DockerRecoveryDrill(unittest.TestCase):
         release.mkdir()
         shutil.copy2(ROOT / "scripts/fast/compose.yml", release / "compose.yml")
         shutil.copy2(ROOT / "scripts/fast/pg_hba.conf", release / "pg_hba.conf")
-        (release / ".env").write_text(f"ATLAS_DB_PASSWORD=automated-drill-password\nATLAS_BACKUP_ROOT={root / 'backups'}\n")
+        (release / ".env").write_text(f"ATLAS_DB_PASSWORD=automated-drill-password\nATLAS_BACKUP_ROOT={root / 'backups'}\nATLAS_BASE_URL=https://atlas.test.invalid\nATLAS_AUTHORITY=https://atlas.test.invalid/auth\n")
         (root / "backups/wal").mkdir(parents=True)
         key = root / "key"
         key.write_bytes(b"automated-drill-encryption-key-0123456789abcdef")
@@ -129,6 +129,13 @@ class DockerRecoveryDrill(unittest.TestCase):
             else:
                 self.fail("Disposable PostgreSQL did not become ready")
             subprocess.run(["docker", "compose", "-p", project, "exec", "-T", "postgres", "createdb", "-U", "atlas", "keycloak"], cwd=release, env=environment, check=True, capture_output=True)
+            # A deployment can back up a fresh installation before its first EF
+            # migration. Missing history must mean an empty version list, not abort.
+            os.environ.update(environment)
+            fresh_compose = backup.Compose(release)
+            self.assertEqual("f", fresh_compose.sql("SELECT to_regclass('public.__EFMigrationsHistory') IS NOT NULL"))
+            fresh_args = argparse.Namespace(release_dir=release, backup_root=root / "backups", key_file=key, kind="logical", build_id="automated-fresh-drill", keep_writers=False)
+            self.assertEqual("", backup.create(fresh_args)["migrationVersions"])
             schema = (ROOT / "docs/baselines/T1.0/02_机器合同/database.sql").read_text() + "\nCREATE TABLE public.__EFMigrationsHistory(version text PRIMARY KEY); INSERT INTO public.__EFMigrationsHistory VALUES ('automated-drill');\n"
             subprocess.run(["docker", "compose", "-p", project, "exec", "-T", "postgres", "psql", "-v", "ON_ERROR_STOP=1", "-U", "atlas", "-d", "atlas"], cwd=release, env=environment, input=schema, text=True, check=True, capture_output=True)
             args = argparse.Namespace(release_dir=release, backup_root=root / "backups", key_file=key, kind="logical", build_id="automated-t40-drill", keep_writers=False)
@@ -150,6 +157,8 @@ class DockerRecoveryDrill(unittest.TestCase):
             self.assertEqual("verified", report["status"])
             self.assertEqual(0, report["isolation"]["publishedPorts"])
             self.assertIn("baselines", report["inventory"])
+            self.assertFalse((report_dir / "content").exists(), "plaintext restore data must be removed after verification")
+            self.assertFalse((report_dir / "wal").exists())
             base_args = argparse.Namespace(release_dir=release, backup_root=root / "backups", key_file=key, kind="base", build_id="automated-t40-drill", keep_writers=False)
             base_metadata = backup.create(base_args)
             base_archive = root / "backups" / base_metadata["archive"]

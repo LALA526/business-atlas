@@ -97,6 +97,7 @@ services:
       Authentication__Oidc__MetadataAddress: http://identity:8080/realms/atlas/.well-known/openid-configuration
       Authentication__Oidc__ClientId: atlas-web
       Authentication__Oidc__ClientSecret: ${ATLAS_OIDC_CLIENT_SECRET}
+      Authentication__Oidc__CallbackOrigin: ${ATLAS_BASE_URL}
       Authentication__Bearer__Authority: ${ATLAS_AUTHORITY}
       Authentication__Bearer__MetadataAddress: http://identity:8080/realms/atlas/.well-known/openid-configuration
       Authentication__Bearer__Audience: business-atlas-api

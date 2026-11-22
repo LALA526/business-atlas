@@ -184,7 +184,14 @@ def create(args: argparse.Namespace) -> dict:
                 ("pg_basebackup --host=postgres --username=atlas --pgdata=/out/database --format=tar --wal-method=stream --checkpoint=fast --no-password" if args.kind == "base" else
                  "pg_dump --host=postgres --username=atlas --dbname=atlas --format=custom --file=/out/atlas.dump --no-password && pg_dump --host=postgres --username=atlas --dbname=keycloak --format=custom --file=/out/keycloak.dump --no-password") +
                 " && tar -C /blobs -cf /out/blobs.tar .")
-            migration = compose.sql("SELECT COALESCE(string_agg(version, ',' ORDER BY version), '') FROM public.__EFMigrationsHistory") if args.kind == "logical" else "physical-base-backup"
+            if args.kind == "logical":
+                # Do not reference a fresh installation's missing history table in
+                # a CASE branch: PostgreSQL resolves relations while planning the
+                # query, before either branch can run.
+                has_history = compose.sql("SELECT to_regclass('public.__EFMigrationsHistory') IS NOT NULL") == "t"
+                migration = compose.sql("SELECT COALESCE(string_agg(version, ',' ORDER BY version), '') FROM public.__EFMigrationsHistory") if has_history else ""
+            else:
+                migration = "physical-base-backup"
             expected = staging / ("database/base.tar" if args.kind == "base" else "atlas.dump")
             required_outputs = [expected, staging / "blobs.tar", staging / "globals.sql"]
             if args.kind == "logical":
@@ -227,7 +234,7 @@ def wal_sync(args: argparse.Namespace) -> dict:
     key = require_key(args.key_file)
     copied = 0
     for path in sorted(source.iterdir()):
-        if not path.is_file() or path.name.endswith((".enc", ".sha256", ".partial")):
+        if not path.is_file() or path.name.endswith((".enc", ".sha256", ".partial")) or path.name == "status.json":
             continue
         target = destination / (path.name + ".enc")
         temporary = destination / (path.name + ".partial")

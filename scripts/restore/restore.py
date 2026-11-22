@@ -219,6 +219,10 @@ def restore(args: argparse.Namespace) -> dict:
             docker("rm", "-f", container)
             docker("volume", "rm", data_volume, blob_volume)
             docker("network", "rm", network)
+            # The verification report is durable; plaintext database dumps,
+            # streamed WAL and private blobs are not left behind after a drill.
+            for transient in (extracted, work / "physical", work / "wal"):
+                shutil.rmtree(transient, ignore_errors=True)
 
 
 def main() -> None:

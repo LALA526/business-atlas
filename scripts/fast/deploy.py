@@ -111,7 +111,7 @@ def https_get(opener, url):
             raise RuntimeError(f"Health endpoint returned HTTP {response.status}: {url}")
 
 
-def check_health(ca_cert, authority, local_url):
+def check_health(ca_cert, authority, local_url, verify_login=True):
     context = ssl.create_default_context()
     context.load_verify_locations(cafile=str(ca_cert))
     opener = urllib.request.build_opener(
@@ -121,6 +121,8 @@ def check_health(ca_cert, authority, local_url):
     https_get(opener, local_url + "/health/ready")
     https_get(opener, local_url + "/")
     https_get(opener, local_url + "/auth/realms/atlas/.well-known/openid-configuration")
+    if not verify_login:
+        return
     # Exercise the real BFF authorization-code + PKCE challenge through discovery.
     # Verify the BFF creates the expected public login redirect locally. Following
     # that redirect from a server-side probe can hit external bot protection;
@@ -187,7 +189,7 @@ def main():
         realm = realm.replace("__" + name + "__", value)
     (release / "keycloak/atlas-realm.json").write_text(realm)
     # Caddy listens on container port 8443; clients use the mapped public origin.
-    env_values = {**local_secrets, "ATLAS_AUTHORITY": public_url + "/auth", "ATLAS_BACKUP_ROOT": str(backup_root)}
+    env_values = {**local_secrets, "ATLAS_BASE_URL": public_url, "ATLAS_AUTHORITY": public_url + "/auth", "ATLAS_BACKUP_ROOT": str(backup_root)}
     (release / ".env").write_text("".join(f"{name}={value}\n" for name, value in env_values.items()))
     (release / ".env").chmod(0o600)
 
@@ -229,7 +231,10 @@ def main():
                     compose("up", "-d", cwd=old)
                     previous_url = previous.get("applicationUrl", previous.get("url", public_url))
                     previous_local = local_url if previous_url.startswith("https:") else "http://127.0.0.1:15809"
-                    check_health(ca_cert, previous_url, previous_local)
+                    # Older releases did not pin the public OIDC callback. Their
+                    # local login probe can therefore fail even though the public
+                    # application is healthy; current releases still exercise PAR.
+                    check_health(ca_cert, previous_url, previous_local, verify_login=False)
                     append_event(history, {"at": utc_now(), "event": "rollback_succeeded", "buildId": build_id, "restoredBuildId": previous["buildId"]})
                     print("Restored previous working release", previous["buildId"], flush=True)
                 except Exception as recovery_error:

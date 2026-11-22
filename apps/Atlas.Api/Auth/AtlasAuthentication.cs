@@ -90,6 +90,23 @@ public static class AtlasAuthentication
             options.UsePkce = true;
             options.SaveTokens = false;
             options.GetClaimsFromUserInfoEndpoint = configuration.GetValue("Authentication:Oidc:UseUserInfo", false);
+            var callbackOrigin = configuration["Authentication:Oidc:CallbackOrigin"]?.TrimEnd('/');
+            if (!string.IsNullOrWhiteSpace(callbackOrigin))
+            {
+                // The callback is part of the public client contract, not whichever
+                // loopback/host alias happened to reach the reverse proxy. In
+                // particular, PAR validates it before returning the login redirect.
+                options.Events.OnRedirectToIdentityProvider = context =>
+                {
+                    context.ProtocolMessage.RedirectUri = callbackOrigin + "/signin-oidc";
+                    return Task.CompletedTask;
+                };
+                options.Events.OnRedirectToIdentityProviderForSignOut = context =>
+                {
+                    context.ProtocolMessage.PostLogoutRedirectUri = callbackOrigin + "/signout-callback-oidc";
+                    return Task.CompletedTask;
+                };
+            }
             options.RequireHttpsMetadata = !allowInsecurePreview && !allowInternalMetadata && !environment.IsDevelopment();
             options.MapInboundClaims = false;
             options.TokenValidationParameters.AuthenticationType = CookieScheme;
