@@ -2,7 +2,7 @@
   "realm": "atlas",
   "enabled": true,
   "displayName": "Business Atlas",
-  "sslRequired": "none",
+  "sslRequired": "external",
   "registrationAllowed": false,
   "clients": [
     {
@@ -15,14 +15,14 @@
       "standardFlowEnabled": true,
       "directAccessGrantsEnabled": false,
       "redirectUris": [
-        "http://192.168.10.10:15809/signin-oidc",
-        "http://192.168.10.10:15809/signout-callback-oidc",
-        "http://127.0.0.1:15809/signin-oidc",
-        "http://127.0.0.1:15809/signout-callback-oidc"
+        "__ATLAS_BASE_URL__/signin-oidc",
+        "__ATLAS_BASE_URL__/signout-callback-oidc",
+        "https://127.0.0.1:15809/signin-oidc",
+        "https://127.0.0.1:15809/signout-callback-oidc"
       ],
       "webOrigins": [
-        "http://192.168.10.10:15809",
-        "http://127.0.0.1:15809"
+        "__ATLAS_BASE_URL__",
+        "https://127.0.0.1:15809"
       ],
       "defaultClientScopes": [
         "profile",

@@ -37,9 +37,21 @@ Keycloak administrator credentials to the host-only, mode-0600 file
 keys use persistent Docker volumes. The API applies its EF Core migrations on
 startup against the deployed Atlas database.
 
-This deployment is explicitly an HTTP LAN preview at
-`http://192.168.10.10:15809`; only that deployment sets
-`Authentication__AllowInsecureLanPreview=true`. The application otherwise keeps
-secure cookies and HTTPS OIDC metadata requirements. A public/production release
-must use HTTPS, external production identity configuration, and must not enable
-the LAN preview switch.
+The runtime is installed at `https://192.168.10.10:15809`. Deployment creates a
+host-private local CA and a server certificate covering the LAN address and
+loopback. Authorized clients must trust the CA identified by `caCertificate` in
+`initial-login.json`; the CA private key and all credentials remain on the runtime
+host. Browser cookies and the public OIDC issuer are HTTPS-only, while OIDC
+discovery uses the private container network. `ATLAS_BASE_URL` can select another
+HTTPS host on port 15809; the non-secret `scripts/fast/secrets.env.example` lists
+all required configuration names without containing credentials.
+
+Deployment applies EF migrations before exposing the new API, checks the web, API
+readiness and OIDC discovery endpoints, and verifies every running image is
+ARM64. Host memory/CPU and per-container `docker stats` measurements are written
+to `~/atlas-deploy/product/reports/<build>-resources.json`. Start, success,
+failure and automatic/manual rollback results are appended to
+`deployment-history.jsonl`. `python3 rollback.py` from a deployed release restores
+the previous recorded application release. Database restores and point-in-time
+recovery are owned by T40; an application rollback must not be represented as a
+database rollback.

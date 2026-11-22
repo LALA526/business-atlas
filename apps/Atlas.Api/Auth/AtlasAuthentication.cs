@@ -25,10 +25,11 @@ public static class AtlasAuthentication
         var dataProtection = services.AddDataProtection().SetApplicationName("BusinessAtlas");
         var keyPath = configuration["Authentication:DataProtectionKeyPath"];
         if (!string.IsNullOrWhiteSpace(keyPath)) dataProtection.PersistKeysToFileSystem(new DirectoryInfo(keyPath));
-        // Production remains HTTPS-only. The isolated LAN preview explicitly opts into HTTP cookies.
-        var cookieSecurePolicy = configuration.GetValue("Authentication:AllowInsecureLanPreview", false)
-            ? CookieSecurePolicy.SameAsRequest
-            : CookieSecurePolicy.Always;
+        // Public browser and issuer URLs always use HTTPS. A deployment may fetch
+        // discovery over its private container network without weakening the issuer.
+        var allowInsecurePreview = configuration.GetValue("Authentication:AllowInsecureLanPreview", false);
+        var allowInternalMetadata = configuration.GetValue("Authentication:AllowInsecureInternalMetadata", false);
+        var cookieSecurePolicy = allowInsecurePreview ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
 
         services.AddAuthentication(options =>
         {
@@ -82,7 +83,7 @@ public static class AtlasAuthentication
             options.UsePkce = true;
             options.SaveTokens = false;
             options.GetClaimsFromUserInfoEndpoint = configuration.GetValue("Authentication:Oidc:UseUserInfo", false);
-            options.RequireHttpsMetadata = !configuration.GetValue("Authentication:AllowInsecureLanPreview", false) && !environment.IsDevelopment();
+            options.RequireHttpsMetadata = !allowInsecurePreview && !allowInternalMetadata && !environment.IsDevelopment();
             options.MapInboundClaims = false;
             options.TokenValidationParameters.AuthenticationType = CookieScheme;
             options.TokenValidationParameters.NameClaimType = "name";
@@ -104,7 +105,7 @@ public static class AtlasAuthentication
             if (configuration["Authentication:Bearer:MetadataAddress"] is { Length: > 0 } bearerMetadataAddress)
                 options.MetadataAddress = bearerMetadataAddress;
             options.Audience = configuration["Authentication:Bearer:Audience"];
-            options.RequireHttpsMetadata = !configuration.GetValue("Authentication:AllowInsecureLanPreview", false) && !environment.IsDevelopment();
+            options.RequireHttpsMetadata = !allowInsecurePreview && !allowInternalMetadata && !environment.IsDevelopment();
             options.MapInboundClaims = false;
             options.TokenValidationParameters = new TokenValidationParameters
             {
